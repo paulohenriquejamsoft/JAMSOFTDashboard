@@ -1265,9 +1265,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: cada `codigo` da tabela do design gera a mensagem esperada; erro sem ProblemDetails → "Erro inesperado"; `USUARIO_BLOQUEADO` formata o horário; `VALIDACAO` expõe erros por campo
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: ≥ 18 tests pass
+- [x] Testes: cada `codigo` da tabela do design gera a mensagem esperada; erro sem ProblemDetails → "Erro inesperado"; `USUARIO_BLOQUEADO` formata o horário; `VALIDACAO` expõe erros por campo
+- [x] Gate check passes: Quick-Web
+- [x] Test count: ≥ 18 tests pass
 
 **Tests**: unit
 **Gate**: quick-web
