@@ -1501,9 +1501,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: invisível para Admin/Consulta; busca lista tenants; escolher grava contexto e mostra o nome; "Limpar" remove
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes de componente: invisível para Admin/Consulta; busca lista tenants; escolher grava contexto e mostra o nome; "Limpar" remove
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService, Perfil } from '../../core/auth/auth.service';
 import { EstadoAviso } from '../../core/auth/perfil.guard';
 import { TenantContextoService } from '../../core/auth/tenant-contexto.service';
+import { SeletorTenantComponent } from '../../admin/seletor-tenant/seletor-tenant.component';
 
 interface ItemMenu {
   rotulo: string;
@@ -28,7 +29,7 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
  */
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SeletorTenantComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './shell.component.scss',
   template: `
@@ -53,7 +54,8 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
 
     <div class="area">
       <header class="cabecalho">
-        <ng-content select="[cabecalho]" />
+        <!-- Só aparece para o SuperAdmin (CTX-01). -->
+        <app-seletor-tenant />
         <div class="usuario">
           <span class="avatar" aria-hidden="true">{{ iniciais() }}</span>
           <div class="usuario-texto">
