@@ -285,10 +285,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Teste de esquema: e-mail duplicado recusado; SuperAdmin com tenant recusado; Admin sem tenant recusado
-- [ ] Teste de esquema: hash de refresh duplicado recusado
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Teste de esquema: e-mail duplicado recusado; SuperAdmin com tenant recusado; Admin sem tenant recusado
+- [x] Teste de esquema: hash de refresh duplicado recusado
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full

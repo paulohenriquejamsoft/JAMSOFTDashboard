@@ -251,7 +251,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| AUTH-01 | P1: Login e sessão | Tasks | In Tasks |
+| AUTH-01 | P1: Login e sessão | Execute | Implementing |
 | AUTH-02 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-03 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-04 | P1: Login e sessão | Tasks | In Tasks |
@@ -279,9 +279,9 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-04 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |
-| USR-01 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-01 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-02 | P2: Admin gerencia usuários | Tasks | In Tasks |
-| USR-03 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-03 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-04 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-05 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-06 | P2: Admin gerencia usuários | Tasks | In Tasks |

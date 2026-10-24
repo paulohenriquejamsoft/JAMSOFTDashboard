@@ -22,6 +22,62 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Autenticacao.RefreshToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<DateTime>("ExpiraEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("EXPIRA_EM");
+
+                    b.Property<Guid>("Familia")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("FAMILIA");
+
+                    b.Property<byte[]>("Hash")
+                        .IsRequired()
+                        .HasColumnType("binary(32)")
+                        .HasColumnName("HASH");
+
+                    b.Property<DateTime?>("RevogadoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("REVOGADO_EM");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<DateTime?>("UsadoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("USADO_EM");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("USUARIO_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("REFRESH_TOKEN");
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
                 {
                     b.Property<int>("Id")
@@ -139,6 +195,111 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.ToTable("TENANT");
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Usuarios.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("ATIVO");
+
+                    b.Property<DateTime?>("BloqueadoAte")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("BLOQUEADO_ATE");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
+                        .HasColumnName("EMAIL");
+
+                    b.Property<byte>("FalhasLogin")
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)0)
+                        .HasColumnName("FALHAS_LOGIN");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("NOME");
+
+                    b.Property<string>("Perfil")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("PERFIL");
+
+                    b.Property<string>("SenhaHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("SENHA_HASH");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<bool>("TrocarSenha")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("TROCAR_SENHA");
+
+                    b.Property<DateTime?>("UltimoLoginEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMO_LOGIN_EM");
+
+                    b.Property<byte[]>("Versao")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion")
+                        .HasColumnName("VERSAO");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "Perfil", "Ativo");
+
+                    b.ToTable("USUARIO", t =>
+                        {
+                            t.HasCheckConstraint("CK_USUARIO_PERFIL", "PERFIL IN ('SuperAdmin','Admin','Consulta')");
+
+                            t.HasCheckConstraint("CK_USUARIO_PERFIL_TENANT", "(PERFIL = 'SuperAdmin' AND TENANT_ID IS NULL) OR (PERFIL <> 'SuperAdmin' AND TENANT_ID IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Autenticacao.RefreshToken", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Usuarios.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
                 {
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
@@ -146,6 +307,14 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Usuarios.Usuario", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 #pragma warning restore 612, 618
         }
