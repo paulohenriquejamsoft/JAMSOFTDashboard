@@ -710,9 +710,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: CNPJ válido com e sem máscara; dígito verificador errado; tamanho errado; `00000000000000`; letras
-- [ ] Gate check passes: Quick
-- [ ] Test count: 6 new tests pass
+- [x] Testes: CNPJ válido com e sem máscara; dígito verificador errado; tamanho errado; `00000000000000`; letras
+- [x] Gate check passes: Quick
+- [x] Test count: 6 new tests pass
 
 **Tests**: unit
 **Gate**: quick
