@@ -35,7 +35,10 @@ public static class Policies
                 // Mantém os nomes das claims do token (sub, perfil, tenant, trocar_senha).
                 bearer.MapInboundClaims = false;
                 bearer.TokenValidationParameters = TokenService.ParametrosValidacao(jwt.Value);
+                bearer.Events = new JwtBearerEvents { OnTokenValidated = RevalidarAcessoAsync };
             });
+        services.AddMemoryCache();
+        services.AddSingleton<StatusAcessoCache>();
 
         services.AddScoped<IAuthorizationHandler, PerfilHandler>();
         services.AddScoped<IAuthorizationHandler, TrocaSenhaConcluidaHandler>();
@@ -65,6 +68,21 @@ public static class Policies
     /// <summary>Libera a rota para quem ainda precisa trocar a senha (troca de senha, logout).</summary>
     public static TBuilder AllowTrocaSenhaPendente<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder =>
         builder.WithMetadata(new PermiteTrocaSenhaPendente());
+
+    /// <summary>Usuário ou tenant inativo derruba a autenticação: 401 mesmo com token ainda válido.</summary>
+    private static async Task RevalidarAcessoAsync(TokenValidatedContext contexto)
+    {
+        var principal = contexto.Principal!;
+        // Credenciais de Coletor têm revalidação própria (feature sincronizacao-vendas).
+        if (principal.FindFirst(TiposClaim.Perfil)?.Value == nameof(Perfil.Coletor)) return;
+
+        var status = contexto.HttpContext.RequestServices.GetRequiredService<StatusAcessoCache>();
+        var ativo = Guid.TryParse(principal.FindFirst(TiposClaim.Usuario)?.Value, out var usuario)
+            && await status.AtivoAsync(usuario,
+                Guid.TryParse(principal.FindFirst(TiposClaim.Tenant)?.Value, out var tenant) ? tenant : null,
+                contexto.HttpContext.RequestAborted);
+        if (!ativo) contexto.Fail("Acesso desativado.");
+    }
 
     private static AuthorizationPolicy PolicyDeUsuario(PerfilRequirement perfil) =>
         new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)

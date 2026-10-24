@@ -497,9 +497,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: token válido de usuário inativado → 401 após `Invalidar`; tenant inativado → 401 para todos os usuários dele; usuário ativo segue 200; consulta ao banco no máximo 1 vez por TTL
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: token válido de usuário inativado → 401 após `Invalidar`; tenant inativado → 401 para todos os usuários dele; usuário ativo segue 200; consulta ao banco no máximo 1 vez por TTL
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
