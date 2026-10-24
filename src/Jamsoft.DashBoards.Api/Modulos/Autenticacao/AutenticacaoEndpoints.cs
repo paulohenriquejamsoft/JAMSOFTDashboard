@@ -52,6 +52,8 @@ public static class AutenticacaoEndpoints
         grupo.MapPost("/refresh", RefreshEndpoint.RenovarAsync).AllowAnonymous();
         // Também identificada pelo cookie: funciona com access token expirado ou troca de senha pendente.
         grupo.MapPost("/logout", LogoutEndpoint.SairAsync).AllowAnonymous();
+        grupo.MapPost("/trocar-senha", TrocarSenhaEndpoint.TrocarAsync).RequireAuthorization().AllowTrocaSenhaPendente();
+        grupo.MapGet("/eu", TrocarSenhaEndpoint.EuAsync).RequireAuthorization();
         return app;
     }
 }

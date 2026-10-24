@@ -682,9 +682,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: com troca pendente, outras rotas → 403 e trocar-senha → 200; senha atual errada → 400; nova senha fora da política (9 caracteres, sem dígito) → 400 `VALIDACAO`; depois da troca, rotas protegidas → 200; `/eu` devolve nome, e-mail, perfil, tenant
-- [ ] Gate check passes: Full
-- [ ] Test count: 6 new tests pass
+- [x] Testes: com troca pendente, outras rotas → 403 e trocar-senha → 200; senha atual errada → 400; nova senha fora da política (9 caracteres, sem dígito) → 400 `VALIDACAO`; depois da troca, rotas protegidas → 200; `/eu` devolve nome, e-mail, perfil, tenant
+- [x] Gate check passes: Full
+- [x] Test count: 6 new tests pass
 
 **Tests**: integration
 **Gate**: full
