@@ -16,7 +16,7 @@ public sealed record SolicitarExclusaoResposta(Guid JobId);
 /// <summary>
 /// <c>POST /api/admin/tenants/{idPublico}/exclusao</c> (DEL-01, DEL-02, DEL-03, DEL-08, DEL-09): somente SuperAdmin.
 /// <c>confirmacaoNome</c> precisa ser idêntico ao nome do tenant (ordinal, sem trim). Na mesma transação inativa o
-/// tenant e cria o job <see cref="SituacaoExclusao.Pendente"/>; o worker de exclusão faz o resto.
+/// tenant e cria o job <see cref="SituacaoExclusao.Pendente"/>; o <see cref="ExclusaoTenantWorker"/> faz o resto.
 /// Job ativo já existente é detectado pelo índice único filtrado → 409.
 /// </summary>
 public static class SolicitarExclusaoEndpoint

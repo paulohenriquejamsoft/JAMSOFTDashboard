@@ -75,6 +75,15 @@ public sealed class BancoDeTestes : IAsyncLifetime
         return valor is null or DBNull ? default : (T)valor;
     }
 
+    /// <summary>Executa comandos SQL no banco de testes (carga de dados, triggers de teste).</summary>
+    public async Task ExecutarAsync(string sql)
+    {
+        await using var conexao = new SqlConnection(ConnectionString);
+        await conexao.OpenAsync();
+        await using var comando = new SqlCommand(sql, conexao) { CommandTimeout = 120 };
+        await comando.ExecuteNonQueryAsync();
+    }
+
     public async Task InitializeAsync()
     {
         var servidor = Environment.GetEnvironmentVariable(VariavelServidor);

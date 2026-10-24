@@ -21,6 +21,7 @@ builder.Services.AddSegurancaApi();
 builder.Services.AddAutenticacao();
 builder.Services.AddEmpresas();
 builder.Services.AddUsuarios();
+builder.Services.AddExclusao();
 
 var app = builder.Build();
 

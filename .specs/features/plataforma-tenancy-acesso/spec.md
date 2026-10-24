@@ -296,8 +296,8 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | DEL-02 | P2: Exclusão total de tenant | Execute | Implementing |
 | DEL-03 | P2: Exclusão total de tenant | Execute | Implementing |
 | DEL-04 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-05 | P2: Exclusão total de tenant | Tasks | In Tasks |
-| DEL-06 | P2: Exclusão total de tenant | Tasks | In Tasks |
+| DEL-05 | P2: Exclusão total de tenant | Execute | Implementing |
+| DEL-06 | P2: Exclusão total de tenant | Execute | Implementing |
 | DEL-07 | P2: Exclusão total de tenant | Execute | Implementing |
 | DEL-08 | P2: Exclusão total de tenant | Execute | Implementing |
 | DEL-09 | P2: Exclusão total de tenant | Execute | Implementing |

@@ -32,6 +32,9 @@ public readonly record struct OperacaoAuditada(string Codigo)
 
     /// <summary>Ciclo da exclusão de tenant (DEL-08).</summary>
     public static readonly OperacaoAuditada ExclusaoSolicitada = new("EXCLUSAO_SOLICITADA");
+    public static readonly OperacaoAuditada ExclusaoIniciada = new("EXCLUSAO_INICIADA");
+    public static readonly OperacaoAuditada ExclusaoConcluida = new("EXCLUSAO_CONCLUIDA");
+    public static readonly OperacaoAuditada ExclusaoFalhou = new("EXCLUSAO_FALHOU");
 
     public override string ToString() => Codigo;
 }

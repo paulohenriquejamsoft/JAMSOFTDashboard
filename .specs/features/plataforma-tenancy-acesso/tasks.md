@@ -1104,9 +1104,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: tenants A e B com 12.000 linhas cada; excluir A → 0 linhas de A em todas as tabelas, B inalterado, `LINHAS_REMOVIDAS` por tabela correto, job `Concluida`, tenant removido; falha injetada na 2ª tabela → `Falhou` com `ETAPA_ATUAL`, tenant segue inativo; job `EmExecucao` sem heartbeat é retomado; dois workers não processam o mesmo job
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: tenants A e B com 12.000 linhas cada; excluir A → 0 linhas de A em todas as tabelas, B inalterado, `LINHAS_REMOVIDAS` por tabela correto, job `Concluida`, tenant removido; falha injetada na 2ª tabela → `Falhou` com `ETAPA_ATUAL`, tenant segue inativo; job `EmExecucao` sem heartbeat é retomado; dois workers não processam o mesmo job
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
