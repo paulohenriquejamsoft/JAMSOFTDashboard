@@ -1659,9 +1659,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Os 4 cenários passam em Chromium
-- [ ] Gate check passes: Full-Web
-- [ ] Test count: 4 e2e tests pass
+- [x] Os 4 cenários passam em Chromium
+- [x] Gate check passes: Full-Web
+- [x] Test count: 4 e2e tests pass
 
 **Tests**: e2e
 **Gate**: full-web
