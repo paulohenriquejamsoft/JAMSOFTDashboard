@@ -1,4 +1,5 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
+using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -18,6 +19,7 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public const int CompatibilidadeSqlServer = 150;
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<Empresa> Empresas => Set<Empresa>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -258,10 +258,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Teste de esquema: mesmo `COD_EMPRESA` aceito em tenants diferentes e recusado no mesmo tenant
-- [ ] Índice tem `TENANT_ID` como primeira coluna
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Teste de esquema: mesmo `COD_EMPRESA` aceito em tenants diferentes e recusado no mesmo tenant
+- [x] Índice tem `TENANT_ID` como primeira coluna
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full

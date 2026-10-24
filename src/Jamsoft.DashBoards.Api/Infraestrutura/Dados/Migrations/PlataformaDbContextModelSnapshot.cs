@@ -22,6 +22,64 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CodEmpresa")
+                        .HasColumnType("int")
+                        .HasColumnName("COD_EMPRESA");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .HasColumnName("NOME");
+
+                    b.Property<bool>("NomeManual")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("NOME_MANUAL");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<byte[]>("Versao")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion")
+                        .HasColumnName("VERSAO");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "CodEmpresa")
+                        .IsUnique();
+
+                    b.ToTable("EMPRESA");
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -79,6 +137,15 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .IsUnique();
 
                     b.ToTable("TENANT");
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -1,3 +1,4 @@
+using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,16 @@ public static class Dados
     /// <summary>14 dígitos aleatórios: só o esquema é testado aqui, não os dígitos verificadores.</summary>
     public static string CnpjQualquer() =>
         string.Concat(Enumerable.Range(0, 14).Select(_ => Random.Shared.Next(10).ToString()));
+
+    /// <summary>Grava um tenant ativo com CNPJ único e devolve o ID interno.</summary>
+    public static async Task<int> CriarTenantAsync(BancoDeTestes banco, string nome = "Tenant de teste")
+    {
+        await using var contexto = banco.CriarContexto();
+        var tenant = new Tenant { Nome = nome, Cnpj = CnpjQualquer() };
+        contexto.Tenants.Add(tenant);
+        await contexto.SaveChangesAsync();
+        return tenant.Id;
+    }
 
     public static async Task<SqlException> FalhaSqlAsync(Func<Task> acao)
     {

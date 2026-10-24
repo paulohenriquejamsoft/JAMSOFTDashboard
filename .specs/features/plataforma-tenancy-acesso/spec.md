@@ -268,7 +268,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | TEN-06 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-08 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
-| EMP-01 | P1: Empresas do tenant | Tasks | In Tasks |
+| EMP-01 | P1: Empresas do tenant | Execute | Implementing |
 | EMP-02 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-03 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-04 | P1: Empresas do tenant | Tasks | In Tasks |
@@ -278,7 +278,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | ISO-02 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-04 | P1: Isolamento entre tenants | Tasks | In Tasks |
-| ISO-05 | P1: Isolamento entre tenants | Tasks | In Tasks |
+| ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |
 | USR-01 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-02 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-03 | P2: Admin gerencia usuários | Tasks | In Tasks |
