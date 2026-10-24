@@ -1449,9 +1449,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: busca dispara consulta com debounce; paginação; estado vazio com ação; erro com "Tentar novamente"; inativar pede confirmação e atualiza a linha
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 6 new tests pass
+- [x] Testes de componente: busca dispara consulta com debounce; paginação; estado vazio com ação; erro com "Tentar novamente"; inativar pede confirmação e atualiza a linha
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 6 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

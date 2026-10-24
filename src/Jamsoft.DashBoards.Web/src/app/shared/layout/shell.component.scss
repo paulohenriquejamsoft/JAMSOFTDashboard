@@ -1,0 +1,154 @@
+// "Shell" do Design System: menu de 260px com gradiente, header de 58px.
+:host {
+  display: flex;
+  min-height: 100vh;
+  background: var(--body-bg-vermelho);
+}
+
+.menu {
+  width: var(--sidebar-largura);
+  flex-shrink: 0;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 36%),
+    var(--sidebar-bg);
+  color: var(--sidebar-texto);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--espaco-4);
+}
+
+.menu-topo {
+  height: var(--header-altura);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--espaco-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+
+  img {
+    display: block;
+    height: 32px;
+    width: auto;
+  }
+}
+
+.menu-secao {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--secao-menu-size);
+  font-weight: 700;
+  letter-spacing: var(--secao-menu-spacing);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 18px var(--espaco-4) var(--espaco-1);
+  text-transform: uppercase;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 9px var(--espaco-4);
+  margin: 1px var(--espaco-2);
+  border-radius: var(--raio-nav);
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--nav-label-size);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: #fff;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+  }
+
+  &.ativo {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+}
+
+.area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cabecalho {
+  height: var(--header-altura);
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--borda-header);
+  box-shadow: var(--sombra-header);
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  padding: 0 var(--espaco-5);
+}
+
+.usuario {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary-texto);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(140, 18, 32, 0.3);
+}
+
+.usuario-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.usuario-nome {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.usuario-tenant {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.conteudo {
+  flex: 1;
+  min-height: 0;
+  padding: 24px var(--espaco-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-5);
+}
+
+@media (max-width: 760px) {
+  :host {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: auto;
+  }
+
+  .conteudo {
+    padding: var(--espaco-4);
+  }
+}
