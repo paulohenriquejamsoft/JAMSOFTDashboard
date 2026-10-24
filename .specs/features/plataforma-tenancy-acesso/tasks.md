@@ -552,9 +552,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: `migrar` em banco vazio cria todas as tabelas; `criar-superadmin` cria usuário com perfil SuperAdmin, sem tenant e com troca pendente; e-mail repetido falha com mensagem clara
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes: `migrar` em banco vazio cria todas as tabelas; `criar-superadmin` cria usuário com perfil SuperAdmin, sem tenant e com troca pendente; e-mail repetido falha com mensagem clara
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

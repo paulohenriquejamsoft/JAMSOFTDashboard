@@ -26,6 +26,9 @@ public sealed class Usuario
     public DateTime? UltimoLoginEm { get; set; }
     public DateTime CriadoEm { get; set; }
     public byte[] Versao { get; set; } = [];
+
+    /// <summary>Forma gravada e comparada do e-mail: sem espaços nas pontas, em minúsculas.</summary>
+    public static string NormalizarEmail(string email) => email.Trim().ToLowerInvariant();
 }
 
 internal sealed class UsuarioConfiguracao : IEntityTypeConfiguration<Usuario>

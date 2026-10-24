@@ -85,7 +85,9 @@ public sealed class BancoDeTestes : IAsyncLifetime
             servidor = _container.GetConnectionString();
         }
 
-        _conexaoServidor = new SqlConnectionStringBuilder(servidor) { InitialCatalog = "master" }.ConnectionString;
+        // Sem pool: conexões administrativas são raras e uma conexão reaproveitada de outra thread pode falhar
+        // no provedor de memória compartilhada.
+        _conexaoServidor = new SqlConnectionStringBuilder(servidor) { InitialCatalog = "master", Pooling = false }.ConnectionString;
         await ExecutarNoServidorAsync(
             $"CREATE DATABASE [{NomeBanco}]; " +
             $"ALTER DATABASE [{NomeBanco}] SET COMPATIBILITY_LEVEL = {CompatibilidadeSqlServer2019};");
@@ -102,9 +104,22 @@ public sealed class BancoDeTestes : IAsyncLifetime
         }
 
         SqlConnection.ClearAllPools();
+        foreach (var nome in _bancosExtras.Append(NomeBanco))
+            await ExecutarNoServidorAsync(
+                $"IF DB_ID('{nome}') IS NOT NULL BEGIN " +
+                $"ALTER DATABASE [{nome}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{nome}]; END");
+    }
+
+    private readonly List<string> _bancosExtras = [];
+
+    /// <summary>Cria outro banco vazio no mesmo servidor (removido no fim) e devolve a connection string dele.</summary>
+    public async Task<string> CriarBancoVazioAsync()
+    {
+        var nome = $"JD_Testes_{Guid.NewGuid():N}";
+        lock (_bancosExtras) _bancosExtras.Add(nome);
         await ExecutarNoServidorAsync(
-            $"IF DB_ID('{NomeBanco}') IS NOT NULL BEGIN " +
-            $"ALTER DATABASE [{NomeBanco}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{NomeBanco}]; END");
+            $"CREATE DATABASE [{nome}]; ALTER DATABASE [{nome}] SET COMPATIBILITY_LEVEL = {CompatibilidadeSqlServer2019};");
+        return new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = nome }.ConnectionString;
     }
 
     private async Task ExecutarNoServidorAsync(string sql)
