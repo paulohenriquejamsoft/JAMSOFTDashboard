@@ -12,6 +12,14 @@ export default [
         path: 'tenants',
         loadComponent: () => import('./tenants/tenants-lista.page').then((m) => m.TenantsListaPage),
       },
+      {
+        path: 'tenants/novo',
+        loadComponent: () => import('./tenants/tenant-form.page').then((m) => m.TenantFormPage),
+      },
+      {
+        path: 'tenants/:id',
+        loadComponent: () => import('./tenants/tenant-form.page').then((m) => m.TenantFormPage),
+      },
     ],
   },
 ] satisfies Routes;

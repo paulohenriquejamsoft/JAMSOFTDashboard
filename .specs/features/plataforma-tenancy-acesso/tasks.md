@@ -1475,9 +1475,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: CNPJ inválido bloqueia envio; criação com e sem Admin inicial envia o corpo esperado; `CNPJ_DUPLICADO` e `EMAIL_EM_USO` aparecem no campo; `CONFLITO_VERSAO` mostra aviso de recarregar
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: CNPJ inválido bloqueia envio; criação com e sem Admin inicial envia o corpo esperado; `CNPJ_DUPLICADO` e `EMAIL_EM_USO` aparecem no campo; `CONFLITO_VERSAO` mostra aviso de recarregar
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
