@@ -1291,9 +1291,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: login preenche `usuario`; logout limpa estado e chama a API; 3 `renovar()` simultâneos fazem 1 requisição; `restaurarSessao` com refresh 401 deixa `usuario = null`; nada é gravado em `localStorage`/`sessionStorage`
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes: login preenche `usuario`; logout limpa estado e chama a API; 3 `renovar()` simultâneos fazem 1 requisição; `restaurarSessao` com refresh 401 deixa `usuario = null`; nada é gravado em `localStorage`/`sessionStorage`
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
