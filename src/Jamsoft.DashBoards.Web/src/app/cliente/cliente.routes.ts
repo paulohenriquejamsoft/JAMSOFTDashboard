@@ -1,11 +1,6 @@
-import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
 import { ADMIN_TENANT, perfilGuard } from '../core/auth/perfil.guard';
 import { ShellComponent } from '../shared/layout/shell.component';
-
-/** Placeholder até a tela de empresas (T57). */
-@Component({ template: '<p>Empresas</p>' })
-class EmpresasPlaceholder {}
 
 /** Área do tenant (Admin, Consulta ou SuperAdmin com tenant selecionado), dentro do layout logado. */
 export default [
@@ -29,7 +24,11 @@ export default [
         canMatch: [perfilGuard(ADMIN_TENANT)],
         loadComponent: () => import('./usuarios/usuario-form.page').then((m) => m.UsuarioFormPage),
       },
-      { path: 'empresas', canMatch: [perfilGuard(ADMIN_TENANT)], component: EmpresasPlaceholder },
+      {
+        path: 'empresas',
+        canMatch: [perfilGuard(ADMIN_TENANT)],
+        loadComponent: () => import('./empresas/empresas.page').then((m) => m.EmpresasPage),
+      },
     ],
   },
 ] satisfies Routes;

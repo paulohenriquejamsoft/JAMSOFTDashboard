@@ -1633,9 +1633,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: lista; cadastro válido; `EMPRESA_DUPLICADA` no campo código; renomear atualiza a linha; estados vazio e erro
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: lista; cadastro válido; `EMPRESA_DUPLICADA` no campo código; renomear atualiza a linha; estados vazio e erro
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
