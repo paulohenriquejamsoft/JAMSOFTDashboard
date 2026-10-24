@@ -868,9 +868,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: cria quando não existe; reutiliza quando existe; atualiza nome automático; preserva nome manual; duas chamadas simultâneas criam uma única empresa
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: cria quando não existe; reutiliza quando existe; atualiza nome automático; preserva nome manual; duas chamadas simultâneas criam uma única empresa
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

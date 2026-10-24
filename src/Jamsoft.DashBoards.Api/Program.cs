@@ -3,6 +3,7 @@ using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
+using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Seguranca;
 
@@ -16,6 +17,7 @@ builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("P
 builder.Services.AddAuditoria();
 builder.Services.AddSegurancaApi();
 builder.Services.AddAutenticacao();
+builder.Services.AddEmpresas();
 
 var app = builder.Build();
 
