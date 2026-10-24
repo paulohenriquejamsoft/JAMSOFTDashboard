@@ -15,6 +15,8 @@ public readonly record struct OperacaoAuditada(string Codigo)
     /// <summary>Login bem-sucedido de SuperAdmin (AUD-01).</summary>
     public static readonly OperacaoAuditada LoginSuperAdmin = new("LOGIN_SUPERADMIN");
 
+    public static readonly OperacaoAuditada TenantCriado = new("TENANT_CRIADO");
+
     public override string ToString() => Codigo;
 }
 

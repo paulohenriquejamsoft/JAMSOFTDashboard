@@ -19,6 +19,23 @@ public static class Dados
     public static string CnpjQualquer() =>
         string.Concat(Enumerable.Range(0, 14).Select(_ => Random.Shared.Next(10).ToString()));
 
+    /// <summary>CNPJ aleatório com dígitos verificadores corretos (fictício), para as rotas que validam o CNPJ.</summary>
+    public static string CnpjValido()
+    {
+        var digitos = Enumerable.Range(0, 12).Select(_ => Random.Shared.Next(10)).ToList();
+        digitos[0] = Random.Shared.Next(1, 10);
+        digitos[11] = 0; // base não repetida: o primeiro dígito nunca é 0, o último sempre é
+        digitos.Add(Verificador(digitos, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]));
+        digitos.Add(Verificador(digitos, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]));
+        return string.Concat(digitos);
+    }
+
+    private static int Verificador(List<int> digitos, int[] pesos)
+    {
+        var resto = pesos.Select((peso, i) => peso * digitos[i]).Sum() % 11;
+        return resto < 2 ? 0 : 11 - resto;
+    }
+
     /// <summary>Grava um tenant ativo com CNPJ único e devolve o ID interno.</summary>
     public static async Task<int> CriarTenantAsync(BancoDeTestes banco, string nome = "Tenant de teste")
     {

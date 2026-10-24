@@ -736,9 +736,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: criação simples → 201 e resposta sem `ID INT`; com Admin inicial → Admin com troca pendente; CNPJ duplicado → 409 `CNPJ_DUPLICADO`; e-mail do Admin duplicado → 409 e tenant **não** criado (rollback); nome com 2 caracteres → 400; Admin chamando → 403; requisições simultâneas com o mesmo CNPJ → uma 201 e uma 409
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: criação simples → 201 e resposta sem `ID INT`; com Admin inicial → Admin com troca pendente; CNPJ duplicado → 409 `CNPJ_DUPLICADO`; e-mail do Admin duplicado → 409 e tenant **não** criado (rollback); nome com 2 caracteres → 400; Admin chamando → 403; requisições simultâneas com o mesmo CNPJ → uma 201 e uma 409
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

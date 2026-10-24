@@ -38,6 +38,18 @@ public static class Acesso
         new TokenService(Options.Create(new JwtOptions { Chave = ChaveJwt }), tempo ?? TimeProvider.System)
             .Emitir(usuario, tenant).Token;
 
+    /// <summary>Grava um SuperAdmin ativo e devolve um token dele.</summary>
+    public static async Task<string> TokenSuperAdminAsync(BancoDeTestes banco) =>
+        Token(await Dados.NovoUsuarioAsync(banco, Perfil.SuperAdmin), null);
+
+    /// <summary>Requisição autenticada com corpo JSON.</summary>
+    public static HttpRequestMessage ComCorpo<T>(HttpMethod metodo, string rota, string? token, T corpo)
+    {
+        var requisicao = Requisicao(metodo, rota, token);
+        requisicao.Content = System.Net.Http.Json.JsonContent.Create(corpo);
+        return requisicao;
+    }
+
     public static HttpRequestMessage Requisicao(HttpMethod metodo, string rota, string? token, Guid? xTenant = null,
         string? xTenantTexto = null)
     {
