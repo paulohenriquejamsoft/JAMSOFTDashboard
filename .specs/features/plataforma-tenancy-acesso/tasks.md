@@ -946,9 +946,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: Admin cria Consulta → 201 com troca pendente; perfil `SuperAdmin` ou `Coletor` → 403 `PERFIL_NAO_PERMITIDO`; e-mail de outro tenant → 409 com corpo sem dados do outro tenant; Consulta → 403; SuperAdmin com `X-Tenant` cria no tenant escolhido; lista não traz usuários de outro tenant nem `SENHA_HASH`
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: Admin cria Consulta → 201 com troca pendente; perfil `SuperAdmin` ou `Coletor` → 403 `PERFIL_NAO_PERMITIDO`; e-mail de outro tenant → 409 com corpo sem dados do outro tenant; Consulta → 403; SuperAdmin com `X-Tenant` cria no tenant escolhido; lista não traz usuários de outro tenant nem `SENHA_HASH`
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

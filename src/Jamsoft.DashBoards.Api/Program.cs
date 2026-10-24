@@ -5,6 +5,7 @@ using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
+using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddAuditoria();
 builder.Services.AddSegurancaApi();
 builder.Services.AddAutenticacao();
 builder.Services.AddEmpresas();
+builder.Services.AddUsuarios();
 
 var app = builder.Build();
 
@@ -31,6 +33,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.MapAutenticacao();
 app.MapTenants();
 app.MapEmpresas();
+app.MapUsuarios();
 app.MapAuditoria();
 
 app.Run();

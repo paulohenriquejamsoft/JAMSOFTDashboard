@@ -280,14 +280,14 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | ISO-04 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |
 | USR-01 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-02 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-02 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-03 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-04 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-05 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-06 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-07 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-08 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-09 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-09 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-10 | P2: Admin gerencia usuários | Execute | Implementing |
 | CTX-01 | P2: SuperAdmin acessa contexto | Execute | Implementing |
 | CTX-02 | P2: SuperAdmin acessa contexto | Tasks | In Tasks |
