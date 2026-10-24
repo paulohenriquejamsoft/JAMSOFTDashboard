@@ -277,7 +277,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | ISO-01 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-02 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
-| ISO-04 | P1: Isolamento entre tenants | Tasks | In Tasks |
+| ISO-04 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |
 | USR-01 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-02 | P2: Admin gerencia usuários | Tasks | In Tasks |

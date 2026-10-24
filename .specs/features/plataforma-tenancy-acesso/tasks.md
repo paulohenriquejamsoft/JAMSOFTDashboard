@@ -523,9 +523,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: Admin com `X-Tenant` de outro tenant → 403 + 1 registro de auditoria; Admin com `X-Tenant` igual → 200; corpo com tenant divergente → 403; SuperAdmin com `X-Tenant` → 200
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: Admin com `X-Tenant` de outro tenant → 403 + 1 registro de auditoria; Admin com `X-Tenant` igual → 200; corpo com tenant divergente → 403; SuperAdmin com `X-Tenant` → 200
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
