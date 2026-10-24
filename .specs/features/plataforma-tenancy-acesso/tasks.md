@@ -1581,9 +1581,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: renderiza lista; inativar pede confirmação; `ULTIMO_ADMIN` mostra a mensagem do spec; SuperAdmin sem tenant vê o seletor
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes de componente: renderiza lista; inativar pede confirmação; `ULTIMO_ADMIN` mostra a mensagem do spec; SuperAdmin sem tenant vê o seletor
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
