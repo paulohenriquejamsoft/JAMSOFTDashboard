@@ -60,7 +60,13 @@ public sealed class ValidacaoContextoTenantFilter : IEndpointFilter
 
 public static class ValidacaoContextoTenantExtensoes
 {
-    /// <summary>Aplica o <see cref="ValidacaoContextoTenantFilter"/> à rota ou ao grupo.</summary>
+    /// <summary>
+    /// Aplica o <see cref="ValidacaoContextoTenantFilter"/> à rota ou ao grupo e marca a rota como tenant-scoped
+    /// (<see cref="RotaTenantScoped"/>), para a suíte de isolamento encontrá-la.
+    /// </summary>
     public static TBuilder ValidarContextoTenant<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder =>
-        builder.AddEndpointFilter(new ValidacaoContextoTenantFilter());
+        builder.WithMetadata(new RotaTenantScoped()).AddEndpointFilter(new ValidacaoContextoTenantFilter());
 }
+
+/// <summary>Metadado das rotas com dado de tenant (posto por <c>ValidarContextoTenant()</c>).</summary>
+public sealed class RotaTenantScoped;

@@ -1158,10 +1158,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Toda rota tenant-scoped responde 404 (ou 403 com `X-Tenant`) e o banco de B fica inalterado (checksum por tabela)
-- [ ] Teste falha se uma rota nova tenant-scoped não tiver caso cadastrado
-- [ ] Gate check passes: Full
-- [ ] Test count: ≥ 1 caso por rota tenant-scoped, todos passando
+- [x] Toda rota tenant-scoped responde 404 (ou 403 com `X-Tenant`) e o banco de B fica inalterado (checksum por tabela)
+- [x] Teste falha se uma rota nova tenant-scoped não tiver caso cadastrado
+- [x] Gate check passes: Full
+- [x] Test count: ≥ 1 caso por rota tenant-scoped, todos passando
 
 **Tests**: integration
 **Gate**: full
