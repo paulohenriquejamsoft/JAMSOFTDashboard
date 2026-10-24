@@ -1423,9 +1423,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: confirmação diferente bloqueia envio; política violada mostra regra; senha atual errada mostra erro da API; sucesso leva à home do perfil
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes: confirmação diferente bloqueia envio; política violada mostra regra; senha atual errada mostra erro da API; sucesso leva à home do perfil
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

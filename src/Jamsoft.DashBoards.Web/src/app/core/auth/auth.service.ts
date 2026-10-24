@@ -51,6 +51,13 @@ export class AuthService {
       .pipe(map((resposta) => this.abrir(resposta)));
   }
 
+  /** Troca a senha (USR-08); a API devolve um access token novo, já sem a troca pendente. */
+  trocarSenha(senhaAtual: string, novaSenha: string): Observable<UsuarioSessao> {
+    return this.http
+      .post<SessaoResposta>('/api/auth/trocar-senha', { senhaAtual, novaSenha })
+      .pipe(map((resposta) => this.abrir(resposta)));
+  }
+
   /** Revoga o refresh token na API e descarta a sessão local, mesmo se a chamada falhar. */
   logout(): Observable<void> {
     return this.http.post<void>('/api/auth/logout', null, { withCredentials: true }).pipe(
