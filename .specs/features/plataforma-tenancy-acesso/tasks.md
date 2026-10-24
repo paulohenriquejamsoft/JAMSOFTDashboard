@@ -1369,9 +1369,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: matriz perfil × rota (SuperAdmin, Admin, Consulta, anônimo) com o resultado esperado de cada combinação
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: ≥ 12 tests pass
+- [x] Testes: matriz perfil × rota (SuperAdmin, Admin, Consulta, anônimo) com o resultado esperado de cada combinação
+- [x] Gate check passes: Quick-Web
+- [x] Test count: ≥ 12 tests pass
 
 **Tests**: unit
 **Gate**: quick-web

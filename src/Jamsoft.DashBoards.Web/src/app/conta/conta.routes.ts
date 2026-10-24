@@ -1,8 +1,15 @@
 import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
 
-/** Placeholder da área até as telas da fase 9/10. */
-@Component({ template: '<p>Conta</p>' })
-class ContaPlaceholder {}
+/** Placeholders das telas de conta até a fase 9. */
+@Component({ template: '<p>Login</p>' })
+class LoginPlaceholder {}
 
-export default [{ path: '', component: ContaPlaceholder }] satisfies Routes;
+@Component({ template: '<p>Trocar senha</p>' })
+class TrocarSenhaPlaceholder {}
+
+export default [
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+  { path: 'login', component: LoginPlaceholder },
+  { path: 'trocar-senha', component: TrocarSenhaPlaceholder },
+] satisfies Routes;
