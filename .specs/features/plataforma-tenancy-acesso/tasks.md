@@ -1214,8 +1214,8 @@ T57 → T58
 
 **Done when**:
 
-- [ ] `npm --prefix src/Jamsoft.DashBoards.Web run lint`, `run build` e `test -- --watch=false` passam
-- [ ] Gate check passes: Build
+- [x] `npm --prefix src/Jamsoft.DashBoards.Web run lint`, `run build` e `test -- --watch=false` passam
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build

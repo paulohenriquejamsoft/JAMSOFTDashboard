@@ -10,6 +10,10 @@ TestResults/
 node_modules/
 dist/
 .angular/
+out-tsc/
+coverage/
+.sass-cache/
+__screenshots__/
 
 # IDE / SO
 .idea/
