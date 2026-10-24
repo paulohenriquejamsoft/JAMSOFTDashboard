@@ -5,7 +5,11 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 
 /// <summary>Tentativa de gravar dado de outro tenant (ISO-02).</summary>
 public sealed class AcessoCruzadoException(string entidade, int tenantDaEntidade, int tenantAtual)
-    : Exception($"Gravação de {entidade} do tenant {tenantDaEntidade} recusada no contexto do tenant {tenantAtual}.");
+    : Exception($"Gravação de {entidade} do tenant {tenantDaEntidade} recusada no contexto do tenant {tenantAtual}.")
+{
+    public string Entidade { get; } = entidade;
+    public int TenantDaEntidade { get; } = tenantDaEntidade;
+}
 
 /// <summary>
 /// Protege a escrita por tenant (ISO-02): em inserções com <c>TenantId</c> zero preenche o tenant atual;

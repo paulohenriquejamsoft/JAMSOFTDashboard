@@ -394,6 +394,7 @@ T57 → T58
 **Done when**:
 
 - [x] Testes: inserção sem `TenantId` recebe o tenant atual; inserção, alteração e exclusão com tenant B estando em A lançam exceção e não gravam nada; dentro de `OperacaoGlobal()` gravam
+- [x] AcessoCruzadoException → 403 + auditoria (corrigido em fix posterior)
 - [x] Gate check passes: Full
 - [x] Test count: 5 new tests pass
 

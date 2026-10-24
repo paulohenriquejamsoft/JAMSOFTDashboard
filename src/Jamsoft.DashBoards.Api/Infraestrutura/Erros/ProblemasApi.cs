@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 
@@ -88,7 +91,8 @@ public sealed class ProblemaApiException(int status, string codigo, string titul
 
 /// <summary>
 /// Converte exceções em ProblemDetails: <see cref="ProblemaApiException"/> mantém status e código;
-/// corpo de requisição ilegível vira 400; o resto vira 500 ERRO_INTERNO, registrado no log.
+/// corpo de requisição ilegível vira 400; escrita fora do tenant (<see cref="AcessoCruzadoException"/>) vira
+/// 403 ACESSO_NEGADO com registro ACESSO_CRUZADO na auditoria; o resto vira 500 ERRO_INTERNO, registrado no log.
 /// </summary>
 public sealed class TratadorExcecoes(IProblemDetailsService problemas, ILogger<TratadorExcecoes> log) : IExceptionHandler
 {
@@ -98,11 +102,15 @@ public sealed class TratadorExcecoes(IProblemDetailsService problemas, ILogger<T
         {
             ProblemaApiException p => (p.Status, p.Codigo, p.Titulo),
             BadHttpRequestException b => (b.StatusCode, "REQUISICAO_INVALIDA", "Requisição inválida"),
+            AcessoCruzadoException => (StatusCodes.Status403Forbidden, "ACESSO_NEGADO", "Acesso não permitido"),
             _ => (StatusCodes.Status500InternalServerError, ProblemasApi.CodigoErroInterno, "Erro inesperado"),
         };
 
         if (status >= StatusCodes.Status500InternalServerError)
             log.LogError(excecao, "Erro não tratado em {Metodo} {Rota}.", contexto.Request.Method, contexto.Request.Path);
+
+        if (excecao is AcessoCruzadoException cruzado)
+            await AuditarAcessoCruzadoAsync(contexto, cruzado, ct);
 
         contexto.Response.StatusCode = status;
         return await problemas.TryWriteAsync(new ProblemDetailsContext
@@ -116,5 +124,30 @@ public sealed class TratadorExcecoes(IProblemDetailsService problemas, ILogger<T
                 Extensions = { [ProblemasApi.Codigo] = codigo }
             }
         });
+    }
+
+    /// <summary>
+    /// Registra a tentativa (ISO-02/ISO-04) com o tenant afetado. Falha ao auditar vai para o log e não
+    /// muda a resposta 403.
+    /// </summary>
+    private async Task AuditarAcessoCruzadoAsync(HttpContext contexto, AcessoCruzadoException excecao, CancellationToken ct)
+    {
+        try
+        {
+            var servicos = contexto.RequestServices;
+            var banco = servicos.GetRequiredService<PlataformaDbContext>();
+            var afetado = await banco.Tenants.AsNoTracking()
+                .Where(t => t.Id == excecao.TenantDaEntidade)
+                .Select(t => new { t.IdPublico, t.Nome })
+                .SingleOrDefaultAsync(ct);
+
+            await servicos.GetRequiredService<IAuditoria>().RegistrarAgoraAsync(OperacaoAuditada.AcessoCruzado,
+                recursoIdPublico: null, afetado?.IdPublico, afetado?.Nome, ResultadoAuditoria.Negado,
+                new { metodo = contexto.Request.Method, rota = contexto.Request.Path.Value, entidade = excecao.Entidade }, ct);
+        }
+        catch (Exception erro)
+        {
+            log.LogError(erro, "Falha ao auditar acesso cruzado em {Metodo} {Rota}.", contexto.Request.Method, contexto.Request.Path);
+        }
     }
 }
