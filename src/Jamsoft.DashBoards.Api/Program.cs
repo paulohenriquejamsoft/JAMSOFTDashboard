@@ -1,10 +1,12 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
+using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddErrosApi();
 builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("Plataforma"));
+builder.Services.AddAuditoria();
 
 var app = builder.Build();
 

@@ -1,0 +1,120 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Seguranca;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+namespace Jamsoft.DashBoards.Api.Modulos.Auditoria;
+
+/// <summary>Operação registrada em AUDITORIA.OPERACAO (AUD-01). Novos módulos acrescentam as suas.</summary>
+public readonly record struct OperacaoAuditada(string Codigo)
+{
+    /// <summary>Contexto de tenant divergente do token (ISO-04).</summary>
+    public static readonly OperacaoAuditada AcessoCruzado = new("ACESSO_CRUZADO");
+
+    public override string ToString() => Codigo;
+}
+
+/// <summary>Valores de AUDITORIA.RESULTADO.</summary>
+public static class ResultadoAuditoria
+{
+    public const string Sucesso = "Sucesso";
+    public const string Negado = "Negado";
+    public const string Falha = "Falha";
+}
+
+/// <summary>Grava operações críticas (AUD-01/AUD-02) com autor, perfil, IP e data UTC da requisição.</summary>
+public interface IAuditoria
+{
+    /// <summary>Adiciona o registro ao DbContext da requisição: grava junto com a operação, no mesmo SaveChanges.</summary>
+    RegistroAuditoria Registrar(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
+        string? tenantNome, string resultado, object? detalhes = null);
+
+    /// <summary>Grava na hora, fora da transação da requisição (login, acesso negado).</summary>
+    Task<RegistroAuditoria> RegistrarAgoraAsync(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
+        string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default);
+}
+
+public sealed class ServicoAuditoria(
+    PlataformaDbContext banco,
+    ITenantAtual tenantAtual,
+    IHttpContextAccessor acessor,
+    TimeProvider tempo,
+    IServiceScopeFactory escopos) : IAuditoria
+{
+    /// <summary>Chaves de <c>detalhes</c> que contêm um destes trechos são removidas (AUTH-09, AUD-02).</summary>
+    private static readonly string[] TrechosSigilosos = ["senha", "token", "secret"];
+
+    public RegistroAuditoria Registrar(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
+        string? tenantNome, string resultado, object? detalhes = null)
+    {
+        var registro = Criar(operacao, recursoIdPublico, tenantIdPublico, tenantNome, resultado, detalhes);
+        banco.Auditoria.Add(registro);
+        return registro;
+    }
+
+    public async Task<RegistroAuditoria> RegistrarAgoraAsync(OperacaoAuditada operacao, Guid? recursoIdPublico,
+        Guid? tenantIdPublico, string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default)
+    {
+        var registro = Criar(operacao, recursoIdPublico, tenantIdPublico, tenantNome, resultado, detalhes);
+        // Contexto próprio: não leva junto alterações pendentes nem depende da transação da requisição.
+        await using var escopo = escopos.CreateAsyncScope();
+        var outroBanco = escopo.ServiceProvider.GetRequiredService<PlataformaDbContext>();
+        outroBanco.Auditoria.Add(registro);
+        await outroBanco.SaveChangesAsync(ct);
+        return registro;
+    }
+
+    private RegistroAuditoria Criar(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
+        string? tenantNome, string resultado, object? detalhes) => new()
+        {
+            OcorridoEm = tempo.GetUtcNow().UtcDateTime,
+            UsuarioIdPublico = tenantAtual.UsuarioIdPublico,
+            Perfil = tenantAtual.Perfil?.ToString(),
+            Operacao = operacao.Codigo,
+            RecursoIdPublico = recursoIdPublico,
+            TenantIdPublico = tenantIdPublico,
+            TenantNome = tenantNome,
+            Ip = acessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
+            Resultado = resultado,
+            Detalhes = Serializar(detalhes),
+        };
+
+    private static string? Serializar(object? detalhes)
+    {
+        if (detalhes is null) return null;
+        var json = JsonSerializer.SerializeToNode(detalhes, JsonSerializerOptions.Web);
+        RemoverSigilos(json);
+        return json?.ToJsonString();
+    }
+
+    private static void RemoverSigilos(JsonNode? no)
+    {
+        switch (no)
+        {
+            case JsonObject objeto:
+                foreach (var chave in objeto.Select(p => p.Key).ToList())
+                {
+                    if (TrechosSigilosos.Any(t => chave.Contains(t, StringComparison.OrdinalIgnoreCase)))
+                        objeto.Remove(chave);
+                    else
+                        RemoverSigilos(objeto[chave]);
+                }
+                break;
+            case JsonArray lista:
+                foreach (var item in lista) RemoverSigilos(item);
+                break;
+        }
+    }
+}
+
+public static class AuditoriaExtensoes
+{
+    public static IServiceCollection AddAuditoria(this IServiceCollection services)
+    {
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddHttpContextAccessor();
+        services.AddScoped<IAuditoria, ServicoAuditoria>();
+        return services;
+    }
+}

@@ -419,9 +419,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: `Registrar` só persiste com `SaveChanges` (rollback descarta); `RegistrarAgoraAsync` persiste mesmo sem transação; detalhes com `senha` saem sem essa chave; todos os campos do AUD-02 preenchidos
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: `Registrar` só persiste com `SaveChanges` (rollback descarta); `RegistrarAgoraAsync` persiste mesmo sem transação; detalhes com `senha` saem sem essa chave; todos os campos do AUD-02 preenchidos
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
