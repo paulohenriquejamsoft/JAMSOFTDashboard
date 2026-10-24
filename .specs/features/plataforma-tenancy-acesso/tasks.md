@@ -445,9 +445,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes unitários: claims corretas por perfil (SuperAdmin sem `tenant`); expiração 15 min; chave curta falha na validação de options; token assinado com a chave secundária é aceito pelos parâmetros de validação
-- [ ] Gate check passes: Quick
-- [ ] Test count: 5 new tests pass
+- [x] Testes unitários: claims corretas por perfil (SuperAdmin sem `tenant`); expiração 15 min; chave curta falha na validação de options; token assinado com a chave secundária é aceito pelos parâmetros de validação
+- [x] Gate check passes: Quick
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick
