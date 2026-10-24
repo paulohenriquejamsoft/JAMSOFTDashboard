@@ -1317,9 +1317,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: cabeçalhos presentes; sem tenant selecionado não envia `X-Tenant`; 401 → renova e repete com sucesso; 401 após renovar → login; rotas `/api/auth/*` não disparam renovação; 403 troca pendente → redireciona
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 6 new tests pass
+- [x] Testes: cabeçalhos presentes; sem tenant selecionado não envia `X-Tenant`; 401 → renova e repete com sucesso; 401 após renovar → login; rotas `/api/auth/*` não disparam renovação; 403 troca pendente → redireciona
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 6 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
