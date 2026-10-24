@@ -75,7 +75,8 @@ public sealed class ServicoEmpresas(PlataformaDbContext banco) : IEmpresas
         return nome.Length > Empresa.NomeMaximo ? nome[..Empresa.NomeMaximo].TrimEnd() : nome;
     }
 
-    private static bool CodigoDuplicado(DbUpdateException erro) =>
+    /// <summary>Violação do índice único (TENANT_ID, COD_EMPRESA): erros 2601/2627 do SQL Server.</summary>
+    internal static bool CodigoDuplicado(DbUpdateException erro) =>
         erro.InnerException is SqlException { Number: 2601 or 2627 } sql
         && sql.Message.Contains(IndiceCodigo, StringComparison.Ordinal);
 }

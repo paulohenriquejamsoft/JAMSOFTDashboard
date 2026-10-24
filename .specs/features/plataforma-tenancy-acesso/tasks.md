@@ -894,9 +894,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: Admin cria → 201; código duplicado → 409 `EMPRESA_DUPLICADA`; código 0 ou nome com 81 caracteres → 400; Consulta cria → 403; Consulta lista → só empresas do tenant; SuperAdmin com `X-Tenant` lista o tenant escolhido; renomear empresa de outro tenant → 404
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: Admin cria → 201; código duplicado → 409 `EMPRESA_DUPLICADA`; código 0 ou nome com 81 caracteres → 400; Consulta cria → 403; Consulta lista → só empresas do tenant; SuperAdmin com `X-Tenant` lista o tenant escolhido; renomear empresa de outro tenant → 404
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

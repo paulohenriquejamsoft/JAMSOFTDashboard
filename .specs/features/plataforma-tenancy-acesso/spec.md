@@ -269,11 +269,11 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-08 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | EMP-01 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-02 | P1: Empresas do tenant | Tasks | In Tasks |
-| EMP-03 | P1: Empresas do tenant | Tasks | In Tasks |
+| EMP-02 | P1: Empresas do tenant | Execute | Implementing |
+| EMP-03 | P1: Empresas do tenant | Execute | Implementing |
 | EMP-04 | P1: Empresas do tenant | Execute | Implementing |
 | EMP-05 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-06 | P1: Empresas do tenant | Tasks | In Tasks |
+| EMP-06 | P1: Empresas do tenant | Execute | Implementing |
 | ISO-01 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-02 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
