@@ -38,8 +38,8 @@ public static class LoginEndpoint
         ProblemasApi.Problema(StatusCodes.Status403Forbidden, CodigoAcessoDesativado, "Acesso desativado");
 
     public static async Task<IResult> EntrarAsync(LoginRequisicao corpo, PlataformaDbContext banco,
-        IPasswordHasher<Usuario> hasher, TokenService tokens, RefreshTokens refreshTokens, IAuditoria auditoria,
-        TimeProvider tempo, HttpContext http, CancellationToken ct)
+        IPasswordHasher<Usuario> hasher, Bloqueio bloqueio, TokenService tokens, RefreshTokens refreshTokens,
+        IAuditoria auditoria, HttpContext http, CancellationToken ct)
     {
         var email = Usuario.NormalizarEmail(corpo.Email ?? "");
         var senha = corpo.Senha ?? "";
@@ -51,8 +51,14 @@ public static class LoginEndpoint
             return CredenciaisInvalidas();
         }
 
+        // Durante o bloqueio nem a senha certa entra (AUTH-03).
+        if (bloqueio.BloqueadoAte(usuario) is { } bloqueadoAte) return Bloqueio.Bloqueado(bloqueadoAte);
+
         if (hasher.VerifyHashedPassword(usuario, usuario.SenhaHash, senha) == PasswordVerificationResult.Failed)
-            return CredenciaisInvalidas();
+        {
+            var inicioBloqueio = await bloqueio.RegistrarFalhaAsync(usuario, ct);
+            return inicioBloqueio is { } ate ? Bloqueio.Bloqueado(ate) : CredenciaisInvalidas();
+        }
 
         var tenant = usuario.TenantId is { } tenantId
             ? await banco.Tenants.AsNoTracking().SingleAsync(t => t.Id == tenantId, ct)
@@ -60,9 +66,7 @@ public static class LoginEndpoint
         // Situação só é revelada a quem acertou a senha.
         if (!usuario.Ativo || tenant is { Ativo: false }) return AcessoDesativado();
 
-        var agora = tempo.GetUtcNow().UtcDateTime;
-        await banco.Usuarios.Where(u => u.Id == usuario.Id)
-            .ExecuteUpdateAsync(u => u.SetProperty(x => x.UltimoLoginEm, agora), ct);
+        await bloqueio.RegistrarSucessoAsync(usuario, ct);
 
         var sessao = await AbrirSessaoAsync(usuario, tenant, tokens, refreshTokens, http, familia: null, ct);
 

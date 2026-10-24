@@ -604,9 +604,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: 4 falhas + sucesso zera contador; 5 falhas → 423 até expirar (relógio falso via `TimeProvider`); login correto durante bloqueio → 423; após 15 min → 200; 21ª requisição no minuto → 429
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: 4 falhas + sucesso zera contador; 5 falhas → 423 até expirar (relógio falso via `TimeProvider`); login correto durante bloqueio → 423; após 15 min → 200; 21ª requisição no minuto → 429
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

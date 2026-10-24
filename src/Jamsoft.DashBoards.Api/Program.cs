@@ -20,6 +20,7 @@ var app = builder.Build();
 
 app.UseErrosApi();
 app.UseSegurancaApi();
+app.UseAutenticacao();
 
 // Sem autenticação: só para monitoramento (IIS, load balancer).
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
