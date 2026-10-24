@@ -1,4 +1,6 @@
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Testcontainers.MsSql;
 
 namespace Jamsoft.DashBoards.Api.Testes.Infraestrutura;
@@ -18,8 +20,45 @@ public sealed class BancoDeTestes : IAsyncLifetime
     private MsSqlContainer? _container;
     private string _conexaoServidor = "";
 
+    private readonly SemaphoreSlim _migracao = new(1, 1);
+    private bool _migrado;
+
     public string NomeBanco { get; } = $"JD_Testes_{Guid.NewGuid():N}";
     public string ConnectionString { get; private set; } = "";
+
+    public PlataformaDbContext CriarContexto()
+    {
+        var options = new DbContextOptionsBuilder<PlataformaDbContext>();
+        PlataformaDbContext.Configurar(options, ConnectionString);
+        return new PlataformaDbContext(options.Options);
+    }
+
+    /// <summary>Aplica as migrações uma única vez por coleção.</summary>
+    public async Task MigrarAsync()
+    {
+        await _migracao.WaitAsync();
+        try
+        {
+            if (_migrado) return;
+            await using var contexto = CriarContexto();
+            await contexto.Database.MigrateAsync();
+            _migrado = true;
+        }
+        finally
+        {
+            _migracao.Release();
+        }
+    }
+
+    /// <summary>Executa um comando SQL no banco de testes (para checagens de esquema).</summary>
+    public async Task<T?> ConsultarEscalarAsync<T>(string sql)
+    {
+        await using var conexao = new SqlConnection(ConnectionString);
+        await conexao.OpenAsync();
+        await using var comando = new SqlCommand(sql, conexao);
+        var valor = await comando.ExecuteScalarAsync();
+        return valor is null or DBNull ? default : (T)valor;
+    }
 
     public async Task InitializeAsync()
     {

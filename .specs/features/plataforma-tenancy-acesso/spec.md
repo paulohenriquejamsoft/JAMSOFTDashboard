@@ -260,13 +260,13 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | AUTH-07 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-08 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-09 | P1: Login e sessão | Tasks | In Tasks |
-| TEN-01 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
-| TEN-02 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
+| TEN-01 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
+| TEN-02 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-03 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-04 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-05 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-06 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
-| TEN-07 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
+| TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-08 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | EMP-01 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-02 | P1: Empresas do tenant | Tasks | In Tasks |

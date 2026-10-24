@@ -231,10 +231,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Migração aplicada no banco de testes cria `TENANT` com os nomes de colunas do design
-- [ ] Teste de esquema: CNPJ duplicado viola índice único; `ID_PUBLICO` é gerado pelo banco
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Migração aplicada no banco de testes cria `TENANT` com os nomes de colunas do design
+- [x] Teste de esquema: CNPJ duplicado viola índice único; `ID_PUBLICO` é gerado pelo banco
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full
