@@ -258,7 +258,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | AUTH-05 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-06 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-07 | P1: Login e sessão | Tasks | In Tasks |
-| AUTH-08 | P1: Login e sessão | Tasks | In Tasks |
+| AUTH-08 | P1: Login e sessão | Execute | Implementing |
 | AUTH-09 | P1: Login e sessão | Tasks | In Tasks |
 | TEN-01 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-02 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
@@ -267,7 +267,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | TEN-05 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-06 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
 | TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-08 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
+| TEN-08 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | EMP-01 | P1: Empresas do tenant | Execute | Implementing |
 | EMP-02 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-03 | P1: Empresas do tenant | Tasks | In Tasks |
@@ -286,9 +286,9 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | USR-05 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-06 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-07 | P2: Admin gerencia usuários | Tasks | In Tasks |
-| USR-08 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-08 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-09 | P2: Admin gerencia usuários | Tasks | In Tasks |
-| USR-10 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-10 | P2: Admin gerencia usuários | Execute | Implementing |
 | CTX-01 | P2: SuperAdmin acessa contexto | Execute | Implementing |
 | CTX-02 | P2: SuperAdmin acessa contexto | Tasks | In Tasks |
 | CTX-03 | P2: SuperAdmin acessa contexto | Execute | Implementing |

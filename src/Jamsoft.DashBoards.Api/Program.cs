@@ -1,16 +1,19 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Auditoria;
+using Jamsoft.DashBoards.Api.Seguranca;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddErrosApi();
 builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("Plataforma"));
 builder.Services.AddAuditoria();
+builder.Services.AddSegurancaApi();
 
 var app = builder.Build();
 
 app.UseErrosApi();
+app.UseSegurancaApi();
 
 // Sem autenticação: só para monitoramento (IIS, load balancer).
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();

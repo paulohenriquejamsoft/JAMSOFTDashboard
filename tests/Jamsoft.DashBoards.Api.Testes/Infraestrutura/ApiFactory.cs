@@ -12,5 +12,6 @@ public sealed class ApiFactory(BancoDeTestes banco) : WebApplicationFactory<Prog
     {
         builder.UseEnvironment("Testes");
         builder.UseSetting("ConnectionStrings:Plataforma", Banco.ConnectionString);
+        builder.UseSetting("Jwt:Chave", Acesso.ChaveJwt);
     }
 }

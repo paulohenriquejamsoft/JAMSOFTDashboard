@@ -471,9 +471,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes com rotas de teste: sem token → 401; token expirado → 401; perfil errado → 403 `ACESSO_NEGADO`; `trocar_senha` → 403 `TROCA_SENHA_PENDENTE` exceto rota liberada; token `Coletor` → 403 em rota de usuário; SuperAdmin sem tenant em `AdminTenant` → 400 `TENANT_NAO_SELECIONADO`
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes com rotas de teste: sem token → 401; token expirado → 401; perfil errado → 403 `ACESSO_NEGADO`; `trocar_senha` → 403 `TROCA_SENHA_PENDENTE` exceto rota liberada; token `Coletor` → 403 em rota de usuário; SuperAdmin sem tenant em `AdminTenant` → 400 `TENANT_NAO_SELECIONADO`
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

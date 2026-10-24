@@ -1,4 +1,6 @@
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
+using Jamsoft.DashBoards.Api.Modulos.Usuarios;
+using Jamsoft.DashBoards.Api.Seguranca;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +26,36 @@ public static class Dados
         contexto.Tenants.Add(tenant);
         await contexto.SaveChangesAsync();
         return tenant.Id;
+    }
+
+    /// <summary>Grava um tenant com CNPJ único e devolve a entidade (com ID e ID_PUBLICO).</summary>
+    public static async Task<Tenant> NovoTenantAsync(BancoDeTestes banco, string nome = "Tenant de teste", bool ativo = true)
+    {
+        await using var contexto = banco.CriarContexto();
+        var tenant = new Tenant { Nome = nome, Cnpj = CnpjQualquer(), Ativo = ativo };
+        contexto.Tenants.Add(tenant);
+        await contexto.SaveChangesAsync();
+        return tenant;
+    }
+
+    /// <summary>Grava um usuário com e-mail único (SuperAdmin sem tenant) e devolve a entidade.</summary>
+    public static async Task<Usuario> NovoUsuarioAsync(BancoDeTestes banco, Perfil perfil, Tenant? tenant = null,
+        bool trocarSenha = false, bool ativo = true)
+    {
+        await using var contexto = banco.CriarContexto();
+        var usuario = new Usuario
+        {
+            TenantId = tenant?.Id,
+            Nome = $"Usuário {perfil}",
+            Email = $"{Guid.NewGuid():N}@teste.com",
+            SenhaHash = "hash-de-teste",
+            Perfil = perfil,
+            TrocarSenha = trocarSenha,
+            Ativo = ativo,
+        };
+        contexto.Usuarios.Add(usuario);
+        await contexto.SaveChangesAsync();
+        return usuario;
     }
 
     public static async Task<SqlException> FalhaSqlAsync(Func<Task> acao)
