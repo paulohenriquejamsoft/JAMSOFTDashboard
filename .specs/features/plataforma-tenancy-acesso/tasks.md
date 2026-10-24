@@ -840,9 +840,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Teste de integração aplica o script, conecta com um login da role e confirma que `UPDATE AUDITORIA` e `DELETE AUDITORIA` falham e `INSERT` funciona
-- [ ] Gate check passes: Full
-- [ ] Test count: 1 new test passes
+- [x] Teste de integração aplica o script, conecta com um login da role e confirma que `UPDATE AUDITORIA` e `DELETE AUDITORIA` falham e `INSERT` funciona
+- [x] Gate check passes: Full
+- [x] Test count: 1 new test passes
 
 **Tests**: integration
 **Gate**: full
