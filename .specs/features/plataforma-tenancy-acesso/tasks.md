@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/plataforma-tenancy-acesso/spec.md`
 **Design**: `.specs/features/plataforma-tenancy-acesso/design.md`
-**Status**: Draft
+**Status**: In Progress
 
 ---
 
@@ -150,11 +150,11 @@ T57 → T58
 
 **Done when**:
 
-- [ ] `dotnet build Jamsoft.DashBoards.slnx` sem warnings
-- [ ] Teste de integração `GET /health` → 200 `{ "status": "ok" }` passa
-- [ ] Fixture sobe SQL Server uma vez por coleção de testes
-- [ ] Gate check passes: Full
-- [ ] Test count: 1 test passes
+- [x] `dotnet build Jamsoft.DashBoards.slnx` sem warnings
+- [x] Teste de integração `GET /health` → 200 `{ "status": "ok" }` passa
+- [x] Fixture sobe SQL Server uma vez por coleção de testes
+- [x] Gate check passes: Full
+- [x] Test count: 1 test passes
 
 **Tests**: integration
 **Gate**: full
