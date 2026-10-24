@@ -303,8 +303,8 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | DEL-09 | P2: Exclusão total de tenant | Execute | Implementing |
 | AUD-01 | P3: Auditoria consultável | Execute | Implementing |
 | AUD-02 | P3: Auditoria consultável | Execute | Implementing |
-| AUD-03 | P3: Auditoria consultável | Tasks | In Tasks |
-| AUD-04 | P3: Auditoria consultável | Tasks | In Tasks |
+| AUD-03 | P3: Auditoria consultável | Execute | Implementing |
+| AUD-04 | P3: Auditoria consultável | Execute | Implementing |
 
 **Coverage:** 54 total, 54 mapped to tasks (`tasks.md`), 0 unmapped
 

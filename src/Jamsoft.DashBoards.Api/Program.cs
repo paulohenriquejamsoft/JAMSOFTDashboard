@@ -28,6 +28,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 
 app.MapAutenticacao();
 app.MapTenants();
+app.MapAuditoria();
 
 app.Run();
 

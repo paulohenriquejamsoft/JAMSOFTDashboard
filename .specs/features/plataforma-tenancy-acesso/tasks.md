@@ -814,9 +814,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: cada filtro isolado e combinado; ordenação por `OCORRIDO_EM` desc; Admin → 403; `PUT`/`DELETE` em `/api/admin/auditoria/{id}` → 404/405
-- [ ] Gate check passes: Full
-- [ ] Test count: 6 new tests pass
+- [x] Testes: cada filtro isolado e combinado; ordenação por `OCORRIDO_EM` desc; Admin → 403; `PUT`/`DELETE` em `/api/admin/auditoria/{id}` → 404/405
+- [x] Gate check passes: Full
+- [x] Test count: 6 new tests pass
 
 **Tests**: integration
 **Gate**: full
