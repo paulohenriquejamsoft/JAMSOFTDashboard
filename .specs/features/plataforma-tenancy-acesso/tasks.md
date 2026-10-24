@@ -578,9 +578,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: login válido (Admin, Consulta, SuperAdmin) → 200 com campos do AUTH-01 e cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`; e-mail inexistente e senha errada → 401 com corpo idêntico; usuário inativo e tenant inativo → 403; logs capturados não contêm senha nem tokens
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: login válido (Admin, Consulta, SuperAdmin) → 200 com campos do AUTH-01 e cookie `HttpOnly; Secure; SameSite=Strict; Path=/api/auth`; e-mail inexistente e senha errada → 401 com corpo idêntico; usuário inativo e tenant inativo → 403; logs capturados não contêm senha nem tokens
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

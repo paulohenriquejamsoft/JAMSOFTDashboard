@@ -12,8 +12,14 @@ public readonly record struct OperacaoAuditada(string Codigo)
     /// <summary>Contexto de tenant divergente do token (ISO-04).</summary>
     public static readonly OperacaoAuditada AcessoCruzado = new("ACESSO_CRUZADO");
 
+    /// <summary>Login bem-sucedido de SuperAdmin (AUD-01).</summary>
+    public static readonly OperacaoAuditada LoginSuperAdmin = new("LOGIN_SUPERADMIN");
+
     public override string ToString() => Codigo;
 }
+
+/// <summary>Autor informado explicitamente, quando ainda não há usuário autenticado na requisição (login).</summary>
+public sealed record AutorAuditoria(Guid UsuarioIdPublico, string Email, Perfil Perfil);
 
 /// <summary>Valores de AUDITORIA.RESULTADO.</summary>
 public static class ResultadoAuditoria
@@ -32,7 +38,8 @@ public interface IAuditoria
 
     /// <summary>Grava na hora, fora da transação da requisição (login, acesso negado).</summary>
     Task<RegistroAuditoria> RegistrarAgoraAsync(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
-        string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default);
+        string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default,
+        AutorAuditoria? autor = null);
 }
 
 public sealed class ServicoAuditoria(
@@ -54,9 +61,10 @@ public sealed class ServicoAuditoria(
     }
 
     public async Task<RegistroAuditoria> RegistrarAgoraAsync(OperacaoAuditada operacao, Guid? recursoIdPublico,
-        Guid? tenantIdPublico, string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default)
+        Guid? tenantIdPublico, string? tenantNome, string resultado, object? detalhes = null, CancellationToken ct = default,
+        AutorAuditoria? autor = null)
     {
-        var registro = Criar(operacao, recursoIdPublico, tenantIdPublico, tenantNome, resultado, detalhes);
+        var registro = Criar(operacao, recursoIdPublico, tenantIdPublico, tenantNome, resultado, detalhes, autor);
         // Contexto próprio: não leva junto alterações pendentes nem depende da transação da requisição.
         await using var escopo = escopos.CreateAsyncScope();
         var outroBanco = escopo.ServiceProvider.GetRequiredService<PlataformaDbContext>();
@@ -66,11 +74,12 @@ public sealed class ServicoAuditoria(
     }
 
     private RegistroAuditoria Criar(OperacaoAuditada operacao, Guid? recursoIdPublico, Guid? tenantIdPublico,
-        string? tenantNome, string resultado, object? detalhes) => new()
+        string? tenantNome, string resultado, object? detalhes, AutorAuditoria? autor = null) => new()
         {
             OcorridoEm = tempo.GetUtcNow().UtcDateTime,
-            UsuarioIdPublico = tenantAtual.UsuarioIdPublico,
-            Perfil = tenantAtual.Perfil?.ToString(),
+            UsuarioIdPublico = autor?.UsuarioIdPublico ?? tenantAtual.UsuarioIdPublico,
+            UsuarioEmail = autor?.Email,
+            Perfil = (autor?.Perfil ?? tenantAtual.Perfil)?.ToString(),
             Operacao = operacao.Codigo,
             RecursoIdPublico = recursoIdPublico,
             TenantIdPublico = tenantIdPublico,

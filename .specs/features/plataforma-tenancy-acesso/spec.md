@@ -252,14 +252,14 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | AUTH-01 | P1: Login e sessão | Execute | Implementing |
-| AUTH-02 | P1: Login e sessão | Tasks | In Tasks |
+| AUTH-02 | P1: Login e sessão | Execute | Implementing |
 | AUTH-03 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-04 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-05 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-06 | P1: Login e sessão | Tasks | In Tasks |
 | AUTH-07 | P1: Login e sessão | Execute | Implementing |
 | AUTH-08 | P1: Login e sessão | Execute | Implementing |
-| AUTH-09 | P1: Login e sessão | Tasks | In Tasks |
+| AUTH-09 | P1: Login e sessão | Execute | Implementing |
 | TEN-01 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-02 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-03 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |

@@ -1,6 +1,7 @@
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,9 +39,13 @@ public static class Dados
         return tenant;
     }
 
-    /// <summary>Grava um usuário com e-mail único (SuperAdmin sem tenant) e devolve a entidade.</summary>
+    /// <summary>Senha usada por <see cref="NovoUsuarioAsync"/> quando <c>comSenha</c> é verdadeiro.</summary>
+    public const string Senha = "SenhaDeTeste123";
+
+    /// <summary>Grava um usuário com e-mail único (SuperAdmin sem tenant) e devolve a entidade.
+    /// Com <c>comSenha</c>, a senha é <see cref="Senha"/>.</summary>
     public static async Task<Usuario> NovoUsuarioAsync(BancoDeTestes banco, Perfil perfil, Tenant? tenant = null,
-        bool trocarSenha = false, bool ativo = true)
+        bool trocarSenha = false, bool ativo = true, bool comSenha = false)
     {
         await using var contexto = banco.CriarContexto();
         var usuario = new Usuario
@@ -53,6 +58,8 @@ public static class Dados
             TrocarSenha = trocarSenha,
             Ativo = ativo,
         };
+        // PBKDF2 é lento: só calcula o hash real quando o teste vai fazer login.
+        if (comSenha) usuario.SenhaHash = new PasswordHasher<Usuario>().HashPassword(usuario, Senha);
         contexto.Usuarios.Add(usuario);
         await contexto.SaveChangesAsync();
         return usuario;
