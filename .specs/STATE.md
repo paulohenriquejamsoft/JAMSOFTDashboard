@@ -101,10 +101,10 @@
 ## Handoff
 
 - **Feature**: `.specs/features/plataforma-tenancy-acesso`
-- **Phase / Task**: Tasks em rascunho (`tasks.md`, 58 tarefas em 10 fases); aguardando aprovação
-- **Completed**: Specify das três features; Design de plataforma-tenancy-acesso (aprovado em 2026-10-24)
+- **Phase / Task**: Execute — Fase 1 concluída (T1–T7); próxima é a Fase 2 (T8–T15)
+- **Completed**: T1, T2, T3, T4, T5, T6, T7 (gate de Build da Fase 1 verde: 25 testes)
 - **In-progress** (file:line): none
-- **Next step**: Aprovar `tasks.md`, iniciar git no repositório e executar a Fase 1 (T1).
-- **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP.
-- **Uncommitted files**: .specs/ (repositório ainda sem git)
-- **Branch**: n/a
+- **Next step**: Executar a Fase 2 começando pela T8 (`src/Jamsoft.DashBoards.Api/Seguranca/TenantAtual.cs`).
+- **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP. Testes de integração rodam com `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true"` (Docker parado nesta máquina).
+- **Uncommitted files**: none
+- **Branch**: feat/plataforma-tenancy-acesso
