@@ -1052,9 +1052,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes unitários: `REFRESH_TOKEN` antes de `USUARIO`; `USUARIO` e `EMPRESA` antes de `TENANT`; `AUDITORIA` e `EXCLUSAO_TENANT` fora do plano; entidade de teste com `TenantId` sem `IPertenceAoTenant` faz o teste de arquitetura falhar
-- [ ] Gate check passes: Quick
-- [ ] Test count: 4 new tests pass
+- [x] Testes unitários: `REFRESH_TOKEN` antes de `USUARIO`; `USUARIO` e `EMPRESA` antes de `TENANT`; `AUDITORIA` e `EXCLUSAO_TENANT` fora do plano; entidade de teste com `TenantId` sem `IPertenceAoTenant` faz o teste de arquitetura falhar
+- [x] Gate check passes: Quick
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick
