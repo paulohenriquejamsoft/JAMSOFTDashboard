@@ -43,7 +43,8 @@ public static class UsuariosEndpoints
 
     public static IEndpointRouteBuilder MapUsuarios(this IEndpointRouteBuilder app)
     {
-        var grupo = app.MapGroup("/api/usuarios").RequireAuthorization(Policies.AdminTenant).ValidarContextoTenant();
+        var grupo = app.MapGroup("/api/usuarios").RequireAuthorization(Policies.AdminTenant).ValidarContextoTenant()
+            .AuditarContextoSuperAdmin();
         grupo.MapGet("/", ListarAsync);
         grupo.MapPost("/", CriarAsync);
         grupo.MapPut("/{idPublico}", EditarUsuarioEndpoint.EditarAsync);

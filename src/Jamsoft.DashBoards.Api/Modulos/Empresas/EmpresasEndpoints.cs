@@ -27,7 +27,7 @@ public static class EmpresasEndpoints
 
     public static IEndpointRouteBuilder MapEmpresas(this IEndpointRouteBuilder app)
     {
-        var grupo = app.MapGroup("/api/empresas").ValidarContextoTenant();
+        var grupo = app.MapGroup("/api/empresas").ValidarContextoTenant().AuditarContextoSuperAdmin();
         grupo.MapGet("/", ListarAsync).RequireAuthorization(Policies.LeituraTenant);
         grupo.MapPost("/", CriarAsync).RequireAuthorization(Policies.AdminTenant);
         grupo.MapPut("/{idPublico}", RenomearAsync).RequireAuthorization(Policies.AdminTenant);

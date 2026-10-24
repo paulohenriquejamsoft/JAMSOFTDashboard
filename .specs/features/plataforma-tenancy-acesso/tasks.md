@@ -1024,9 +1024,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: primeiro acesso gera 1 registro com SuperAdmin, tenant e rota; segundo acesso em 5 min não gera; após 10 min (relógio falso) gera; Admin não gera registro
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: primeiro acesso gera 1 registro com SuperAdmin, tenant e rota; segundo acesso em 5 min não gera; após 10 min (relógio falso) gera; Admin não gera registro
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full

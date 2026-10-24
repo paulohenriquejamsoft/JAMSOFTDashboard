@@ -15,6 +15,9 @@ public readonly record struct OperacaoAuditada(string Codigo)
     /// <summary>Login bem-sucedido de SuperAdmin (AUD-01).</summary>
     public static readonly OperacaoAuditada LoginSuperAdmin = new("LOGIN_SUPERADMIN");
 
+    /// <summary>SuperAdmin acessando rota de um tenant pelo X-Tenant (CTX-02).</summary>
+    public static readonly OperacaoAuditada AcessoContextoTenant = new("ACESSO_CONTEXTO_TENANT");
+
     public static readonly OperacaoAuditada TenantCriado = new("TENANT_CRIADO");
     public static readonly OperacaoAuditada TenantAlterado = new("TENANT_ALTERADO");
     public static readonly OperacaoAuditada TenantInativado = new("TENANT_INATIVADO");
