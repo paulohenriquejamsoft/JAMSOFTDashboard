@@ -4,8 +4,7 @@ using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddErrosApi();
-builder.Services.AddDbContext<PlataformaDbContext>(o =>
-    PlataformaDbContext.Configurar(o, builder.Configuration.GetConnectionString("Plataforma")));
+builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("Plataforma"));
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Seguranca;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.MsSql;
@@ -26,11 +27,18 @@ public sealed class BancoDeTestes : IAsyncLifetime
     public string NomeBanco { get; } = $"JD_Testes_{Guid.NewGuid():N}";
     public string ConnectionString { get; private set; } = "";
 
-    public PlataformaDbContext CriarContexto()
+    /// <summary>
+    /// Contexto sem tenant, para preparar dados e checar esquema: consultas a entidades do tenant
+    /// não retornam nada (filtro global).
+    /// </summary>
+    public PlataformaDbContext CriarContexto() => CriarContexto(TenantSemAcesso.Instancia);
+
+    /// <summary>Contexto isolado no tenant informado, como numa requisição.</summary>
+    public PlataformaDbContext CriarContexto(ITenantAtual tenantAtual)
     {
         var options = new DbContextOptionsBuilder<PlataformaDbContext>();
         PlataformaDbContext.Configurar(options, ConnectionString);
-        return new PlataformaDbContext(options.Options);
+        return new PlataformaDbContext(options.Options, tenantAtual);
     }
 
     /// <summary>Aplica as migrações uma única vez por coleção.</summary>

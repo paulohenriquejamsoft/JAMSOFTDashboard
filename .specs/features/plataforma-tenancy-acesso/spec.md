@@ -275,7 +275,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | EMP-05 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-06 | P1: Empresas do tenant | Tasks | In Tasks |
 | ISO-01 | P1: Isolamento entre tenants | Execute | Implementing |
-| ISO-02 | P1: Isolamento entre tenants | Tasks | In Tasks |
+| ISO-02 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-04 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |

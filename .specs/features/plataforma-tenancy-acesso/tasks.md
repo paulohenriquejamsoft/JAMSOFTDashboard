@@ -367,9 +367,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Teste de integração: empresas de A e B semeadas; contexto como A lista só A; sem tenant lista zero
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Teste de integração: empresas de A e B semeadas; contexto como A lista só A; sem tenant lista zero
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full
