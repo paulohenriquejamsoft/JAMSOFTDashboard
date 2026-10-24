@@ -656,9 +656,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: após logout, refresh com o cookie antigo → 401; resposta expira o cookie; logout sem cookie → 204 (idempotente)
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes: após logout, refresh com o cookie antigo → 401; resposta expira o cookie; logout sem cookie → 204 (idempotente)
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

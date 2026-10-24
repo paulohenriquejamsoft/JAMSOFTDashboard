@@ -91,6 +91,22 @@ public sealed class RefreshTokens(PlataformaDbContext banco, TimeProvider tempo)
             .ExecuteUpdateAsync(r => r.SetProperty(x => x.RevogadoEm, agora), ct);
     }
 
+    /// <summary>Revoga a sessão (família) do token informado (AUTH-06). Token desconhecido não faz nada.</summary>
+    public async Task RevogarFamiliaAsync(string token, CancellationToken ct = default)
+    {
+        var hash = Hash(token);
+        var familia = await banco.RefreshTokens.Where(r => r.Hash == hash).Select(r => (Guid?)r.Familia)
+            .SingleOrDefaultAsync(ct);
+        if (familia is null) return;
+
+        var agora = tempo.GetUtcNow().UtcDateTime;
+        await banco.RefreshTokens.Where(r => r.Familia == familia && r.RevogadoEm == null)
+            .ExecuteUpdateAsync(r => r.SetProperty(x => x.RevogadoEm, agora), ct);
+    }
+
+    /// <summary>Apaga o cookie no navegador (mesmo caminho e atributos de quando foi gravado).</summary>
+    public static void ApagarCookie(HttpResponse resposta) => resposta.Cookies.Delete(Cookie, OpcoesCookie(null));
+
     /// <summary>Cookie <c>HttpOnly; Secure; SameSite=Strict; Path=/api/auth</c>, fora do alcance de scripts.</summary>
     public static void GravarCookie(HttpResponse resposta, RefreshEmitido refresh) =>
         resposta.Cookies.Append(Cookie, refresh.Token, OpcoesCookie(refresh.ExpiraEm));

@@ -50,6 +50,8 @@ public static class AutenticacaoEndpoints
         grupo.MapPost("/login", LoginEndpoint.EntrarAsync).AllowAnonymous().RequireRateLimiting(LimiteLogin);
         // Autenticada pelo cookie de refresh, não pelo access token (que pode já ter expirado).
         grupo.MapPost("/refresh", RefreshEndpoint.RenovarAsync).AllowAnonymous();
+        // Também identificada pelo cookie: funciona com access token expirado ou troca de senha pendente.
+        grupo.MapPost("/logout", LogoutEndpoint.SairAsync).AllowAnonymous();
         return app;
     }
 }

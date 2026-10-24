@@ -256,7 +256,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | AUTH-03 | P1: Login e sessão | Execute | Implementing |
 | AUTH-04 | P1: Login e sessão | Execute | Implementing |
 | AUTH-05 | P1: Login e sessão | Execute | Implementing |
-| AUTH-06 | P1: Login e sessão | Tasks | In Tasks |
+| AUTH-06 | P1: Login e sessão | Execute | Implementing |
 | AUTH-07 | P1: Login e sessão | Execute | Implementing |
 | AUTH-08 | P1: Login e sessão | Execute | Implementing |
 | AUTH-09 | P1: Login e sessão | Execute | Implementing |
