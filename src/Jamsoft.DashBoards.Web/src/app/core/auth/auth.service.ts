@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { TenantContextoService } from './tenant-contexto.service';
 import { Observable, catchError, finalize, firstValueFrom, map, of, share, tap } from 'rxjs';
 
 export type Perfil = 'SuperAdmin' | 'Admin' | 'Consulta';
@@ -32,6 +33,7 @@ export const CABECALHO_CSRF = { 'X-Requested-With': 'jamsoft' };
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly tenantContexto = inject(TenantContextoService);
   private readonly sessao = signal<UsuarioSessao | null>(null);
   private token: string | null = null;
   private renovacao: Observable<UsuarioSessao> | null = null;
@@ -54,7 +56,10 @@ export class AuthService {
     return this.http.post<void>('/api/auth/logout', null, { withCredentials: true }).pipe(
       catchError(() => of(undefined)),
       map(() => undefined),
-      finalize(() => this.encerrar()),
+      finalize(() => {
+        this.encerrar();
+        this.tenantContexto.limpar();
+      }),
     );
   }
 

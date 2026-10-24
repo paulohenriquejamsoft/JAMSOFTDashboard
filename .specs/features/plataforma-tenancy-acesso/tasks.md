@@ -1343,9 +1343,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: selecionar/limpar; restaura após recarregar a página; `sessionStorage` indisponível não quebra; logout limpa
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes: selecionar/limpar; restaura após recarregar a página; `sessionStorage` indisponível não quebra; logout limpa
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
