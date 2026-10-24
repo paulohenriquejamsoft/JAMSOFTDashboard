@@ -312,10 +312,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Teste de esquema: segundo job `Pendente` para o mesmo tenant recusado; job `Concluida` + novo `Pendente` aceitos
-- [ ] Teste de esquema: registro de auditoria com `TENANT_ID_PUBLICO` inexistente é aceito (sem FK)
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Teste de esquema: segundo job `Pendente` para o mesmo tenant recusado; job `Concluida` + novo `Pendente` aceitos
+- [x] Teste de esquema: registro de auditoria com `TENANT_ID_PUBLICO` inexistente é aceito (sem FK)
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

@@ -30,6 +30,22 @@ public sealed class NomesUpperSnakeTestes
         Assert.Equal("CRIADO_EM", entidade.FindProperty(nameof(RefreshTokenExemplo.CriadoEm))!.GetColumnName());
     }
 
+    [Fact]
+    public void Aplicar_mantem_nome_de_tabela_definido_explicitamente()
+    {
+        using var contexto = new ContextoExemplo();
+        var entidade = contexto.Model.FindEntityType(typeof(RegistroExemplo))!;
+
+        Assert.Equal("AUDITORIA_EXEMPLO", entidade.GetTableName());
+        Assert.Equal("OCORRIDO_EM", entidade.FindProperty(nameof(RegistroExemplo.OcorridoEm))!.GetColumnName());
+    }
+
+    private sealed class RegistroExemplo
+    {
+        public long Id { get; set; }
+        public DateTime OcorridoEm { get; set; }
+    }
+
     private sealed class RefreshTokenExemplo
     {
         public int Id { get; set; }
@@ -47,6 +63,7 @@ public sealed class NomesUpperSnakeTestes
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RefreshTokenExemplo>();
+            modelBuilder.Entity<RegistroExemplo>().ToTable("AUDITORIA_EXEMPLO");
             NomesUpperSnake.Aplicar(modelBuilder);
         }
     }

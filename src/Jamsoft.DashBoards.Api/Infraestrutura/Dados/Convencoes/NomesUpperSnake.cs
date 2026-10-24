@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
 
@@ -15,7 +16,10 @@ public static class NomesUpperSnake
         {
             if (entidade.IsOwned()) continue;
 
-            entidade.SetTableName(Converter(entidade.ClrType.Name));
+            // Nome de tabela definido com ToTable("...") na configuração da entidade prevalece.
+            // (o EF já atribui um nome por convenção, a partir do DbSet; só o explícito é preservado).
+            if (((IConventionEntityType)entidade).GetTableNameConfigurationSource() != ConfigurationSource.Explicit)
+                entidade.SetTableName(Converter(entidade.ClrType.Name));
             foreach (var propriedade in entidade.GetProperties())
                 propriedade.SetColumnName(Converter(propriedade.Name));
         }

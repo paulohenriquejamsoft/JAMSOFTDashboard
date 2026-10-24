@@ -300,9 +300,9 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | DEL-06 | P2: Exclusão total de tenant | Tasks | In Tasks |
 | DEL-07 | P2: Exclusão total de tenant | Tasks | In Tasks |
 | DEL-08 | P2: Exclusão total de tenant | Tasks | In Tasks |
-| DEL-09 | P2: Exclusão total de tenant | Tasks | In Tasks |
+| DEL-09 | P2: Exclusão total de tenant | Execute | Implementing |
 | AUD-01 | P3: Auditoria consultável | Tasks | In Tasks |
-| AUD-02 | P3: Auditoria consultável | Tasks | In Tasks |
+| AUD-02 | P3: Auditoria consultável | Execute | Implementing |
 | AUD-03 | P3: Auditoria consultável | Tasks | In Tasks |
 | AUD-04 | P3: Auditoria consultável | Tasks | In Tasks |
 

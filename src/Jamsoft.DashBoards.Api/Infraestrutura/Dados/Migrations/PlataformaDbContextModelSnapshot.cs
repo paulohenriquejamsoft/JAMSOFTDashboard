@@ -22,6 +22,73 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Auditoria.RegistroAuditoria", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Detalhes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("DETALHES");
+
+                    b.Property<string>("Ip")
+                        .HasColumnType("varchar(45)")
+                        .HasColumnName("IP");
+
+                    b.Property<DateTime>("OcorridoEm")
+                        .HasColumnType("datetime2(3)")
+                        .HasColumnName("OCORRIDO_EM");
+
+                    b.Property<string>("Operacao")
+                        .IsRequired()
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("OPERACAO");
+
+                    b.Property<string>("Perfil")
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("PERFIL");
+
+                    b.Property<Guid?>("RecursoIdPublico")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("RECURSO_ID_PUBLICO");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("RESULTADO");
+
+                    b.Property<Guid?>("TenantIdPublico")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("TENANT_ID_PUBLICO");
+
+                    b.Property<string>("TenantNome")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("TENANT_NOME");
+
+                    b.Property<string>("UsuarioEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)")
+                        .HasColumnName("USUARIO_EMAIL");
+
+                    b.Property<Guid?>("UsuarioIdPublico")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("USUARIO_ID_PUBLICO");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OcorridoEm");
+
+                    b.HasIndex("TenantIdPublico", "OcorridoEm");
+
+                    b.ToTable("AUDITORIA", (string)null);
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Autenticacao.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
@@ -134,6 +201,87 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .IsUnique();
 
                     b.ToTable("EMPRESA");
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Exclusao.ExclusaoTenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ConcluidoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CONCLUIDO_EM");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Erro")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("ERRO");
+
+                    b.Property<string>("EtapaAtual")
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("ETAPA_ATUAL");
+
+                    b.Property<DateTime?>("HeartbeatEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("HEARTBEAT_EM");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<DateTime?>("IniciadoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("INICIADO_EM");
+
+                    b.Property<string>("LinhasRemovidas")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("LINHAS_REMOVIDAS");
+
+                    b.Property<string>("Situacao")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("SITUACAO");
+
+                    b.Property<Guid>("SolicitadoPorIdPublico")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("SOLICITADO_POR_ID_PUBLICO");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<Guid>("TenantIdPublico")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("TENANT_ID_PUBLICO");
+
+                    b.Property<string>("TenantNome")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("TENANT_NOME");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId")
+                        .IsUnique()
+                        .HasFilter("[SITUACAO] IN ('Pendente','EmExecucao')");
+
+                    b.ToTable("EXCLUSAO_TENANT");
                 });
 
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", b =>

@@ -1,6 +1,8 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
+using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
+using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,8 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
+    public DbSet<ExclusaoTenant> ExclusoesTenant => Set<ExclusaoTenant>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
