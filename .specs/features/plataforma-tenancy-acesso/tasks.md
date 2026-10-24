@@ -341,9 +341,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes unitários: Admin sem cabeçalho; Admin com cabeçalho igual (ignorado); Admin com cabeçalho diferente (`Divergente`); Consulta idem; SuperAdmin com e sem `X-Tenant`; `X-Tenant` mal formatado; sem autenticação (`IdOuSemAcesso = -1`)
-- [ ] Gate check passes: Quick
-- [ ] Test count: 8 new tests pass
+- [x] Testes unitários: Admin sem cabeçalho; Admin com cabeçalho igual (ignorado); Admin com cabeçalho diferente (`Divergente`); Consulta idem; SuperAdmin com e sem `X-Tenant`; `X-Tenant` mal formatado; sem autenticação (`IdOuSemAcesso = -1`)
+- [x] Gate check passes: Quick
+- [x] Test count: 8 new tests pass
 
 **Tests**: unit
 **Gate**: quick

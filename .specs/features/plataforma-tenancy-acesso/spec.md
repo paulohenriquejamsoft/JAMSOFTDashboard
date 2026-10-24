@@ -274,7 +274,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | EMP-04 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-05 | P1: Empresas do tenant | Tasks | In Tasks |
 | EMP-06 | P1: Empresas do tenant | Tasks | In Tasks |
-| ISO-01 | P1: Isolamento entre tenants | Tasks | In Tasks |
+| ISO-01 | P1: Isolamento entre tenants | Execute | Implementing |
 | ISO-02 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-03 | P1: Isolamento entre tenants | Tasks | In Tasks |
 | ISO-04 | P1: Isolamento entre tenants | Tasks | In Tasks |
@@ -289,9 +289,9 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | USR-08 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-09 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-10 | P2: Admin gerencia usuários | Tasks | In Tasks |
-| CTX-01 | P2: SuperAdmin acessa contexto | Tasks | In Tasks |
+| CTX-01 | P2: SuperAdmin acessa contexto | Execute | Implementing |
 | CTX-02 | P2: SuperAdmin acessa contexto | Tasks | In Tasks |
-| CTX-03 | P2: SuperAdmin acessa contexto | Tasks | In Tasks |
+| CTX-03 | P2: SuperAdmin acessa contexto | Execute | Implementing |
 | DEL-01 | P2: Exclusão total de tenant | Tasks | In Tasks |
 | DEL-02 | P2: Exclusão total de tenant | Tasks | In Tasks |
 | DEL-03 | P2: Exclusão total de tenant | Tasks | In Tasks |
