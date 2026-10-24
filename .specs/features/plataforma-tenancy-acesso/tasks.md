@@ -205,9 +205,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes unitários cobrem: palavra simples, composta, sigla (`Cnpj` → `CNPJ`), sufixo `Id`, número
-- [ ] Gate check passes: Quick
-- [ ] Test count: 5 tests pass
+- [x] Testes unitários cobrem: palavra simples, composta, sigla (`Cnpj` → `CNPJ`), sufixo `Id`, número
+- [x] Gate check passes: Quick
+- [x] Test count: 5 tests pass
 
 **Tests**: unit
 **Gate**: quick

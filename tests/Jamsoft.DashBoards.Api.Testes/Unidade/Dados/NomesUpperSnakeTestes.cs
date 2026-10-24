@@ -1,0 +1,53 @@
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
+using Microsoft.EntityFrameworkCore;
+
+namespace Jamsoft.DashBoards.Api.Testes.Unidade.Dados;
+
+[Trait("Categoria", "Unidade")]
+public sealed class NomesUpperSnakeTestes
+{
+    [Theory]
+    [InlineData("Nome", "NOME")]                     // palavra simples
+    [InlineData("CriadoEm", "CRIADO_EM")]            // composta
+    [InlineData("Cnpj", "CNPJ")]                     // sigla escrita em PascalCase
+    [InlineData("IPOrigem", "IP_ORIGEM")]            // sigla em maiúsculas seguida de palavra
+    [InlineData("TenantId", "TENANT_ID")]            // sufixo Id
+    [InlineData("IdPublico", "ID_PUBLICO")]          // prefixo Id
+    [InlineData("Linha2Endereco", "LINHA2_ENDERECO")] // número
+    public void Converter_gera_UPPER_SNAKE(string nome, string esperado)
+    {
+        Assert.Equal(esperado, NomesUpperSnake.Converter(nome));
+    }
+
+    [Fact]
+    public void Aplicar_nomeia_tabela_no_singular_e_colunas_em_UPPER_SNAKE()
+    {
+        using var contexto = new ContextoExemplo();
+        var entidade = contexto.Model.FindEntityType(typeof(RefreshTokenExemplo))!;
+
+        Assert.Equal("REFRESH_TOKEN_EXEMPLO", entidade.GetTableName());
+        Assert.Equal("TENANT_ID", entidade.FindProperty(nameof(RefreshTokenExemplo.TenantId))!.GetColumnName());
+        Assert.Equal("CRIADO_EM", entidade.FindProperty(nameof(RefreshTokenExemplo.CriadoEm))!.GetColumnName());
+    }
+
+    private sealed class RefreshTokenExemplo
+    {
+        public int Id { get; set; }
+        public int TenantId { get; set; }
+        public DateTime CriadoEm { get; set; }
+    }
+
+    private sealed class ContextoExemplo : DbContext
+    {
+        public DbSet<RefreshTokenExemplo> Tokens => Set<RefreshTokenExemplo>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options) =>
+            options.UseSqlServer("Server=nao-conecta");
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RefreshTokenExemplo>();
+            NomesUpperSnake.Aplicar(modelBuilder);
+        }
+    }
+}
