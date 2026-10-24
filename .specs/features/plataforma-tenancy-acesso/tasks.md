@@ -1553,9 +1553,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: filtros viram parâmetros da consulta; paginação; estado vazio; erro com "Tentar novamente"
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes de componente: filtros viram parâmetros da consulta; paginação; estado vazio; erro com "Tentar novamente"
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

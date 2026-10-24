@@ -20,6 +20,10 @@ export default [
         path: 'tenants/:id',
         loadComponent: () => import('./tenants/tenant-form.page').then((m) => m.TenantFormPage),
       },
+      {
+        path: 'auditoria',
+        loadComponent: () => import('./auditoria/auditoria.page').then((m) => m.AuditoriaPage),
+      },
     ],
   },
 ] satisfies Routes;
