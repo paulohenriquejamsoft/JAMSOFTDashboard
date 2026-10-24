@@ -283,7 +283,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | USR-02 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-03 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-04 | P2: Admin gerencia usuários | Tasks | In Tasks |
-| USR-05 | P2: Admin gerencia usuários | Tasks | In Tasks |
+| USR-05 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-06 | P2: Admin gerencia usuários | Execute | Implementing |
 | USR-07 | P2: Admin gerencia usuários | Tasks | In Tasks |
 | USR-08 | P2: Admin gerencia usuários | Execute | Implementing |

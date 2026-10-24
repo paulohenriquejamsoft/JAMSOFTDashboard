@@ -920,9 +920,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: único Admin → exceção; dois Admins → permite; dois Admins se rebaixando ao mesmo tempo em transações paralelas → exatamente uma falha
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes: único Admin → exceção; dois Admins → permite; dois Admins se rebaixando ao mesmo tempo em transações paralelas → exatamente uma falha
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full
