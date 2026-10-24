@@ -44,6 +44,34 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     /// <summary>Lido a cada consulta: o EF troca a referência ao contexto pela instância em uso.</summary>
     private int TenantIdFiltro => TenantAtual.IdOuSemAcesso;
 
+    private int _operacoesGlobais;
+
+    /// <summary>Verdadeiro dentro de <see cref="OperacaoGlobal"/>.</summary>
+    public bool EmOperacaoGlobal => _operacoesGlobais > 0;
+
+    /// <summary>
+    /// Libera, até o descarte do retorno, a gravação de entidades de qualquer tenant
+    /// (<see cref="TenantSaveChangesInterceptor"/>). Só para SuperAdmin e a rotina de exclusão.
+    /// Não desliga o filtro de leitura: use <c>IgnoreQueryFilters([FiltroTenant])</c> quando preciso.
+    /// </summary>
+    public IDisposable OperacaoGlobal()
+    {
+        _operacoesGlobais++;
+        return new FimOperacaoGlobal(this);
+    }
+
+    private sealed class FimOperacaoGlobal(PlataformaDbContext contexto) : IDisposable
+    {
+        private bool _encerrada;
+
+        public void Dispose()
+        {
+            if (_encerrada) return;
+            _encerrada = true;
+            contexto._operacoesGlobais--;
+        }
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PlataformaDbContext).Assembly);
@@ -72,7 +100,8 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     }
 
     public static void Configurar(DbContextOptionsBuilder options, string? connectionString) =>
-        options.UseSqlServer(connectionString, sql => sql.UseCompatibilityLevel(CompatibilidadeSqlServer));
+        options.UseSqlServer(connectionString, sql => sql.UseCompatibilityLevel(CompatibilidadeSqlServer))
+            .AddInterceptors(TenantSaveChangesInterceptor.Instancia);
 }
 
 public static class DadosPlataformaExtensoes

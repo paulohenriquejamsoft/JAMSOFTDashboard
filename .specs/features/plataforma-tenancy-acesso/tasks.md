@@ -393,9 +393,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: inserção sem `TenantId` recebe o tenant atual; inserção, alteração e exclusão com tenant B estando em A lançam exceção e não gravam nada; dentro de `OperacaoGlobal()` gravam
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: inserção sem `TenantId` recebe o tenant atual; inserção, alteração e exclusão com tenant B estando em A lançam exceção e não gravam nada; dentro de `OperacaoGlobal()` gravam
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

@@ -29,9 +29,16 @@ public sealed class BancoDeTestes : IAsyncLifetime
 
     /// <summary>
     /// Contexto sem tenant, para preparar dados e checar esquema: consultas a entidades do tenant
-    /// não retornam nada (filtro global).
+    /// não retornam nada (filtro global), mas a gravação de qualquer tenant é liberada
+    /// (<see cref="PlataformaDbContext.OperacaoGlobal"/>) para semear vários tenants de uma vez.
     /// </summary>
-    public PlataformaDbContext CriarContexto() => CriarContexto(TenantSemAcesso.Instancia);
+    public PlataformaDbContext CriarContexto()
+    {
+        var contexto = CriarContexto(TenantSemAcesso.Instancia);
+        // Fica liberado durante toda a vida do contexto de preparação.
+        _ = contexto.OperacaoGlobal();
+        return contexto;
+    }
 
     /// <summary>Contexto isolado no tenant informado, como numa requisição.</summary>
     public PlataformaDbContext CriarContexto(ITenantAtual tenantAtual)
