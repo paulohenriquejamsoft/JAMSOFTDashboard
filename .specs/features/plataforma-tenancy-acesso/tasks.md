@@ -972,9 +972,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: editar nome e perfil → 200 + auditoria; rebaixar o único Admin → 422 `ULTIMO_ADMIN` com a mensagem do spec; inativar usuário → refresh dele → 401; usuário de outro tenant → 404; versão antiga → 409
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: editar nome e perfil → 200 + auditoria; rebaixar o único Admin → 422 `ULTIMO_ADMIN` com a mensagem do spec; inativar usuário → refresh dele → 401; usuário de outro tenant → 404; versão antiga → 409
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

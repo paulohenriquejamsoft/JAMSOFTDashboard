@@ -24,6 +24,7 @@ public readonly record struct OperacaoAuditada(string Codigo)
     public static readonly OperacaoAuditada EmpresaAlterada = new("EMPRESA_ALTERADA");
 
     public static readonly OperacaoAuditada UsuarioCriado = new("USUARIO_CRIADO");
+    public static readonly OperacaoAuditada UsuarioAlterado = new("USUARIO_ALTERADO");
 
     public override string ToString() => Codigo;
 }

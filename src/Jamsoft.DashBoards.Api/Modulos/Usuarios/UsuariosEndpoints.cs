@@ -46,6 +46,7 @@ public static class UsuariosEndpoints
         var grupo = app.MapGroup("/api/usuarios").RequireAuthorization(Policies.AdminTenant).ValidarContextoTenant();
         grupo.MapGet("/", ListarAsync);
         grupo.MapPost("/", CriarAsync);
+        grupo.MapPut("/{idPublico}", EditarUsuarioEndpoint.EditarAsync);
         return app;
     }
 
