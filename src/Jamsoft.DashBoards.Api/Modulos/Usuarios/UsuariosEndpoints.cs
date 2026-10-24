@@ -47,6 +47,7 @@ public static class UsuariosEndpoints
         grupo.MapGet("/", ListarAsync);
         grupo.MapPost("/", CriarAsync);
         grupo.MapPut("/{idPublico}", EditarUsuarioEndpoint.EditarAsync);
+        grupo.MapPost("/{idPublico}/redefinir-senha", RedefinirSenhaEndpoint.RedefinirAsync);
         return app;
     }
 

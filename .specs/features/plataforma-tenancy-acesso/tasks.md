@@ -998,9 +998,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: após redefinir, login com a nova senha exige troca; refresh antigo → 401; senha fora da política → 400; usuário de outro tenant → 404; detalhe da auditoria não contém a senha
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: após redefinir, login com a nova senha exige troca; refresh antigo → 401; senha fora da política → 400; usuário de outro tenant → 404; detalhe da auditoria não contém a senha
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
