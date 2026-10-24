@@ -1185,10 +1185,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] As 4 regras passam no código atual
-- [ ] Cada regra falha quando uma violação de exemplo é introduzida (verificado localmente e descartado)
-- [ ] Gate check passes: Quick
-- [ ] Test count: 4 new tests pass
+- [x] As 4 regras passam no código atual
+- [x] Cada regra falha quando uma violação de exemplo é introduzida (verificado localmente e descartado)
+- [x] Gate check passes: Quick
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick

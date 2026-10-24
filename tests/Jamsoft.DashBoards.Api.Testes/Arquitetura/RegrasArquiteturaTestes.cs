@@ -1,6 +1,9 @@
+using System.Text.RegularExpressions;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
+using Jamsoft.DashBoards.Api.Seguranca;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jamsoft.DashBoards.Api.Testes.Arquitetura;
@@ -8,6 +11,76 @@ namespace Jamsoft.DashBoards.Api.Testes.Arquitetura;
 [Trait("Categoria", "Arquitetura")]
 public sealed class RegrasArquiteturaTestes
 {
+    /// <summary>Namespaces que podem desligar o isolamento (design, Risks &amp; Concerns).</summary>
+    private static readonly string[] NamespacesComBypass =
+    [
+        "Jamsoft.DashBoards.Api.Modulos.Tenants",
+        "Jamsoft.DashBoards.Api.Modulos.Auditoria",
+        "Jamsoft.DashBoards.Api.Modulos.Exclusao",
+        "Jamsoft.DashBoards.Api.Modulos.Autenticacao",
+    ];
+
+    /// <summary>Infraestrutura que define <c>OperacaoGlobal</c> e aplica o filtro global.</summary>
+    private const string ArquivoQueDefine = "Infraestrutura/Dados/PlataformaDbContext.cs";
+
+    [Fact]
+    public void Toda_rota_declara_policy_ou_AllowAnonymous()
+    {
+        // Sem IAuthorizeData nem IAllowAnonymous a rota cairia só na policy de fallback, que não conta como explícita.
+        var semDeclaracao = RotasDaApi.Todas
+            .Where(r => r.Metadata.GetMetadata<IAllowAnonymous>() is null && r.Metadata.GetOrderedMetadata<IAuthorizeData>().Count == 0)
+            .Select(RotasDaApi.Descrever).ToList();
+
+        Assert.NotEmpty(RotasDaApi.Todas);
+        Assert.Empty(semDeclaracao);
+    }
+
+    [Fact]
+    public void Rotas_de_api_admin_exigem_a_policy_SuperAdmin()
+    {
+        var admin = RotasDaApi.Todas.Where(r => r.RoutePattern.RawText!.StartsWith("/api/admin", StringComparison.Ordinal)).ToList();
+        var semSuperAdmin = admin
+            .Where(r => r.Metadata.GetMetadata<IAllowAnonymous>() is not null
+                || !r.Metadata.GetOrderedMetadata<IAuthorizeData>().Any(a => a.Policy == Policies.SuperAdmin))
+            .Select(RotasDaApi.Descrever).ToList();
+
+        Assert.NotEmpty(admin);
+        Assert.Empty(semSuperAdmin);
+    }
+
+    [Fact]
+    public void IgnoreQueryFilters_e_OperacaoGlobal_so_aparecem_nos_modulos_autorizados()
+    {
+        var projeto = Path.Combine(DiretorioDaSolucao(), "src", "Jamsoft.DashBoards.Api");
+        var uso = new Regex(@"\b(IgnoreQueryFilters|OperacaoGlobal)\s*\(");
+        var declaracaoNamespace = new Regex(@"^namespace\s+([\w.]+)", RegexOptions.Multiline);
+        var separador = Path.DirectorySeparatorChar;
+        var arquivos = Directory.EnumerateFiles(projeto, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{separador}obj{separador}") && !f.Contains($"{separador}bin{separador}"))
+            .ToList();
+
+        var indevidos = new List<string>();
+        foreach (var arquivo in arquivos)
+        {
+            var relativo = Path.GetRelativePath(projeto, arquivo).Replace(Path.DirectorySeparatorChar, '/');
+            var texto = File.ReadAllText(arquivo);
+            if (relativo == ArquivoQueDefine || !uso.IsMatch(texto)) continue;
+            var ns = declaracaoNamespace.Match(texto).Groups[1].Value;
+            if (!NamespacesComBypass.Any(p => ns == p || ns.StartsWith(p + ".", StringComparison.Ordinal)))
+                indevidos.Add($"{relativo} ({ns})");
+        }
+
+        Assert.Contains(arquivos, f => f.EndsWith("PlataformaDbContext.cs", StringComparison.Ordinal));
+        Assert.Empty(indevidos);
+    }
+
+    private static string DiretorioDaSolucao()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "Jamsoft.DashBoards.slnx"))) dir = dir.Parent;
+        return dir?.FullName ?? throw new InvalidOperationException("Jamsoft.DashBoards.slnx não encontrado.");
+    }
+
     [Fact]
     public void Toda_entidade_com_TenantId_implementa_IPertenceAoTenant_e_esta_no_plano_de_exclusao()
     {
