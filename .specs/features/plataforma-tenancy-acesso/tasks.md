@@ -178,10 +178,10 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Rota de teste que lança exceção → 500, `application/problem+json`, `codigo = ERRO_INTERNO`, `traceId` presente, sem stack trace no corpo
-- [ ] Rota de teste com validação inválida → 400 `VALIDACAO` com `erros` por campo
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 tests pass (no silent deletions)
+- [x] Rota de teste que lança exceção → 500, `application/problem+json`, `codigo = ERRO_INTERNO`, `traceId` presente, sem stack trace no corpo
+- [x] Rota de teste com validação inválida → 400 `VALIDACAO` com `erros` por campo
+- [x] Gate check passes: Full
+- [x] Test count: 3 tests pass (no silent deletions)
 
 **Tests**: integration
 **Gate**: full
