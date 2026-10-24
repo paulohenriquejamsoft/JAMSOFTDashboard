@@ -1397,9 +1397,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: campos obrigatórios; botão desabilitado enquanto envia; cada erro mostra a mensagem certa; sucesso redireciona SuperAdmin → `/admin/tenants`, Admin/Consulta → home do cliente, troca pendente → `/conta/trocar-senha`
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 7 new tests pass
+- [x] Testes de componente: campos obrigatórios; botão desabilitado enquanto envia; cada erro mostra a mensagem certa; sucesso redireciona SuperAdmin → `/admin/tenants`, Admin/Consulta → home do cliente, troca pendente → `/conta/trocar-senha`
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 7 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

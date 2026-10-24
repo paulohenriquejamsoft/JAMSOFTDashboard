@@ -1,0 +1,55 @@
+// Telas de conta: card branco centrado sobre o fundo claro, com a logo vermelha.
+:host {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espaco-4);
+  box-sizing: border-box;
+  background: var(--body-bg);
+}
+
+.cartao {
+  width: min(400px, 100%);
+  background: #fff;
+  border: 1px solid var(--borda-suave);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+  border-top: 2px solid var(--primary);
+  padding: var(--espaco-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-5);
+}
+
+.logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  align-self: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.subtitulo {
+  margin: -12px 0 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-4);
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
