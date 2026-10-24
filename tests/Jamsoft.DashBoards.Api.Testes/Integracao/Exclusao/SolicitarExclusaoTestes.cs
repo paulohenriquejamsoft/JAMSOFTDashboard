@@ -123,4 +123,21 @@ public sealed class SolicitarExclusaoTestes(BancoDeTestes banco) : IAsyncLifetim
         var (_, jobs) = await EstadoAsync(tenant);
         Assert.Single(jobs);
     }
+
+    [Fact]
+    public async Task Resposta_409_EXCLUSAO_EM_ANDAMENTO_traz_o_jobId_do_job_ativo()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Job Ativo");
+        var token = await Acesso.TokenSuperAdminAsync(banco);
+        Guid jobId;
+        using (var primeira = await SolicitarAsync(tenant, token, tenant.Nome))
+            jobId = (await Sessao.JsonAsync(primeira)).GetProperty("jobId").GetGuid();
+
+        using var segunda = await SolicitarAsync(tenant, token, tenant.Nome);
+
+        Assert.Equal(HttpStatusCode.Conflict, segunda.StatusCode);
+        var corpo = await Sessao.JsonAsync(segunda);
+        Assert.Equal(SolicitarExclusaoEndpoint.CodigoExclusaoEmAndamento, corpo.GetProperty("codigo").GetString());
+        Assert.Equal(jobId, corpo.GetProperty("jobId").GetGuid());
+    }
 }

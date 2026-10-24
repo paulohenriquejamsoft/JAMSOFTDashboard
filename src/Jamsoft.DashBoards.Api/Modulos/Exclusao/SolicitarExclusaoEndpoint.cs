@@ -63,9 +63,13 @@ public static class SolicitarExclusaoEndpoint
         catch (DbUpdateException erro) when (erro.InnerException is SqlException { Number: 2601 or 2627 } sql
             && sql.Message.Contains(IndiceJobAtivo, StringComparison.Ordinal))
         {
-            // O descarte da transação desfaz a inativação.
+            // O descarte da transação desfaz a inativação. O jobId do job ativo deixa o frontend acompanhá-lo.
+            var jobAtivo = await banco.ExclusoesTenant.AsNoTracking()
+                .Where(j => j.TenantId == tenant.Id
+                    && (j.Situacao == SituacaoExclusao.Pendente || j.Situacao == SituacaoExclusao.EmExecucao))
+                .Select(j => (Guid?)j.IdPublico).FirstOrDefaultAsync(ct);
             return ProblemasApi.Problema(StatusCodes.Status409Conflict, CodigoExclusaoEmAndamento,
-                "Exclusão já em andamento");
+                "Exclusão já em andamento", new Dictionary<string, object?> { ["jobId"] = jobAtivo });
         }
 
         status.InvalidarTenant(tenant.IdPublico);

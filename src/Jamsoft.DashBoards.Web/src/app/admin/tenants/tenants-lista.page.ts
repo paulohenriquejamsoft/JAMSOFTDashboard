@@ -5,6 +5,7 @@ import { Subject, catchError, debounceTime, distinctUntilChanged, finalize, map,
 import { traduzirProblema } from '../../core/erros/problema';
 import { EstadoCarga, Paginado } from '../../shared/paginado';
 import { ConfirmacaoDialog } from '../../shared/ui/confirmacao.dialog';
+import { ExclusaoTenantDialog } from '../exclusao/exclusao-tenant.dialog';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
 import { PaginacaoComponent } from '../../shared/ui/paginacao.component';
 import { ConsultaTenants, SituacaoFiltro, Tenant, TenantsApi, formatarCnpj } from './tenants.api';
@@ -20,7 +21,7 @@ type Resultado = { estado: 'carregando' } | { estado: 'erro'; mensagem: string }
  */
 @Component({
   selector: 'app-tenants-lista',
-  imports: [RouterLink, EstadoCargaComponent, PaginacaoComponent, ConfirmacaoDialog],
+  imports: [RouterLink, EstadoCargaComponent, PaginacaoComponent, ConfirmacaoDialog, ExclusaoTenantDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pagina">
@@ -93,6 +94,9 @@ type Resultado = { estado: 'carregando' } | { estado: 'erro'; mensagem: string }
                       <button type="button" class="btn btn-claro btn-sm" (click)="pedirSituacao(tenant)">
                         {{ tenant.ativo ? 'Inativar' : 'Reativar' }}
                       </button>
+                      <button type="button" class="btn btn-suave btn-sm" (click)="alvoExclusao.set(tenant)">
+                        Excluir
+                      </button>
                     </td>
                   </tr>
                 }
@@ -125,6 +129,10 @@ type Resultado = { estado: 'carregando' } | { estado: 'erro'; mensagem: string }
         (cancelar)="alvoSituacao.set(null)"
       />
     }
+
+    @if (alvoExclusao(); as alvo) {
+      <app-exclusao-tenant [tenant]="alvo" (fechado)="fecharExclusao($event)" />
+    }
   `,
 })
 export class TenantsListaPage {
@@ -138,6 +146,7 @@ export class TenantsListaPage {
   readonly itens = signal<Tenant[]>([]);
   readonly alvoSituacao = signal<Tenant | null>(null);
   readonly alterandoSituacao = signal(false);
+  readonly alvoExclusao = signal<Tenant | null>(null);
   readonly avisoAcao = signal<string | null>(null);
 
   private readonly busca$ = new Subject<string>();
@@ -202,6 +211,12 @@ export class TenantsListaPage {
         this.avisoAcao.set(traduzirProblema(erro).mensagem);
       },
     });
+  }
+
+  /** Depois de uma solicitação de exclusão o tenant fica inativo (ou some): a lista recarrega. */
+  fecharExclusao(solicitou: boolean): void {
+    this.alvoExclusao.set(null);
+    if (solicitou) this.recarregar();
   }
 
   private consultar(consulta: ConsultaTenants): void {

@@ -80,7 +80,7 @@ describe('TenantsListaPage', () => {
     await vi.advanceTimersByTimeAsync(0);
     fixture.detectChanges();
 
-    expect(linhas()).toEqual(['Loja B 11.222.333/0001-81 Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Loja B 11.222.333/0001-81 Ativo Editar Inativar Excluir']);
   });
 
   it('filtro de situação consulta com situacao e volta à página 1', async () => {
@@ -92,7 +92,7 @@ describe('TenantsListaPage', () => {
     select.dispatchEvent(new Event('change'));
     await responder(http.expectOne(consulta('pagina=1&situacao=Inativo')), pagina([tenant('Loja Parada', false)]));
 
-    expect(linhas()).toEqual(['Loja Parada 11.222.333/0001-81 Inativo Editar Reativar']);
+    expect(linhas()).toEqual(['Loja Parada 11.222.333/0001-81 Inativo Editar Reativar Excluir']);
   });
 
   it('paginação pede a página escolhida', async () => {
@@ -102,7 +102,7 @@ describe('TenantsListaPage', () => {
     tela().querySelector<HTMLButtonElement>('button[aria-label="Página 3"]')!.click();
     await responder(http.expectOne(consulta('pagina=3')), pagina([tenant('Loja Z')], 3, 45));
 
-    expect(linhas()).toEqual(['Loja Z 11.222.333/0001-81 Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Loja Z 11.222.333/0001-81 Ativo Editar Inativar Excluir']);
     expect(tela().querySelector('button[aria-current=page]')?.textContent?.trim()).toBe('3');
     expect(tela().querySelector<HTMLButtonElement>('button[aria-label="Próxima página"]')!.disabled).toBe(true);
   });
@@ -125,7 +125,7 @@ describe('TenantsListaPage', () => {
 
     botao('Tentar novamente')!.click();
     await responder(http.expectOne(consulta('pagina=1')), pagina([tenant('Loja A')]));
-    expect(linhas()).toEqual(['Loja A 11.222.333/0001-81 Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Loja A 11.222.333/0001-81 Ativo Editar Inativar Excluir']);
   });
 
   it('inativar pede confirmação, chama a API e atualiza a linha', async () => {
@@ -147,8 +147,8 @@ describe('TenantsListaPage', () => {
 
     expect(tela().querySelector('[role=alertdialog]')).toBeNull();
     expect(linhas()).toEqual([
-      'Loja A 11.222.333/0001-81 Inativo Editar Reativar',
-      'Loja B 11.222.333/0001-81 Ativo Editar Inativar',
+      'Loja A 11.222.333/0001-81 Inativo Editar Reativar Excluir',
+      'Loja B 11.222.333/0001-81 Ativo Editar Inativar Excluir',
     ]);
   });
 
@@ -163,6 +163,6 @@ describe('TenantsListaPage', () => {
     http.expectOne('/api/admin/tenants/id-loja-a/reativar').flush(tenant('Loja A', true));
     await fixture.whenStable();
 
-    expect(linhas()).toEqual(['Loja A 11.222.333/0001-81 Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Loja A 11.222.333/0001-81 Ativo Editar Inativar Excluir']);
   });
 });

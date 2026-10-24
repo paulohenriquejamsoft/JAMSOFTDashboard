@@ -1527,9 +1527,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: botão confirmar só habilita com nome idêntico; 202 inicia polling; `Concluida` encerra polling; `Falhou` mostra erro e "Retomar"; `EXCLUSAO_EM_ANDAMENTO` mostra o job atual
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: botão confirmar só habilita com nome idêntico; 202 inicia polling; `Concluida` encerra polling; `Falhou` mostra erro e "Retomar"; `EXCLUSAO_EM_ANDAMENTO` mostra o job atual
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
