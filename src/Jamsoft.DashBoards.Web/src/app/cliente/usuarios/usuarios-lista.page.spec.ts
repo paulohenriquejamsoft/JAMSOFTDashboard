@@ -71,8 +71,8 @@ describe('UsuariosListaPage', () => {
     await carregar([usuario('Ana Admin', 'Admin'), usuario('Caio Consulta', 'Consulta', false)]);
 
     expect(linhas()).toEqual([
-      'Ana Admin ana.admin@loja.com Admin Ativo Editar Inativar',
-      'Caio Consulta caio.consulta@loja.com Consulta Inativo Editar Reativar',
+      'Ana Admin ana.admin@loja.com Admin Ativo Editar Inativar Redefinir senha',
+      'Caio Consulta caio.consulta@loja.com Consulta Inativo Editar Reativar Redefinir senha',
     ]);
     expect(botaoEm(tela(), 'Editar')?.getAttribute('href')).toBe('/cliente/usuarios/id-ana.admin');
   });
@@ -95,7 +95,7 @@ describe('UsuariosListaPage', () => {
     await fixture.whenStable();
 
     expect(tela().querySelector('[role=alertdialog]')).toBeNull();
-    expect(linhas()[1]).toBe('Caio Consulta caio.consulta@loja.com Consulta Inativo Editar Reativar');
+    expect(linhas()[1]).toBe('Caio Consulta caio.consulta@loja.com Consulta Inativo Editar Reativar Redefinir senha');
   });
 
   it('ULTIMO_ADMIN ao inativar o último Admin mostra a mensagem do spec e mantém a linha', async () => {
@@ -109,7 +109,7 @@ describe('UsuariosListaPage', () => {
     await fixture.whenStable();
 
     expect(tela().querySelector('[role=alert]')?.textContent?.trim()).toBe('O tenant precisa de ao menos um Admin ativo');
-    expect(linhas()).toEqual(['Ana Admin ana.admin@loja.com Admin Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Ana Admin ana.admin@loja.com Admin Ativo Editar Inativar Redefinir senha']);
   });
 
   it('SuperAdmin sem tenant vê o aviso e o seletor, sem consultar; ao escolher um tenant a lista carrega', async () => {
@@ -125,6 +125,6 @@ describe('UsuariosListaPage', () => {
     await carregar([usuario('Bia Admin', 'Admin')]);
 
     expect(tela().querySelector('app-seletor-tenant')).toBeNull();
-    expect(linhas()).toEqual(['Bia Admin bia.admin@loja.com Admin Ativo Editar Inativar']);
+    expect(linhas()).toEqual(['Bia Admin bia.admin@loja.com Admin Ativo Editar Inativar Redefinir senha']);
   });
 });

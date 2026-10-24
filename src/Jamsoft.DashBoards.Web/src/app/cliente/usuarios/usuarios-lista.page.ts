@@ -8,15 +8,16 @@ import { traduzirProblema } from '../../core/erros/problema';
 import { EstadoCarga } from '../../shared/paginado';
 import { ConfirmacaoDialog } from '../../shared/ui/confirmacao.dialog';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
+import { RedefinirSenhaDialog } from './redefinir-senha.dialog';
 import { Usuario, UsuariosApi } from './usuarios.api';
 
 /**
  * `/cliente/usuarios` (USR-04, USR-09): usuários do tenant (nome, e-mail, perfil, situação) com editar e
- * inativar/reativar. O SuperAdmin opera no tenant selecionado; sem seleção, a tela mostra o seletor.
+ * inativar/reativar e redefinir senha. O SuperAdmin opera no tenant selecionado; sem seleção, a tela mostra o seletor.
  */
 @Component({
   selector: 'app-usuarios-lista',
-  imports: [RouterLink, EstadoCargaComponent, ConfirmacaoDialog, SeletorTenantComponent],
+  imports: [RouterLink, EstadoCargaComponent, ConfirmacaoDialog, SeletorTenantComponent, RedefinirSenhaDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="pagina">
@@ -80,6 +81,9 @@ import { Usuario, UsuariosApi } from './usuarios.api';
                         <button type="button" class="btn btn-claro btn-sm" (click)="pedirSituacao(usuario)">
                           {{ usuario.ativo ? 'Inativar' : 'Reativar' }}
                         </button>
+                        <button type="button" class="btn btn-claro btn-sm" (click)="alvoRedefinir.set(usuario)">
+                          Redefinir senha
+                        </button>
                       </td>
                     </tr>
                   }
@@ -105,6 +109,10 @@ import { Usuario, UsuariosApi } from './usuarios.api';
         (cancelar)="alvoSituacao.set(null)"
       />
     }
+
+    @if (alvoRedefinir(); as alvo) {
+      <app-redefinir-senha [usuario]="alvo" (fechado)="alvoRedefinir.set(null)" />
+    }
   `,
 })
 export class UsuariosListaPage {
@@ -117,6 +125,7 @@ export class UsuariosListaPage {
   readonly usuarios = signal<Usuario[]>([]);
   readonly alvoSituacao = signal<Usuario | null>(null);
   readonly alterandoSituacao = signal(false);
+  readonly alvoRedefinir = signal<Usuario | null>(null);
   readonly avisoAcao = signal<string | null>(null);
   private carga?: Subscription;
 

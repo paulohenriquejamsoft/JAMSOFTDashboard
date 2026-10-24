@@ -1607,9 +1607,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes de componente: só oferece perfis Admin e Consulta; `EMAIL_EM_USO` no campo; senha fora da política bloqueada; `ULTIMO_ADMIN` ao rebaixar mostra a mensagem; redefinir senha envia e confirma
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: só oferece perfis Admin e Consulta; `EMAIL_EM_USO` no campo; senha fora da política bloqueada; `ULTIMO_ADMIN` ao rebaixar mostra a mensagem; redefinir senha envia e confirma
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

@@ -19,6 +19,16 @@ export default [
         canMatch: [perfilGuard(ADMIN_TENANT)],
         loadComponent: () => import('./usuarios/usuarios-lista.page').then((m) => m.UsuariosListaPage),
       },
+      {
+        path: 'usuarios/novo',
+        canMatch: [perfilGuard(ADMIN_TENANT)],
+        loadComponent: () => import('./usuarios/usuario-form.page').then((m) => m.UsuarioFormPage),
+      },
+      {
+        path: 'usuarios/:id',
+        canMatch: [perfilGuard(ADMIN_TENANT)],
+        loadComponent: () => import('./usuarios/usuario-form.page').then((m) => m.UsuarioFormPage),
+      },
       { path: 'empresas', canMatch: [perfilGuard(ADMIN_TENANT)], component: EmpresasPlaceholder },
     ],
   },
