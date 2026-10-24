@@ -1078,9 +1078,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: Admin → 403; nome com caixa diferente ou espaço extra → 422 `CONFIRMACAO_INVALIDA` e nada criado; confirmação válida → 202, tenant inativo, job `Pendente`, auditoria; segunda solicitação → 409
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: Admin → 403; nome com caixa diferente ou espaço extra → 422 `CONFIRMACAO_INVALIDA` e nada criado; confirmação válida → 202, tenant inativo, job `Pendente`, auditoria; segunda solicitação → 409
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

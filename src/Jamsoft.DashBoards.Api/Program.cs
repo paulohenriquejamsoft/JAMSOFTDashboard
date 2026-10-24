@@ -4,6 +4,7 @@ using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
+using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -35,6 +36,7 @@ app.MapTenants();
 app.MapEmpresas();
 app.MapUsuarios();
 app.MapAuditoria();
+app.MapExclusao();
 
 app.Run();
 

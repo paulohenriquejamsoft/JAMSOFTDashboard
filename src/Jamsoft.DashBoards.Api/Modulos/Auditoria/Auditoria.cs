@@ -30,6 +30,9 @@ public readonly record struct OperacaoAuditada(string Codigo)
     public static readonly OperacaoAuditada UsuarioAlterado = new("USUARIO_ALTERADO");
     public static readonly OperacaoAuditada SenhaRedefinida = new("SENHA_REDEFINIDA");
 
+    /// <summary>Ciclo da exclusão de tenant (DEL-08).</summary>
+    public static readonly OperacaoAuditada ExclusaoSolicitada = new("EXCLUSAO_SOLICITADA");
+
     public override string ToString() => Codigo;
 }
 
