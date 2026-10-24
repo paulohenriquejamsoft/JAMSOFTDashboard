@@ -1239,9 +1239,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Todos os tokens do Design System existem como variáveis CSS com os mesmos nomes/valores
-- [ ] Build passa
-- [ ] Gate check passes: Build
+- [x] Todos os tokens do Design System existem como variáveis CSS com os mesmos nomes/valores
+- [x] Build passa
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build

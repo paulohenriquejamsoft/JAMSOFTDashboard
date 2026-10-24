@@ -1,1 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
+@use 'styles/tokens';
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-primary);
+  background: var(--body-bg);
+}
+
+a {
+  color: var(--primary-texto);
+}
+
+a:hover {
+  color: var(--primary-texto-hover);
+}

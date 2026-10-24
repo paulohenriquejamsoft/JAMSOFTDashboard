@@ -1,0 +1,108 @@
+// Tokens do Design System (canvas "SGE Design System", §3.1).
+// Nomes e valores seguem o Design System; o tema escuro usa a sidebar e a superfície #171923.
+
+:root {
+  // Marca
+  --primary: #f2323f;
+  --primary-hover: #ff5b63;
+  --primary-soft: rgba(242, 50, 63, 0.1);
+  --primary-texto: #c81e2b;
+  --primary-texto-hover: #9e1420;
+  --cor-logo: #ff0000;
+  --gradiente-sidebar: linear-gradient(180deg, #e53342 0%, #b91524 52%, #7f0b19 100%);
+
+  // Neutros e superfícies
+  --text-primary: #171923;
+  --text-secondary: #4a4f5c;
+  --text-muted: #6f7482;
+  --cor-borda-campo: #c8ccd5;
+  --field-bg: rgba(109, 112, 122, 0.09);
+  --body-bg: #fbfaf7;
+  --body-bg-vermelho: #fff6f7;
+  --surface-bg: #ffffff;
+  --header-bg: rgba(255, 251, 251, 0.98);
+  --borda-suave: rgba(23, 25, 35, 0.1);
+  --borda-header: rgba(140, 18, 32, 0.13);
+
+  // Menu lateral (tema vermelho)
+  --sidebar-bg: var(--gradiente-sidebar);
+  --sidebar-texto: #ffffff;
+  --sidebar-ativo: rgba(255, 255, 255, 0.22);
+  --sidebar-linha: rgba(255, 255, 255, 0.18);
+  --sidebar-largura: 260px;
+
+  // Estados (cor / hover)
+  --sucesso: #388e3c;
+  --sucesso-hover: #4caf50;
+  --perigo: #d50000;
+  --perigo-hover: #f44336;
+  --atencao: #d39e00;
+  --atencao-hover: #e5b21b;
+  --secundario: #545b62;
+  --secundario-hover: #5a6268;
+  --padrao: #b0bec5;
+  --padrao-hover: #eceff1;
+  --mensageiro: #f5b400;
+  --mensageiro-hover: #f5a623;
+
+  // Tipografia
+  --font: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-size-base: 14px;
+  --line-height-base: 1.5;
+  --titulo-pagina-size: 28px;
+  --titulo-pagina-weight: 700;
+  --titulo-pagina-spacing: -0.4px;
+  --titulo-card-size: 14px;
+  --nav-label-size: 12.5px;
+  --campo-size: 12px;
+  --rotulo-size: 11px;
+  --rotulo-weight: 700;
+  --rotulo-spacing: 0.7px;
+  --secao-menu-size: 9px;
+  --secao-menu-spacing: 1.8px;
+  --dica-size: 11px;
+
+  // Raios
+  --raio-legado: 2px;
+  --raio-campo: 6px;
+  --raio-nav: 7px;
+  --raio-card: 8px;
+  --raio-pill: 20px;
+
+  // Sombras
+  --sombra-header: 0 8px 24px rgba(23, 25, 35, 0.04);
+  --sombra-card: 0 8px 22px rgba(23, 25, 35, 0.1);
+  --sombra-destaque: 0 8px 18px rgba(242, 50, 63, 0.24);
+  --sombra-foco: 0 0 0 4px rgba(242, 50, 63, 0.14);
+
+  // Espaçamento e medidas
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-5: 20px;
+  --espaco-6: 28px;
+  --header-altura: 58px;
+  --logo-altura-minima: 26px;
+}
+
+// Tema escuro: sidebar e superfície #171923 (tema "Escuro (padrão)" do Design System).
+[data-theme='dark'] {
+  --sidebar-bg: #171923;
+  --sidebar-texto: #ffffff;
+  --sidebar-ativo: rgba(242, 50, 63, 0.24);
+  --sidebar-linha: rgba(255, 255, 255, 0.1);
+
+  --body-bg: #171923;
+  --surface-bg: #171923;
+  --header-bg: #171923;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --cor-borda-campo: rgba(255, 255, 255, 0.18);
+  --field-bg: rgba(255, 255, 255, 0.06);
+  --borda-suave: rgba(255, 255, 255, 0.1);
+  --borda-header: rgba(255, 255, 255, 0.1);
+  --sombra-header: none;
+}
