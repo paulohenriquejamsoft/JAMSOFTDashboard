@@ -762,9 +762,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: paginação padrão 20; `tamanho=500` → limitado a 100; filtro por nome e por CNPJ; filtro por situação; GUID inexistente → 404; GUID mal formatado → 400; edição com versão antiga → 409; lista vazia → 200 com `itens: []`
-- [ ] Gate check passes: Full
-- [ ] Test count: 8 new tests pass
+- [x] Testes: paginação padrão 20; `tamanho=500` → limitado a 100; filtro por nome e por CNPJ; filtro por situação; GUID inexistente → 404; GUID mal formatado → 400; edição com versão antiga → 409; lista vazia → 200 com `itens: []`
+- [x] Gate check passes: Full
+- [x] Test count: 8 new tests pass
 
 **Tests**: integration
 **Gate**: full

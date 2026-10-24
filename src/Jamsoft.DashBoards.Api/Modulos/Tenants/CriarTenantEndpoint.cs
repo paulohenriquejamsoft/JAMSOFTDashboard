@@ -77,20 +77,29 @@ public static class CriarTenantEndpoint
             // O descarte da transação desfaz o tenant já inserido.
             return indice == IndiceEmail
                 ? ProblemasApi.Problema(StatusCodes.Status409Conflict, CodigoEmailEmUso, "E-mail já está em uso")
-                : ProblemasApi.Problema(StatusCodes.Status409Conflict, CodigoCnpjDuplicado, "CNPJ já cadastrado");
+                : CnpjDuplicado();
         }
 
         return Results.Created($"/api/admin/tenants/{tenant.IdPublico}", TenantResposta.De(tenant));
     }
 
-    private static Dictionary<string, string[]> Validar(CriarTenantRequisicao corpo, out string cnpj)
+    /// <summary>Regras de nome (3–120) e CNPJ, comuns à criação e à edição.</summary>
+    internal static Dictionary<string, string[]> ValidarNomeCnpj(string? nome, string? cnpjInformado, out string cnpj)
     {
         var erros = new Dictionary<string, string[]>();
-        var nome = corpo.Nome?.Trim() ?? "";
-        if (nome.Length is < NomeMinimo or > NomeMaximo)
+        if ((nome?.Trim() ?? "").Length is < NomeMinimo or > NomeMaximo)
             erros["nome"] = [$"O nome precisa ter entre {NomeMinimo} e {NomeMaximo} caracteres."];
-        if (!Cnpj.TentarNormalizar(corpo.Cnpj, out cnpj))
+        if (!Cnpj.TentarNormalizar(cnpjInformado, out cnpj))
             erros["cnpj"] = ["CNPJ inválido."];
+        return erros;
+    }
+
+    internal static IResult CnpjDuplicado() =>
+        ProblemasApi.Problema(StatusCodes.Status409Conflict, CodigoCnpjDuplicado, "CNPJ já cadastrado");
+
+    private static Dictionary<string, string[]> Validar(CriarTenantRequisicao corpo, out string cnpj)
+    {
+        var erros = ValidarNomeCnpj(corpo.Nome, corpo.Cnpj, out cnpj);
 
         if (corpo.AdminInicial is { } admin)
         {
@@ -106,11 +115,11 @@ public static class CriarTenantEndpoint
         return erros;
     }
 
-    private const string IndiceCnpj = "IX_TENANT_CNPJ";
+    internal const string IndiceCnpj = "IX_TENANT_CNPJ";
     private const string IndiceEmail = "IX_USUARIO_EMAIL";
 
     /// <summary>Índice único de CNPJ ou e-mail violado (erros 2601/2627 do SQL Server), ou nulo.</summary>
-    private static string? IndiceUnicoViolado(DbUpdateException erro) =>
+    internal static string? IndiceUnicoViolado(DbUpdateException erro) =>
         erro.InnerException is SqlException { Number: 2601 or 2627 } sql
             ? new[] { IndiceCnpj, IndiceEmail }.FirstOrDefault(i => sql.Message.Contains(i, StringComparison.Ordinal))
             : null;
