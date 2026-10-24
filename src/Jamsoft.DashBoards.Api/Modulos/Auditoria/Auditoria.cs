@@ -35,6 +35,7 @@ public readonly record struct OperacaoAuditada(string Codigo)
     public static readonly OperacaoAuditada ExclusaoIniciada = new("EXCLUSAO_INICIADA");
     public static readonly OperacaoAuditada ExclusaoConcluida = new("EXCLUSAO_CONCLUIDA");
     public static readonly OperacaoAuditada ExclusaoFalhou = new("EXCLUSAO_FALHOU");
+    public static readonly OperacaoAuditada ExclusaoRetomada = new("EXCLUSAO_RETOMADA");
 
     public override string ToString() => Codigo;
 }

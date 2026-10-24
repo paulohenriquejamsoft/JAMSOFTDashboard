@@ -1130,9 +1130,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: consulta de job existente e inexistente (404); retomar job `Falhou` → 202 e o worker conclui a partir da etapa salva; retomar `Concluida` → 409; Admin → 403
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: consulta de job existente e inexistente (404); retomar job `Falhou` → 202 e o worker conclui a partir da etapa salva; retomar `Concluida` → 409; Admin → 403
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
