@@ -630,9 +630,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: refresh válido → novo par e antigo marcado usado; reuso do antigo → 401 e todos os tokens do usuário revogados; expirado → 401; sem `X-Requested-With` → 400; token de usuário inativo → 401
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: refresh válido → novo par e antigo marcado usado; reuso do antigo → 401 e todos os tokens do usuário revogados; expirado → 401; sem `X-Requested-With` → 400; token de usuário inativo → 401
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
