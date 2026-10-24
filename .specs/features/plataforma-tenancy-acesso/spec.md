@@ -265,7 +265,7 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 | TEN-03 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-04 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-05 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-06 | P1: SuperAdmin gerencia tenants | Tasks | In Tasks |
+| TEN-06 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | TEN-08 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
 | EMP-01 | P1: Empresas do tenant | Execute | Implementing |

@@ -17,6 +17,8 @@ public readonly record struct OperacaoAuditada(string Codigo)
 
     public static readonly OperacaoAuditada TenantCriado = new("TENANT_CRIADO");
     public static readonly OperacaoAuditada TenantAlterado = new("TENANT_ALTERADO");
+    public static readonly OperacaoAuditada TenantInativado = new("TENANT_INATIVADO");
+    public static readonly OperacaoAuditada TenantReativado = new("TENANT_REATIVADO");
 
     public override string ToString() => Codigo;
 }

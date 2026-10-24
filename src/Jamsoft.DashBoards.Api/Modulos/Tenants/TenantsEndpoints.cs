@@ -30,6 +30,7 @@ public static class TenantsEndpoints
         grupo.MapGet("/", ListarAsync);
         grupo.MapGet("/{idPublico}", ObterAsync);
         grupo.MapPut("/{idPublico}", EditarAsync);
+        grupo.MapSituacaoTenant();
         return app;
     }
 

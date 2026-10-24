@@ -788,9 +788,9 @@ T57 → T58
 
 **Done when**:
 
-- [ ] Testes: após inativar, login do Admin → 403 e token já emitido → 401; dados do tenant intactos; após reativar, login → 200; auditoria registra as duas operações
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: após inativar, login do Admin → 403 e token já emitido → 401; dados do tenant intactos; após reativar, login → 200; auditoria registra as duas operações
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
