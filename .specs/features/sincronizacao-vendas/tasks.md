@@ -233,9 +233,9 @@ T45
 
 **Done when**:
 
-- [ ] Teste de esquema: mesmo `BATCH_ID` no mesmo tenant recusado e aceito em outro tenant
-- [ ] Gate check passes: Full
-- [ ] Test count: 1 new test passes
+- [x] Teste de esquema: mesmo `BATCH_ID` no mesmo tenant recusado e aceito em outro tenant
+- [x] Gate check passes: Full
+- [x] Test count: 1 new test passes
 
 **Tests**: integration
 **Gate**: full

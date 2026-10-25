@@ -382,6 +382,62 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.ToTable("EXCLUSAO_TENANT");
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.LoteIngestao", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Atualizados")
+                        .HasColumnType("int")
+                        .HasColumnName("ATUALIZADOS");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("BATCH_ID");
+
+                    b.Property<int>("Inseridos")
+                        .HasColumnType("int")
+                        .HasColumnName("INSERIDOS");
+
+                    b.Property<int>("OrigemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ORIGEM_ID");
+
+                    b.Property<DateTime>("RecebidoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("RECEBIDO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("Rejeitados")
+                        .HasColumnType("int")
+                        .HasColumnName("REJEITADOS");
+
+                    b.Property<string>("Resposta")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("RESPOSTA");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrigemId");
+
+                    b.HasIndex("RecebidoEm");
+
+                    b.HasIndex("TenantId", "BatchId")
+                        .IsUnique();
+
+                    b.ToTable("LOTE_INGESTAO");
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", b =>
                 {
                     b.Property<int>("Id")
@@ -747,6 +803,21 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .WithMany()
                         .HasForeignKey("OrigemId")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.LoteIngestao", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", null)
+                        .WithMany()
+                        .HasForeignKey("OrigemId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
                         .WithMany()
