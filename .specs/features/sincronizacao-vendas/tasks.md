@@ -497,9 +497,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: lote novo → todas inseridas; mesmo lote com situação alterada → todas atualizadas com os campos novos e `ALTERADO_EM`; mistura → contagens exatas; dois lotes sobrepostos em paralelo → nenhuma duplicata e soma coerente; tenant vem do parâmetro (venda de outro tenant com mesma chave não é tocada)
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: lote novo → todas inseridas; mesmo lote com situação alterada → todas atualizadas com os campos novos e `ALTERADO_EM`; mistura → contagens exatas; dois lotes sobrepostos em paralelo → nenhuma duplicata e soma coerente; tenant vem do parâmetro (venda de outro tenant com mesma chave não é tocada)
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
