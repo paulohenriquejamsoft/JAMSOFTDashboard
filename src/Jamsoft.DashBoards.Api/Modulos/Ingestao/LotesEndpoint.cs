@@ -32,6 +32,7 @@ public sealed class TenantDoLote(int id, Guid idPublico, Guid? coletorIdPublico)
 /// lote é gravado num contexto fixo no tenant dele: vendas inválidas são rejeitadas com o motivo e as demais gravadas
 /// pelo <see cref="GravadorVendas"/>. O lote é gravado numa transação junto com a linha de <see cref="LoteIngestao"/> e
 /// a resposta; um lote já processado (mesmo <c>batchId</c> no tenant) recebe a resposta gravada (ING-05, AD-014).
+/// Empresa que já pertence a outra origem → 409 <c>EMPRESA_VINCULADA_A_OUTRA_ORIGEM</c> sem gravar nada (ING-07, ING-10).
 /// </summary>
 public static class LotesEndpoint
 {
@@ -40,6 +41,7 @@ public static class LotesEndpoint
     public const string CodigoLoteGrandeDemais = "LOTE_GRANDE_DEMAIS";
     public const string CodigoTenantNaoAutorizado = "TENANT_NAO_AUTORIZADO";
     public const string CodigoTenantInativo = "TENANT_INATIVO";
+    public const string CodigoEmpresaDeOutraOrigem = "EMPRESA_VINCULADA_A_OUTRA_ORIGEM";
 
     private const string IndiceOrigem = "IX_ORIGEM_SINCRONIZACAO_TENANT_ID_CONFIGURACAO_ID_ROTINA";
     private const string IndiceLote = "IX_LOTE_INGESTAO_TENANT_ID_BATCH_ID";
@@ -126,10 +128,30 @@ public static class LotesEndpoint
         var empresas = new Dictionary<int, int>();
         var servico = new ServicoEmpresas(banco);
         foreach (var grupo in validacao.Validas.GroupBy(v => v.CodEmpresa))
-            empresas[grupo.Key] = (await servico.ObterOuCriarAsync(tenantId, grupo.Key, grupo.First().NomeEmpresa, ct)).Id;
+        {
+            var empresa = await servico.ObterOuCriarAsync(tenantId, grupo.Key, grupo.First().NomeEmpresa, ct);
+            // A exceção desfaz a transação do lote inteiro: nada é gravado (ING-10).
+            if (!await DaOrigemAsync(banco, empresa, origem.Id, ct))
+                throw new ProblemaApiException(StatusCodes.Status409Conflict, CodigoEmpresaDeOutraOrigem,
+                    $"Empresa {grupo.Key} vinculada a outra origem");
+            empresas[grupo.Key] = empresa.Id;
+        }
 
         var (inseridos, atualizados) = await GravadorVendas.GravarAsync(banco, tenantId, origem.Id, validacao.Validas, empresas, ct);
         return (new ResultadoLote(lote.BatchId, inseridos, atualizados, validacao.Rejeitadas), origem.Id);
+    }
+
+    /// <summary>
+    /// A empresa pertence à origem do lote (ING-10). Empresa sem dona (nova ou criada à mão) passa a ser desta origem; o
+    /// <c>UPDATE</c> condicionado a <c>ORIGEM_ID IS NULL</c> resolve a corrida entre duas origens.
+    /// </summary>
+    private static async Task<bool> DaOrigemAsync(PlataformaDbContext banco, Empresa empresa, int origemId, CancellationToken ct)
+    {
+        if (empresa.OrigemId is { } dona) return dona == origemId;
+        var adotada = await banco.Empresas.Where(e => e.Id == empresa.Id && e.OrigemId == null)
+            .ExecuteUpdateAsync(e => e.SetProperty(x => x.OrigemId, origemId), ct);
+        return adotada == 1
+            || await banco.Empresas.Where(e => e.Id == empresa.Id).Select(e => e.OrigemId).SingleAsync(ct) == origemId;
     }
 
     /// <summary>A origem (tenant, configuração, rotina) do lote, criada no primeiro lote.</summary>

@@ -575,9 +575,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: primeira venda de empresa nova cria a empresa com o nome recebido e `ORIGEM_ID` da origem; empresa criada à mão é adotada; segunda configuração enviando a mesma empresa → 409 e nenhuma venda gravada; falha injetada no MERGE desfaz origem/empresa/lote (nada persistido)
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: primeira venda de empresa nova cria a empresa com o nome recebido e `ORIGEM_ID` da origem; empresa criada à mão é adotada; segunda configuração enviando a mesma empresa → 409 e nenhuma venda gravada; falha injetada no MERGE desfaz origem/empresa/lote (nada persistido)
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
