@@ -348,9 +348,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: cada atalho gera as datas esperadas (relógio falso); mudar período emite o filtro e atualiza a URL; abrir com `?inicio&fim&empresas` restaura o filtro; fim < início e 25 meses mostram a mensagem e não emitem; seletor de empresas oculto com 1 empresa
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 7 new tests pass
+- [x] Testes de componente: cada atalho gera as datas esperadas (relógio falso); mudar período emite o filtro e atualiza a URL; abrir com `?inicio&fim&empresas` restaura o filtro; fim < início e 25 meses mostram a mensagem e não emitem; seletor de empresas oculto com 1 empresa
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 7 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
