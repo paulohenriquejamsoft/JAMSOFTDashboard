@@ -890,9 +890,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes contra a API real (`WebApplicationFactory`): autentica e envia lote; token expirado (relógio falso) renova uma vez e reenvia; credencial revogada → resultado "credencial inválida"; tenant inativo → "não autorizada"; com handler que falha 3x e depois responde, chega ao sucesso com os 3 intervalos esperados; 400 não é repetido
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 6 new tests pass
+- [x] Testes contra a API real (`WebApplicationFactory`): autentica e envia lote; token expirado (relógio falso) renova uma vez e reenvia; credencial revogada → resultado "credencial inválida"; tenant inativo → "não autorizada"; com handler que falha 3x e depois responde, chega ao sucesso com os 3 intervalos esperados; 400 não é repetido
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 6 new tests pass
 
 **Tests**: integration
 **Gate**: full

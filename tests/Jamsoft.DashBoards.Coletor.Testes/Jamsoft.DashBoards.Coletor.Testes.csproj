@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.13" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.11.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
@@ -21,9 +22,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <!-- Mesmo fixture de banco dos testes da API: um banco descartável por coleção (TESTES_SQLSERVER ou container). -->
+  <!-- Mesmo fixture de banco dos testes da API: um banco descartável por coleção (TESTES_SQLSERVER ou container).
+       TenantFixo lê as vendas gravadas pela API real em memória (ApiEmMemoria) nos testes do ClienteApi e ponta a ponta. -->
   <ItemGroup>
     <Compile Include="..\Jamsoft.DashBoards.Api.Testes\Infraestrutura\BancoDeTestes.cs" Link="Infraestrutura\BancoDeTestes.cs" />
+    <Compile Include="..\Jamsoft.DashBoards.Api.Testes\Infraestrutura\TenantFixo.cs" Link="Infraestrutura\TenantFixo.cs" />
   </ItemGroup>
 
   <ItemGroup>
