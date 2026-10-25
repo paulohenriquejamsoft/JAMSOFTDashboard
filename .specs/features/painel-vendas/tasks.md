@@ -640,9 +640,9 @@ T22
 
 **Done when**:
 
-- [ ] Cenários passam em Chromium; smoke passa em Firefox e WebKit; `scrollWidth <= clientWidth` nas duas larguras
-- [ ] Gate check passes: Full-Web
-- [ ] Test count: ≥ 5 e2e tests pass
+- [x] Cenários passam em Chromium; smoke passa em Firefox e WebKit; `scrollWidth <= clientWidth` nas duas larguras
+- [x] Gate check passes: Full-Web
+- [x] Test count: ≥ 5 e2e tests pass
 
 **Tests**: e2e
 **Gate**: full-web

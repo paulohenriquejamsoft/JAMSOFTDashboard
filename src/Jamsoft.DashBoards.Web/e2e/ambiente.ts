@@ -64,6 +64,16 @@ export function cliApi(args: string[], env: NodeJS.ProcessEnv): string {
   return execFileSync('dotnet', [DLL_API, ...args], { cwd: PROJETO_API, env, encoding: 'utf8' });
 }
 
+/** Senha temporária impressa pelo `criar-superadmin` (linha seguinte a "Senha temporária"). */
+export function senhaTemporariaDaSaida(saida: string): string {
+  const linhas = saida.split(/\r?\n/);
+  // Só o prefixo ASCII: a saída redirecionada usa a página de código do console, que estraga os acentos.
+  const indice = linhas.findIndex((l) => l.includes('Senha tempor'));
+  const senha = linhas[indice + 1]?.trim();
+  if (indice < 0 || !senha) throw new Error('Senha temporária não encontrada na saída do criar-superadmin.');
+  return senha;
+}
+
 /** Sobe um processo em segundo plano; a saída vai para o console só com `E2E_LOG=1`. */
 export function iniciar(comando: string, args: string[], opcoes: { cwd: string; env: NodeJS.ProcessEnv; shell?: boolean }): ChildProcess {
   const processo = spawn(comando, args, { ...opcoes, stdio: process.env['E2E_LOG'] ? 'inherit' : 'ignore', windowsHide: true });

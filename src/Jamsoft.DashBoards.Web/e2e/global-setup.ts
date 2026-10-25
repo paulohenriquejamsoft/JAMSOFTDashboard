@@ -15,6 +15,7 @@ import {
   iniciar,
   lerEstado,
   portaLivre,
+  senhaTemporariaDaSaida,
 } from './ambiente';
 import limpar from './global-teardown';
 
@@ -43,15 +44,13 @@ export default async function globalSetup(): Promise<void> {
       ConnectionStrings__Plataforma: connectionString(banco),
       // Chave só deste e2e (48 bytes aleatórios); nunca uma chave real.
       Jwt__Chave: randomBytes(48).toString('base64'),
+      // Os specs fazem mais logins por minuto que o limite padrão (20 por IP), todos de localhost.
+      Acesso__LimiteLoginPorMinuto: '200',
     };
 
     cliApi(['migrar'], env);
     const saida = cliApi(['criar-superadmin', '--email', EMAIL_SUPERADMIN, '--nome', 'SuperAdmin E2E'], env);
-    const linhas = saida.split(/\r?\n/);
-    // Só o prefixo ASCII: a saída redirecionada usa a página de código do console, que estraga os acentos.
-    const indice = linhas.findIndex((l) => l.includes('Senha tempor'));
-    const senha = linhas[indice + 1]?.trim();
-    if (indice < 0 || !senha) throw new Error('Senha temporária não encontrada na saída do criar-superadmin.');
+    const senha = senhaTemporariaDaSaida(saida);
     process.env['E2E_SUPERADMIN_EMAIL'] = EMAIL_SUPERADMIN;
     process.env['E2E_SUPERADMIN_SENHA'] = senha;
 

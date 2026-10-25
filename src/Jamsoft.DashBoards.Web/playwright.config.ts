@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * e2e contra API + Web reais e um banco descartável (ver e2e/global-setup.ts). Só Chromium, um worker:
- * os cenários de tenancy são sequenciais e compartilham o mesmo banco.
+ * e2e contra API + Web reais e um banco descartável (ver e2e/global-setup.ts). Um worker: os cenários são
+ * sequenciais e compartilham o mesmo banco. Chromium roda tudo; Firefox e WebKit rodam o smoke do painel (PWA-06).
  */
 export default defineConfig({
   testDir: './e2e',
@@ -19,5 +19,9 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   outputDir: './e2e/.resultados',
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testMatch: /painel\.spec\.ts/, grep: /@smoke/ },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] }, testMatch: /painel\.spec\.ts/, grep: /@smoke/ },
+  ],
 });
