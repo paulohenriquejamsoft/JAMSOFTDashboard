@@ -126,7 +126,7 @@ public sealed class ClienteApiTestes(BancoDeTestes banco) : IAsyncLifetime
     {
         Assert.Equal([2, 4, 8, 16, 32], ClienteApi.IntervalosPadrao.Select(i => i.TotalSeconds));
         var (tenant, _, credencial) = await ColetorAutorizadoAsync();
-        var relogio = new FakeTimeProvider(DateTimeOffset.UtcNow);
+        var relogio = new RelogioEspiao(new FakeTimeProvider(DateTimeOffset.UtcNow));
         var transporte = new TransporteGravado(_api.Server.CreateHandler(), relogio)
         {
             Interceptar = (requisicao, numero) => requisicao.RequestUri!.AbsolutePath.EndsWith(ClienteApi.RotaLotes, StringComparison.Ordinal)
@@ -135,11 +135,21 @@ public sealed class ClienteApiTestes(BancoDeTestes banco) : IAsyncLifetime
         using var cliente = new ClienteApi(credencial, relogio, transporte);
 
         var envio = cliente.EnviarLoteAsync(Lote(tenant, 1));
-        // O relógio só anda quando o cliente está parado esperando: cada passo de 1 s dispara a espera vencida.
-        for (var passos = 0; !envio.IsCompleted && passos < 200; passos++)
+        // O relógio só anda depois que o cliente armou a espera entre tentativas (os timers de 100 s são o tempo
+        // limite de cada tentativa e os infinitos são timers desarmados), e anda exatamente o prazo que o cliente pediu.
+        var atendidas = 0;
+        IReadOnlyList<TimeSpan> Esperas() => [.. relogio.Prazos.Where(p => p > TimeSpan.Zero && p < ClienteApi.TimeoutPorTentativa)];
+        while (true)
         {
-            await Task.Delay(50);
-            relogio.Advance(TimeSpan.FromSeconds(1));
+            await Esperar.AteAsync(() => envio.IsCompleted || Esperas().Count > atendidas, "espera entre tentativas");
+            if (envio.IsCompleted)
+            {
+                break;
+            }
+
+            var feitas = transporte.Da(ClienteApi.RotaLotes).Count;
+            relogio.Falso.Advance(Esperas()[atendidas++]);
+            await Esperar.AteAsync(() => envio.IsCompleted || transporte.Da(ClienteApi.RotaLotes).Count > feitas, "nova tentativa");
         }
 
         Assert.Equal(SituacaoResposta.Sucesso, (await envio).Situacao);

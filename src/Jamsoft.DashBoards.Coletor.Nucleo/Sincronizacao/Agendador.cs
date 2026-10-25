@@ -293,11 +293,13 @@ public sealed class Agendador : BackgroundService
             }
 
             var proxima = _relogio.GetUtcNow() + configuracao.Intervalo;
+            using var espera = CancellationTokenSource.CreateLinkedTokenSource(ct, despertar);
+            var aguardar = Task.Delay(configuracao.Intervalo, _relogio, espera.Token);
+            // Avisa depois de armar a espera: quem vê a próxima execução já encontra o timer contando.
             Notificar(laco, new EstadoAgendamento(laco.ConfiguracaoId, false, proxima, resumo));
             try
             {
-                using var espera = CancellationTokenSource.CreateLinkedTokenSource(ct, despertar);
-                await Task.Delay(configuracao.Intervalo, _relogio, espera.Token);
+                await aguardar;
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
