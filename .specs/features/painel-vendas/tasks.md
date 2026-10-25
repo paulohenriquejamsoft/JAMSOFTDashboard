@@ -374,9 +374,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: ao abrir, dispara os 4 blocos com o mês corrente; cada bloco mostra carregando enquanto pendente; erro em `rankings` mostra erro e "Tentar novamente" só nele e os outros 3 renderizam; "Tentar novamente" refaz só aquele bloco; `semVendas` → mensagem; tenant sem sincronização → mensagem própria; SuperAdmin sem tenant → seletor e nenhuma chamada
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 7 new tests pass
+- [x] Testes de componente: ao abrir, dispara os 4 blocos com o mês corrente; cada bloco mostra carregando enquanto pendente; erro em `rankings` mostra erro e "Tentar novamente" só nele e os outros 3 renderizam; "Tentar novamente" refaz só aquele bloco; `semVendas` → mensagem; tenant sem sincronização → mensagem própria; SuperAdmin sem tenant → seletor e nenhuma chamada
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 7 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

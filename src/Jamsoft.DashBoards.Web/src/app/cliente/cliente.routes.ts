@@ -8,7 +8,7 @@ export default [
     path: '',
     component: ShellComponent,
     children: [
-      { path: '', loadComponent: () => import('./cliente-inicio.page').then((m) => m.ClienteInicioPage) },
+      { path: '', loadComponent: () => import('./painel/painel.page').then((m) => m.PainelPage) },
       {
         path: 'usuarios',
         canMatch: [perfilGuard(ADMIN_TENANT)],
