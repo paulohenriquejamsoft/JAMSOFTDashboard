@@ -34,6 +34,7 @@ const MENSAGENS: Record<string, string> = {
   EXCLUSAO_NAO_RETOMAVEL: 'A exclusão não pode ser retomada',
   PERFIL_NAO_PERMITIDO: 'Perfil não permitido',
   MUITAS_REQUISICOES: 'Aguarde um minuto',
+  COLETOR_REVOGADO: 'Credencial revogada',
 };
 
 interface CorpoProblema {

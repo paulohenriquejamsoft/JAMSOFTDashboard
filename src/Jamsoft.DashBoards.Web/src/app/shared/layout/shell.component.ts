@@ -109,6 +109,7 @@ export class ShellComponent {
           itens: [
             { rotulo: 'Início', link: '/admin', exato: true },
             { rotulo: 'Tenants', link: '/admin/tenants' },
+            { rotulo: 'Coletores', link: '/admin/coletores' },
             { rotulo: 'Auditoria', link: '/admin/auditoria' },
           ],
         },

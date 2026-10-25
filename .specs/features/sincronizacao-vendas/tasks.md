@@ -1199,9 +1199,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de componente: estados carregando/vazio/erro; revogar pede confirmação e atualiza a linha; rotacionar abre o diálogo com o novo secret; rota protegida por perfil (guard)
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: estados carregando/vazio/erro; revogar pede confirmação e atualiza a linha; rotacionar abre o diálogo com o novo secret; rota protegida por perfil (guard)
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

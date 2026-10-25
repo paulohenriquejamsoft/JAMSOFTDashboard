@@ -21,6 +21,10 @@ export default [
         loadComponent: () => import('./tenants/tenant-form.page').then((m) => m.TenantFormPage),
       },
       {
+        path: 'coletores',
+        loadComponent: () => import('./coletores/coletores-lista.page').then((m) => m.ColetoresListaPage),
+      },
+      {
         path: 'auditoria',
         loadComponent: () => import('./auditoria/auditoria.page').then((m) => m.AuditoriaPage),
       },

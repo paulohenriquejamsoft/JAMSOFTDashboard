@@ -44,6 +44,12 @@ const matriz: [Ator, string, Esperado][] = [
   ['anônimo', '/cliente/usuarios', login],
   ['anônimo', '/cliente/empresas', login],
   ['anônimo', '/conta/login', login],
+
+  // Gestão de Coletores: só SuperAdmin (COL-08).
+  ['SuperAdmin sem tenant', '/admin/coletores', liberado('/admin/coletores')],
+  ['Admin', '/admin/coletores', { url: '/cliente', aviso: NEGADO }],
+  ['Consulta', '/admin/coletores', { url: '/cliente', aviso: NEGADO }],
+  ['anônimo', '/admin/coletores', login],
 ];
 
 function sessaoDe(ator: Ator): UsuarioSessao | null {
