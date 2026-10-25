@@ -72,8 +72,12 @@ public static class TokenColetorEndpoint
         var emitido = tokens.EmitirColetor(coletor, tenants.Select(t => t.IdPublico));
 
         var agora = tempo.GetUtcNow().UtcDateTime;
-        await banco.Coletores.Where(c => c.Id == coletor.Id)
-            .ExecuteUpdateAsync(c => c.SetProperty(x => x.UltimoTokenEm, agora), ct);
+        await banco.Database.ExecuteSqlInterpolatedAsync($"""
+            MERGE COLETOR_ACESSO WITH (HOLDLOCK) AS destino
+            USING (SELECT {coletor.Id} AS COLETOR_ID) AS origem ON destino.COLETOR_ID = origem.COLETOR_ID
+            WHEN MATCHED THEN UPDATE SET ULTIMO_TOKEN_EM = {agora}
+            WHEN NOT MATCHED THEN INSERT (COLETOR_ID, ULTIMO_TOKEN_EM) VALUES (origem.COLETOR_ID, {agora});
+            """, ct);
 
         return Results.Ok(new TokenColetorResposta(emitido.Token, emitido.ExpiraEm, tenants));
     }

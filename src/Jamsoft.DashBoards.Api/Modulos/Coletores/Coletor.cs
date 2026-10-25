@@ -22,8 +22,18 @@ public sealed class Coletor
     public int VersaoCredencial { get; set; } = 1;
     public DateTime CriadoEm { get; set; }
     public DateTime? RevogadoEm { get; set; }
-    public DateTime? UltimoTokenEm { get; set; }
     public byte[] Versao { get; set; } = [];
+    public ColetorAcesso? Acesso { get; set; }
+}
+
+/// <summary>
+/// Último token emitido ao <see cref="Coletor"/>, fora da linha do coletor: o ROWVERSION muda a cada UPDATE da linha,
+/// e a renovação do token (a cada 15 min) não pode invalidar a versão lida pelo admin.
+/// </summary>
+public sealed class ColetorAcesso
+{
+    public int ColetorId { get; set; }
+    public DateTime UltimoTokenEm { get; set; }
 }
 
 internal sealed class ColetorConfiguracao : IEntityTypeConfiguration<Coletor>
@@ -43,7 +53,17 @@ internal sealed class ColetorConfiguracao : IEntityTypeConfiguration<Coletor>
         e.Property(x => x.VersaoCredencial).HasDefaultValue(1).ValueGeneratedNever();
         e.Property(x => x.CriadoEm).HasColumnType("datetime2(0)").HasDefaultValueSql("SYSUTCDATETIME()");
         e.Property(x => x.RevogadoEm).HasColumnType("datetime2(0)");
-        e.Property(x => x.UltimoTokenEm).HasColumnType("datetime2(0)");
         e.Property(x => x.Versao).IsRowVersion();
+        e.HasOne(x => x.Acesso).WithOne().HasForeignKey<ColetorAcesso>(x => x.ColetorId).OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+internal sealed class ColetorAcessoConfiguracao : IEntityTypeConfiguration<ColetorAcesso>
+{
+    public void Configure(EntityTypeBuilder<ColetorAcesso> e)
+    {
+        e.HasKey(x => x.ColetorId);
+        e.Property(x => x.ColetorId).ValueGeneratedNever();
+        e.Property(x => x.UltimoTokenEm).HasColumnType("datetime2(0)");
     }
 }

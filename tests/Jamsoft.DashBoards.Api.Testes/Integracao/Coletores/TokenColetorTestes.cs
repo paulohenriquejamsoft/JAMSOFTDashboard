@@ -82,7 +82,7 @@ public sealed class TokenColetorTestes(BancoDeTestes banco) : IAsyncLifetime
             json.GetProperty("tenants").EnumerateArray()
                 .Select(t => (t.GetProperty("idPublico").GetGuid(), t.GetProperty("nome").GetString())));
         await using var leitura = banco.CriarContexto();
-        Assert.NotNull((await leitura.Coletores.AsNoTracking().SingleAsync(c => c.Id == coletor.Id)).UltimoTokenEm);
+        Assert.NotNull((await leitura.Coletores.AsNoTracking().Include(c => c.Acesso).SingleAsync(c => c.Id == coletor.Id)).Acesso?.UltimoTokenEm);
     }
 
     [Fact]

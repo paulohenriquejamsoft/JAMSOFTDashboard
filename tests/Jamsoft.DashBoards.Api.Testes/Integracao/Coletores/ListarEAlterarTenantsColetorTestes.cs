@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
@@ -151,6 +152,32 @@ public sealed class ListarEAlterarTenantsColetorTestes(BancoDeTestes banco) : IA
         var depois = await NoBancoAsync(idPublico);
         Assert.Equal([b.Id], depois.Tenants);
         Assert.Equal(2, depois.VersaoCredencial);
+    }
+
+    /// <summary>
+    /// O Coletor renova o token a cada 15 min; isso não é edição do cadastro e não pode derrubar a versão que o
+    /// admin leu (sem 409 falso). O último token continua visível na lista.
+    /// </summary>
+    [Fact]
+    public async Task Emitir_token_nao_muda_a_versao_e_o_PUT_com_a_versao_lida_antes_responde_200()
+    {
+        var a = await Dados.NovoTenantAsync(banco);
+        var b = await Dados.NovoTenantAsync(banco);
+        var (idPublico, segredo) = await CriarAsync("Coletor Renova Token", a);
+        var (versaoLida, _, _) = await NoBancoAsync(idPublico);
+        var clientId = (await ItemDaListaAsync(idPublico)).GetProperty("clientId").GetGuid();
+        using (var token = await _cliente.PostAsJsonAsync("/api/coletor/token", new { clientId, clientSecret = segredo }))
+            Assert.Equal(HttpStatusCode.OK, token.StatusCode);
+
+        Assert.Equal(versaoLida, (await NoBancoAsync(idPublico)).Versao);
+        var item = await ItemDaListaAsync(idPublico);
+        Assert.Equal(versaoLida, item.GetProperty("versao").GetString());
+        Assert.Equal(JsonValueKind.String, item.GetProperty("ultimoTokenEm").ValueKind);
+
+        using var resposta = await AlterarAsync(idPublico, new { tenants = new[] { b.IdPublico }, versao = versaoLida });
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        Assert.Equal([b.Id], (await NoBancoAsync(idPublico)).Tenants);
     }
 
     [Fact]

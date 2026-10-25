@@ -20,7 +20,7 @@ public sealed record ColetorResposta(Guid IdPublico, string Nome, Guid ClientId,
     IReadOnlyList<TenantResumo> Tenants, DateTime CriadoEm, DateTime? RevogadoEm, DateTime? UltimoTokenEm, string Versao)
 {
     public static ColetorResposta De(Coletor c, IReadOnlyList<TenantResumo> tenants) =>
-        new(c.IdPublico, c.Nome, c.ClientId, c.Ativo, tenants, c.CriadoEm, c.RevogadoEm, c.UltimoTokenEm,
+        new(c.IdPublico, c.Nome, c.ClientId, c.Ativo, tenants, c.CriadoEm, c.RevogadoEm, c.Acesso?.UltimoTokenEm,
             Convert.ToBase64String(c.Versao));
 }
 
@@ -52,7 +52,7 @@ public static class ColetoresEndpoints
     public static async Task<IResult> RevogarAsync(Guid idPublico, PlataformaDbContext banco, IAuditoria auditoria,
         StatusColetorCache status, TimeProvider tempo, CancellationToken ct)
     {
-        var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
+        var coletor = await banco.Coletores.Include(c => c.Acesso).SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
         if (coletor is null) return TenantsEndpoints.NaoEncontrado();
 
         coletor.Ativo = false;
@@ -96,7 +96,7 @@ public static class ColetoresEndpoints
         var porPagina = Math.Clamp(tamanho ?? TenantsEndpoints.TamanhoPadrao, 1, TenantsEndpoints.TamanhoMaximo);
 
         var total = await banco.Coletores.CountAsync(ct);
-        var coletores = await banco.Coletores.AsNoTracking().OrderBy(c => c.Nome).ThenBy(c => c.Id)
+        var coletores = await banco.Coletores.AsNoTracking().Include(c => c.Acesso).OrderBy(c => c.Nome).ThenBy(c => c.Id)
             .Skip((numero - 1) * porPagina).Take(porPagina)
             .ToListAsync(ct);
         var tenants = await TenantsDosColetoresAsync(banco, [.. coletores.Select(c => c.Id)], ct);
@@ -117,7 +117,7 @@ public static class ColetoresEndpoints
         if (!TenantsEndpoints.TentarLerVersao(corpo.Versao, out var versao)) erros["versao"] = ["Versão ausente ou inválida."];
         if (erros.Count > 0) return ProblemasApi.Validacao(erros);
 
-        var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
+        var coletor = await banco.Coletores.Include(c => c.Acesso).SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
         if (coletor is null) return TenantsEndpoints.NaoEncontrado();
 
         using (banco.OperacaoGlobal())

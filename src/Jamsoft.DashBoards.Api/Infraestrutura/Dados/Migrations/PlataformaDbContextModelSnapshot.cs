@@ -190,10 +190,6 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .HasColumnType("varbinary(32)")
                         .HasColumnName("SECRET_HASH");
 
-                    b.Property<DateTime?>("UltimoTokenEm")
-                        .HasColumnType("datetime2(0)")
-                        .HasColumnName("ULTIMO_TOKEN_EM");
-
                     b.Property<byte[]>("Versao")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -218,6 +214,21 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         {
                             t.HasCheckConstraint("CK_COLETOR_SECRET_HASH", "DATALENGTH(SECRET_HASH) = 32");
                         });
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorAcesso", b =>
+                {
+                    b.Property<int>("ColetorId")
+                        .HasColumnType("int")
+                        .HasColumnName("COLETOR_ID");
+
+                    b.Property<DateTime>("UltimoTokenEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMO_TOKEN_EM");
+
+                    b.HasKey("ColetorId");
+
+                    b.ToTable("COLETOR_ACESSO");
                 });
 
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorTenant", b =>
@@ -782,6 +793,15 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorAcesso", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", null)
+                        .WithOne("Acesso")
+                        .HasForeignKey("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorAcesso", "ColetorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorTenant", b =>
                 {
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", null)
@@ -868,6 +888,11 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.NoAction);
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", b =>
+                {
+                    b.Navigation("Acesso");
                 });
 #pragma warning restore 612, 618
         }
