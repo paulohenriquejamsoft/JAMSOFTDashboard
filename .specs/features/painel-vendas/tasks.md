@@ -240,9 +240,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: 3 NF-e e 7 NFC-e → participação por faturamento conforme o conjunto e contagens 3/7; período só com NFC-e → NF-e com zeros
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Testes: 3 NF-e e 7 NFC-e → participação por faturamento conforme o conjunto e contagens 3/7; período só com NFC-e → NF-e com zeros
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full

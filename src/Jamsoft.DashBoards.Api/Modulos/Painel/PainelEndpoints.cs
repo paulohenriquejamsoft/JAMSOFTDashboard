@@ -36,6 +36,7 @@ public static class PainelEndpoints
         grupo.MapGet("/kpis", KpisAsync);
         grupo.MapGet("/evolucao", EvolucaoAsync);
         grupo.MapGet("/rankings", RankingsAsync);
+        grupo.MapGet("/dfe", DfeAsync);
         return app;
     }
 
@@ -210,6 +211,31 @@ public static class PainelEndpoints
                 Arredondar(g.Faturamento), g.Vendas, total == 0 ? 0 : Arredondar(g.Faturamento / total * 100)))
             .OrderByDescending(i => i.Faturamento).ThenBy(i => i.Nome, NomesPtBr)
             .ToList();
+
+    /// <summary>
+    /// Faturamento, nº de vendas e participação % (sobre o faturamento) por tipo de DF-e, sempre com NF-e e NFC-e:
+    /// tipo sem vendas vem com zeros (DFE-01, DFE-02).
+    /// </summary>
+    public static async Task<IResult> DfeAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
+        ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
+    {
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        if (erro is not null) return erro;
+
+        var porTipo = await consulta.Do(filtro, empresaIds)
+            .Where(v => v.Situacao == Finalizada || v.Situacao == Contingencia)
+            .GroupBy(v => v.TipoDfe)
+            .Select(g => new { Tipo = g.Key, Faturamento = g.Sum(v => v.Valor), Vendas = g.Count() })
+            .ToDictionaryAsync(x => x.Tipo, ct);
+        var total = porTipo.Values.Sum(x => x.Faturamento);
+
+        var tipos = Venda.TiposDfe.Select(tipo =>
+        {
+            var (faturamento, vendas) = porTipo.TryGetValue(tipo, out var x) ? (x.Faturamento, x.Vendas) : (0m, 0);
+            return new ItemDfe(tipo, Arredondar(faturamento), vendas, total == 0 ? 0 : Arredondar(faturamento / total * 100));
+        }).ToList();
+        return Results.Ok(new DfeResposta(tipos));
+    }
 
     private static Indicador Indicador(decimal atual, decimal anterior) =>
         new(Arredondar(atual), Arredondar(anterior), anterior == 0 ? null : Arredondar((atual - anterior) / anterior * 100));
