@@ -39,7 +39,22 @@ public sealed class TransporteGravado(HttpMessageHandler api, TimeProvider relog
             numero = _chamadas.Count(c => c.Rota == rota) + 1;
         }
 
-        var resposta = Interceptar?.Invoke(request, numero) ?? await base.SendAsync(request, cancellationToken);
+        HttpResponseMessage resposta;
+        try
+        {
+            resposta = Interceptar?.Invoke(request, numero) ?? await base.SendAsync(request, cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            // Queda simulada: a tentativa conta, sem status.
+            lock (_chamadas)
+            {
+                _chamadas.Add(new ChamadaGravada(rota, 0, agora));
+            }
+
+            throw;
+        }
+
         lock (_chamadas)
         {
             _chamadas.Add(new ChamadaGravada(rota, resposta.StatusCode, agora));

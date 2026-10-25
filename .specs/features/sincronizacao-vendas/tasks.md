@@ -994,9 +994,9 @@ T45
 
 **Done when**:
 
-- [ ] 1.200 vendas em 6 meses → plataforma com 1.200; +10 novas e 1 cancelada na janela → 1.210 e a antiga "Cancelada"; reiniciar → continua 1.210; API derrubada 2x durante carga de 3.000 → contagem exata, sem duplicatas
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 4 new tests pass
+- [x] 1.200 vendas em 6 meses → plataforma com 1.200; +10 novas e 1 cancelada na janela → 1.210 e a antiga "Cancelada"; reiniciar → continua 1.210; API derrubada 2x durante carga de 3.000 → contagem exata, sem duplicatas
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
