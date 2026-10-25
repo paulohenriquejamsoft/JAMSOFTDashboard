@@ -1,4 +1,5 @@
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Modulos.Ingestao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -17,6 +18,8 @@ public sealed class Empresa : IPertenceAoTenant
     public string Nome { get; set; } = "";
     /// <summary>Nome editado por um usuário: a ingestão não sobrescreve (EMP-05).</summary>
     public bool NomeManual { get; set; }
+    /// <summary>Origem dona da empresa (ING-10): definida na primeira ingestão; nula para empresa criada à mão.</summary>
+    public int? OrigemId { get; set; }
     public DateTime CriadoEm { get; set; }
     public byte[] Versao { get; set; } = [];
 }
@@ -31,6 +34,7 @@ internal sealed class EmpresaConfiguracao : IEntityTypeConfiguration<Empresa>
         // TENANT_ID na frente: atende ao filtro por tenant e garante o código único por tenant (ISO-05).
         e.HasIndex(x => new { x.TenantId, x.CodEmpresa }).IsUnique();
         e.HasOne<Tenant>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.NoAction);
+        e.HasOne<OrigemSincronizacao>().WithMany().HasForeignKey(x => x.OrigemId).OnDelete(DeleteBehavior.NoAction);
         e.Property(x => x.Nome).HasMaxLength(Empresa.NomeMaximo).IsRequired();
         e.Property(x => x.NomeManual).HasDefaultValue(false).ValueGeneratedNever();
         e.Property(x => x.CriadoEm).HasColumnType("datetime2(0)").HasDefaultValueSql("SYSUTCDATETIME()");

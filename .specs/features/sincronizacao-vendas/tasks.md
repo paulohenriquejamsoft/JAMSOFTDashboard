@@ -181,9 +181,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de esquema: mesma (configuração, rotina) duplicada no tenant recusada e aceita em outro tenant; empresa existente aceita `ORIGEM_ID` nulo
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Testes de esquema: mesma (configuração, rotina) duplicada no tenant recusada e aceita em outro tenant; empresa existente aceita `ORIGEM_ID` nulo
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full

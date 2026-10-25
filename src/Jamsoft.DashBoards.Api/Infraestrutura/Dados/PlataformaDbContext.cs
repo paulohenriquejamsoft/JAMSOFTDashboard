@@ -5,6 +5,7 @@ using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Exclusao;
+using Jamsoft.DashBoards.Api.Modulos.Ingestao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -43,6 +44,7 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public DbSet<ExclusaoTenant> ExclusoesTenant => Set<ExclusaoTenant>();
     public DbSet<Coletor> Coletores => Set<Coletor>();
     public DbSet<ColetorTenant> ColetoresTenant => Set<ColetorTenant>();
+    public DbSet<OrigemSincronizacao> OrigensSincronizacao => Set<OrigemSincronizacao>();
 
     /// <summary>Lido a cada consulta: o EF troca a referência ao contexto pela instância em uso.</summary>
     private int TenantIdFiltro => TenantAtual.IdOuSemAcesso;

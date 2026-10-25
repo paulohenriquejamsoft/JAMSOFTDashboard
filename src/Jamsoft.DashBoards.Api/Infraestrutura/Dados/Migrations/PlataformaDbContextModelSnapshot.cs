@@ -273,6 +273,10 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("NOME_MANUAL");
 
+                    b.Property<int?>("OrigemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ORIGEM_ID");
+
                     b.Property<int>("TenantId")
                         .HasColumnType("int")
                         .HasColumnName("TENANT_ID");
@@ -288,6 +292,8 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
                     b.HasIndex("IdPublico")
                         .IsUnique();
+
+                    b.HasIndex("OrigemId");
 
                     b.HasIndex("TenantId", "CodEmpresa")
                         .IsUnique();
@@ -374,6 +380,81 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .HasFilter("[SITUACAO] IN ('Pendente','EmExecucao')");
 
                     b.ToTable("EXCLUSAO_TENANT");
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BancoOrigem")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("BANCO_ORIGEM");
+
+                    b.Property<int>("ColetorId")
+                        .HasColumnType("int")
+                        .HasColumnName("COLETOR_ID");
+
+                    b.Property<Guid>("ConfiguracaoId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CONFIGURACAO_ID");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<int?>("RegistrosUltima")
+                        .HasColumnType("int")
+                        .HasColumnName("REGISTROS_ULTIMA");
+
+                    b.Property<string>("Rotina")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("ROTINA");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<DateTime?>("UltimaExecucaoFim")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMA_EXECUCAO_FIM");
+
+                    b.Property<DateTime?>("UltimaExecucaoInicio")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMA_EXECUCAO_INICIO");
+
+                    b.Property<string>("UltimaMensagem")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("ULTIMA_MENSAGEM");
+
+                    b.Property<string>("UltimaSituacao")
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("ULTIMA_SITUACAO");
+
+                    b.Property<DateTime?>("UltimoSucessoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMO_SUCESSO_EM");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColetorId");
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "ConfiguracaoId", "Rotina")
+                        .IsUnique();
+
+                    b.ToTable("ORIGEM_SINCRONIZACAO");
                 });
 
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", b =>
@@ -557,6 +638,26 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
                 {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", null)
+                        .WithMany()
+                        .HasForeignKey("OrigemId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", null)
+                        .WithMany()
+                        .HasForeignKey("ColetorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")

@@ -271,8 +271,10 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
 
             var retomado = await JobAsync(semHeartbeat.Id);
             Assert.Equal(SituacaoExclusao.Concluida, retomado.Situacao);
+            // Retomado da 2ª etapa: a 1ª não volta a ser executada.
             Assert.Equal(
-                new Dictionary<string, long> { ["EMPRESA"] = 7, ["REFRESH_TOKEN"] = 3, ["USUARIO"] = 3, ["TENANT"] = 1 },
+                LinhasEsperadas(Plano.Tabelas.Skip(1),
+                    new() { ["EMPRESA"] = 7, ["REFRESH_TOKEN"] = 3, ["USUARIO"] = 3, ["TENANT"] = 1 }),
                 Linhas(retomado));
             Assert.All(await DadosTenant.LinhasAsync(banco, parado.Id), p => Assert.Equal(0, p.Value));
             // Job com heartbeat recente pertence a outro worker vivo: não é tocado.
