@@ -295,10 +295,10 @@ T22
 
 **Done when**:
 
-- [ ] Testes: o tema usa `--primary` na série atual e `--text-muted` tracejado na anterior; fontes Inter/JetBrains Mono; `R$ 1.234,56` e `24/10/2026` formatados pelo pipe com a configuração aplicada
-- [ ] Build: chunk inicial sem ECharts (verificado nas estatísticas do build) e budget do bundle inicial inalterado
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 3 new tests pass
+- [x] Testes: o tema usa `--primary` na série atual e `--text-muted` tracejado na anterior; fontes Inter/JetBrains Mono; `R$ 1.234,56` e `24/10/2026` formatados pelo pipe com a configuração aplicada
+- [x] Build: chunk inicial sem ECharts (verificado nas estatísticas do build) e budget do bundle inicial inalterado
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 3 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
