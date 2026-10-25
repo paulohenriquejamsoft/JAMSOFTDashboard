@@ -732,9 +732,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: o arquivo gravado não contém senha nem secret em texto; recarrega igual; intervalo 4 min e 25 h recusados; banco já vinculado a outro tenant → erro "Banco já vinculado ao tenant X"; período inicial padrão = hoje − 6 meses (relógio falso); excluir remove configuração e checkpoint; gravação interrompida não corrompe o arquivo anterior
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 7 new tests pass
+- [x] Testes: o arquivo gravado não contém senha nem secret em texto; recarrega igual; intervalo 4 min e 25 h recusados; banco já vinculado a outro tenant → erro "Banco já vinculado ao tenant X"; período inicial padrão = hoje − 6 meses (relógio falso); excluir remove configuração e checkpoint; gravação interrompida não corrompe o arquivo anterior
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 7 new tests pass (+1 de CFG-05: campos obrigatórios)
 
 **Tests**: unit
 **Gate**: quick
