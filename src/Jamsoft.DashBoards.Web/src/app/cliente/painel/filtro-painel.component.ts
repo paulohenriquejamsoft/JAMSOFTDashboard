@@ -95,6 +95,8 @@ export class FiltroPainelComponent implements OnInit {
 
   /** Filtro válido escolhido pelo usuário (ou o inicial, ao abrir). */
   readonly filtrar = output<FiltroPainel>();
+  /** Quantas empresas o tenant tem: com uma só, o painel oculta o ranking de empresas (RNK-05). */
+  readonly empresasCarregadas = output<number>();
 
   readonly inicio = signal('');
   readonly fim = signal('');
@@ -109,7 +111,10 @@ export class FiltroPainelComponent implements OnInit {
     this.fim.set(parametros.get('fim') ?? padrao.fim);
     this.selecionadas.set(parametros.getAll('empresas'));
     this.empresasApi.listar().subscribe({
-      next: (empresas) => this.empresas.set(empresas),
+      next: (empresas) => {
+        this.empresas.set(empresas);
+        this.empresasCarregadas.emit(empresas.length);
+      },
       // Sem a lista, o filtro segue com todas as empresas.
       error: () => this.empresas.set([]),
     });

@@ -17,10 +17,11 @@ const empresa = (idPublico: string, nome: string): Empresa => ({ idPublico, codE
 @Component({
   imports: [FiltroPainelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<app-filtro-painel (filtrar)="emitidos.push($event)" />`,
+  template: `<app-filtro-painel (filtrar)="emitidos.push($event)" (empresasCarregadas)="quantidades.push($event)" />`,
 })
 class HostComponent {
   readonly emitidos: FiltroPainel[] = [];
+  readonly quantidades: number[] = [];
 }
 
 describe('FiltroPainelComponent', () => {
@@ -133,6 +134,12 @@ describe('FiltroPainelComponent', () => {
     await mudarData('filtro-fim', '2026-09-30');
     expect(tela().querySelector('[role=alert]')).toBeNull();
     expect(ultimo()).toEqual({ inicio: '2024-10-01', fim: '2026-09-30', empresas: [] });
+  });
+
+  it('informa quantas empresas o tenant tem', async () => {
+    await abrir('/painel', '2026-10-24T15:00:00Z', [empresa(EMPRESA_A, 'Matriz'), empresa(EMPRESA_B, 'Filial')]);
+
+    expect(host.quantidades).toEqual([2]);
   });
 
   it('seletor de empresas fica oculto com 1 empresa e, com 2, marcar uma restringe o filtro e a URL', async () => {

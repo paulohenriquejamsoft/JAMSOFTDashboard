@@ -454,9 +454,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: cada linha mostra os 4 campos formatados; barra com largura = participação; tenant com 1 empresa → sem tabela de Empresas; lista vazia → estado vazio; tabela com `<caption>`/cabeçalhos acessíveis
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: cada linha mostra os 4 campos formatados; barra com largura = participação; tenant com 1 empresa → sem tabela de Empresas; lista vazia → estado vazio; tabela com `<caption>`/cabeçalhos acessíveis
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

@@ -11,6 +11,7 @@ import { EvolucaoComponent } from './evolucao.component';
 import { FiltroPainelComponent } from './filtro-painel.component';
 import { KpisComponent } from './kpis.component';
 import { FiltroPainel, PainelService } from './painel.service';
+import { RankingsComponent } from './rankings.component';
 
 export const MENSAGEM_SEM_VENDAS = 'Nenhuma venda no período';
 export const MENSAGEM_SEM_SINCRONIZACAO = 'Nenhuma venda sincronizada ainda';
@@ -52,7 +53,7 @@ class Bloco<T> {
  */
 @Component({
   selector: 'app-painel',
-  imports: [EstadoCargaComponent, EvolucaoComponent, FiltroPainelComponent, KpisComponent, SeletorTenantComponent],
+  imports: [EstadoCargaComponent, EvolucaoComponent, FiltroPainelComponent, KpisComponent, RankingsComponent, SeletorTenantComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .grade {
@@ -93,7 +94,7 @@ class Bloco<T> {
           </div>
         </div>
       } @else {
-        <app-filtro-painel (filtrar)="aplicar($event)" />
+        <app-filtro-painel (filtrar)="aplicar($event)" (empresasCarregadas)="quantidadeEmpresas.set($event)" />
 
         @if (semSincronizacao()) {
           <p class="alerta alerta-atencao" role="status">{{ mensagemSemSincronizacao }}</p>
@@ -129,8 +130,10 @@ class Bloco<T> {
               <div class="card-cabecalho"><h2 id="bloco-rankings">Rankings</h2></div>
               <app-estado-carga [estado]="rankings.estado()" [mensagemErro]="rankings.mensagemErro()"
                 (tentarNovamente)="recarregar(rankings)" />
-              @if (rankings.estado() === 'pronto') {
-                <div class="bloco-conteudo"></div>
+              @if (rankings.dados(); as dados) {
+                @if (rankings.estado() === 'pronto') {
+                  <app-rankings class="bloco-conteudo" [dados]="dados" [mostrarEmpresas]="quantidadeEmpresas() !== 1" />
+                }
               }
             </section>
 
@@ -157,6 +160,8 @@ export class PainelPage {
   readonly mensagemSemSincronizacao = MENSAGEM_SEM_SINCRONIZACAO;
   readonly tenant = tenantEfetivo();
   readonly semSincronizacao = signal(false);
+  /** `null` até o filtro carregar as empresas; com 1, o ranking de empresas some (RNK-05). */
+  readonly quantidadeEmpresas = signal<number | null>(null);
 
   readonly kpis = new Bloco((f) => this.painel.kpis(f));
   readonly evolucao = new Bloco((f) => this.painel.evolucao(f));
