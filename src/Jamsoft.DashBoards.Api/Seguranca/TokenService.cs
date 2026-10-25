@@ -1,5 +1,6 @@
 using System.Text;
 using Jamsoft.DashBoards.Api.Configuracao;
+using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -23,10 +24,6 @@ public sealed class TokenService(IOptions<JwtOptions> opcoes, TimeProvider tempo
 
     public TokenEmitido Emitir(Usuario usuario, Tenant? tenant)
     {
-        var jwt = opcoes.Value;
-        var agora = tempo.GetUtcNow();
-        var expiraEm = agora.Add(Duracao);
-
         var claims = new Dictionary<string, object>
         {
             [TiposClaim.Usuario] = usuario.IdPublico.ToString(),
@@ -36,6 +33,29 @@ public sealed class TokenService(IOptions<JwtOptions> opcoes, TimeProvider tempo
         };
         if (usuario.Perfil != Perfil.SuperAdmin && tenant is not null)
             claims[TiposClaim.Tenant] = tenant.IdPublico.ToString();
+
+        return Criar(claims);
+    }
+
+    /// <summary>
+    /// Token do Coletor (COL-03, AD-015): <c>sub</c> = ID público do coletor, <c>perfil = Coletor</c>,
+    /// <c>tenants</c> (ID públicos autorizados e ativos) e <c>cred_ver</c>, com os mesmos 15 minutos.
+    /// </summary>
+    public TokenEmitido EmitirColetor(Coletor coletor, IEnumerable<Guid> tenants) =>
+        Criar(new Dictionary<string, object>
+        {
+            [TiposClaim.Usuario] = coletor.IdPublico.ToString(),
+            [TiposClaim.Perfil] = nameof(Perfil.Coletor),
+            [TiposClaim.Tenants] = tenants.Select(t => t.ToString()).ToList(),
+            [TiposClaim.VersaoCredencial] = coletor.VersaoCredencial,
+            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
+        });
+
+    private TokenEmitido Criar(Dictionary<string, object> claims)
+    {
+        var jwt = opcoes.Value;
+        var agora = tempo.GetUtcNow();
+        var expiraEm = agora.Add(Duracao);
 
         var token = Manipulador.CreateToken(new SecurityTokenDescriptor
         {

@@ -103,6 +103,23 @@ public static class Dados
         return coletor;
     }
 
+    /// <summary>
+    /// Grava um coletor ativo com secret conhecido, autorizado aos <paramref name="tenants"/>, e devolve a entidade
+    /// e o secret em texto (para chamar <c>POST /api/coletor/token</c>).
+    /// </summary>
+    public static async Task<(Coletor Coletor, string Segredo)> NovoColetorComSegredoAsync(BancoDeTestes banco,
+        params Tenant[] tenants)
+    {
+        var segredo = SegredoColetor.Gerar();
+        await using var contexto = banco.CriarContexto();
+        var coletor = new Coletor { Nome = "Coletor com segredo", ClientId = Guid.NewGuid(), SecretHash = SegredoColetor.Hash(segredo) };
+        contexto.Coletores.Add(coletor);
+        await contexto.SaveChangesAsync();
+        contexto.ColetoresTenant.AddRange(tenants.Select(t => new ColetorTenant { TenantId = t.Id, ColetorId = coletor.Id }));
+        await contexto.SaveChangesAsync();
+        return (coletor, segredo);
+    }
+
     public static async Task<SqlException> FalhaSqlAsync(Func<Task> acao)
     {
         var erro = await Assert.ThrowsAsync<DbUpdateException>(acao);

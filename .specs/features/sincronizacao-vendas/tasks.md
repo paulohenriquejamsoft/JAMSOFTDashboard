@@ -391,9 +391,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: credencial válida → 200 com token cujas claims são `perfil=Coletor`, `tenants` = ID públicos autorizados e ativos, `cred_ver` atual, validade 15 min; secret errado, `clientId` inexistente e credencial revogada → 401 `CREDENCIAL_INVALIDA` com corpo idêntico; 21ª requisição no minuto → 429
-- [ ] Gate check passes: Full
-- [ ] Test count: 6 new tests pass
+- [x] Testes: credencial válida → 200 com token cujas claims são `perfil=Coletor`, `tenants` = ID públicos autorizados e ativos, `cred_ver` atual, validade 15 min; secret errado, `clientId` inexistente e credencial revogada → 401 `CREDENCIAL_INVALIDA` com corpo idêntico; 21ª requisição no minuto → 429
+- [x] Gate check passes: Full
+- [x] Test count: 6 new tests pass
 
 **Tests**: integration
 **Gate**: full

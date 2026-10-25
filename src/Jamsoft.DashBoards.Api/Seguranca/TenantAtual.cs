@@ -14,6 +14,10 @@ public static class TiposClaim
     /// <summary>ID_PUBLICO do tenant (ausente para SuperAdmin).</summary>
     public const string Tenant = "tenant";
     public const string TrocarSenha = "trocar_senha";
+    /// <summary>Token de Coletor: ID_PUBLICO dos tenants autorizados e ativos na emissão.</summary>
+    public const string Tenants = "tenants";
+    /// <summary>Token de Coletor: <c>VERSAO_CREDENCIAL</c> na emissão.</summary>
+    public const string VersaoCredencial = "cred_ver";
 }
 
 /// <summary>Quem chama e em qual tenant, resolvido uma vez por requisição (ISO-01, CTX-01, CTX-03).</summary>

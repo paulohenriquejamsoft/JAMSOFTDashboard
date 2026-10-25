@@ -20,6 +20,7 @@ builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("P
 builder.Services.AddAuditoria();
 builder.Services.AddSegurancaApi();
 builder.Services.AddAutenticacao();
+builder.Services.AddColetores();
 builder.Services.AddEmpresas();
 builder.Services.AddUsuarios();
 builder.Services.AddExclusao();
@@ -36,6 +37,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.MapAutenticacao();
 app.MapTenants();
 app.MapColetores();
+app.MapColetor();
 app.MapEmpresas();
 app.MapUsuarios();
 app.MapAuditoria();
