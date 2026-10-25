@@ -838,9 +838,9 @@ T45
 
 **Done when**:
 
-- [ ] Teste: aplica duas vezes no ERP falso; com `EXECUTE AS USER` do usuário criado (sem login de servidor), o `ExtratorVendas` lê; `SELECT` direto em `NotaSaida` falha; índices existem
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 1 new test passes
+- [x] Teste: aplica duas vezes no ERP falso; com `EXECUTE AS USER` do usuário criado (sem login de servidor), o `ExtratorVendas` lê; `SELECT` direto em `NotaSaida` falha; índices existem
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 1 new test passes
 
 **Tests**: integration
 **Gate**: full
