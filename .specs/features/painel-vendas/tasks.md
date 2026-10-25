@@ -666,8 +666,8 @@ T22
 
 **Done when**:
 
-- [ ] Relatório com p95 por bloco, ambiente, resultado do Lighthouse e checklist visual do DS; se p95 > 2 s, recomendação registrada (agregados pré-calculados) para decisão
-- [ ] Gate check passes: Build
+- [x] Relatório com p95 por bloco, ambiente, resultado do Lighthouse e checklist visual do DS; se p95 > 2 s, recomendação registrada (agregados pré-calculados) para decisão
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
