@@ -942,9 +942,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes (executor falso + `FakeTimeProvider`): intervalo contado do fim da anterior; nunca duas execuções da mesma configuração; 6 configurações → no máximo 4 simultâneas; falha de uma não afeta outra; reinício do agendador retoma do checkpoint
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 5 new tests pass
+- [x] Testes (executor falso + `FakeTimeProvider`): intervalo contado do fim da anterior; nunca duas execuções da mesma configuração; 6 configurações → no máximo 4 simultâneas; falha de uma não afeta outra; reinício do agendador retoma do checkpoint
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 5 new tests pass (+1: tenant recusado para só a configuração e credencial recusada para todas, edge case do ING-02 e design do ClienteApi)
 
 **Tests**: unit
 **Gate**: quick
