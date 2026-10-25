@@ -32,10 +32,10 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | Indicadores do MVP | KPIs gerais, evolução temporal, rankings, NF-e × NFC-e | Escolha do usuário | y |
-| Base do faturamento | Soma de `valor` apenas de vendas "Finalizada"; "Contingência" fica fora do faturamento | Canceladas e inutilizadas não são receita; contingência ainda não foi autorizada pela SEFAZ | n |
-| Ticket médio | Faturamento ÷ nº de vendas "Finalizada"; 0 quando não há vendas | Definição usual | n |
-| Itens por venda | Soma de `qtd_itens` ÷ nº de vendas "Finalizada" | Coerente com ticket médio | n |
-| % canceladas | Nº "Cancelada" ÷ (nº "Finalizada" + nº "Cancelada") × 100 | Inutilizadas não são vendas emitidas | n |
+| Base do faturamento | Soma de `valor` das vendas **efetivadas**: "Finalizada" + "Contingência" | Confirmado pelo usuário em 2026-10-25: contingência é venda efetivada aguardando autorização; canceladas e inutilizadas não são receita | y |
+| Ticket médio | Faturamento ÷ nº de vendas efetivadas (Finalizada + Contingência); 0 quando não há vendas | Definição usual, coerente com a base do faturamento | n |
+| Itens por venda | Soma de `qtd_itens` ÷ nº de vendas efetivadas (Finalizada + Contingência) | Coerente com ticket médio | n |
+| % canceladas | Nº "Cancelada" ÷ (nº efetivadas + nº "Cancelada") × 100 | Inutilizadas não são vendas emitidas | n |
 | Data de referência dos indicadores | `data_hora` da venda, que vem de `DataHoraFechamento` do ERP (data e hora) | Confirmado pelo usuário em 2026-10-25: `datafatura` não tem hora | y |
 | Fuso horário | America/Sao_Paulo para agrupar por dia/mês | Clientes no Brasil | n |
 | Período padrão | Mês corrente (dia 1 até hoje) | Uso mais comum | n |
@@ -198,43 +198,43 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| DASH-01 | P1: KPIs do período | - | Pending |
-| DASH-02 | P1: KPIs do período | - | Pending |
-| DASH-03 | P1: KPIs do período | - | Pending |
-| DASH-04 | P1: KPIs do período | - | Pending |
-| DASH-05 | P1: KPIs do período | - | Pending |
-| DASH-06 | P1: KPIs do período | - | Pending |
-| DASH-07 | P1: KPIs do período | - | Pending |
-| DASH-08 | P1: KPIs do período | - | Pending |
-| DASH-09 | P1: KPIs do período | - | Pending |
-| TRD-01 | P1: Evolução temporal | - | Pending |
-| TRD-02 | P1: Evolução temporal | - | Pending |
-| TRD-03 | P1: Evolução temporal | - | Pending |
-| TRD-04 | P1: Evolução temporal | - | Pending |
-| UI-01 | P1: Interface por perfil | - | Pending |
-| UI-02 | P1: Interface por perfil | - | Pending |
-| UI-03 | P1: Interface por perfil | - | Pending |
-| UI-04 | P1: Interface por perfil | - | Pending |
-| UI-05 | P1: Interface por perfil | - | Pending |
-| UI-06 | P1: Interface por perfil | - | Pending |
-| UI-07 | P1: Interface por perfil | - | Pending |
-| UI-08 | P1: Interface por perfil | - | Pending |
-| RNK-01 | P2: Rankings | - | Pending |
-| RNK-02 | P2: Rankings | - | Pending |
-| RNK-03 | P2: Rankings | - | Pending |
-| RNK-04 | P2: Rankings | - | Pending |
-| RNK-05 | P2: Rankings | - | Pending |
-| DFE-01 | P2: NF-e × NFC-e | - | Pending |
-| DFE-02 | P2: NF-e × NFC-e | - | Pending |
-| PWA-01 | P2: PWA e responsividade | - | Pending |
-| PWA-02 | P2: PWA e responsividade | - | Pending |
-| PWA-03 | P2: PWA e responsividade | - | Pending |
-| PWA-04 | P2: PWA e responsividade | - | Pending |
-| PWA-05 | P2: PWA e responsividade | - | Pending |
-| PWA-06 | P2: PWA e responsividade | - | Pending |
-| PWA-07 | P2: PWA e responsividade | - | Pending |
+| DASH-01 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-02 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-03 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-04 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-05 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-06 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-07 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-08 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-09 | P1: KPIs do período | Tasks | In Tasks |
+| TRD-01 | P1: Evolução temporal | Tasks | In Tasks |
+| TRD-02 | P1: Evolução temporal | Tasks | In Tasks |
+| TRD-03 | P1: Evolução temporal | Tasks | In Tasks |
+| TRD-04 | P1: Evolução temporal | Tasks | In Tasks |
+| UI-01 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-02 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-03 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-04 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-05 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-06 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-07 | P1: Interface por perfil | Tasks | In Tasks |
+| UI-08 | P1: Interface por perfil | Tasks | In Tasks |
+| RNK-01 | P2: Rankings | Tasks | In Tasks |
+| RNK-02 | P2: Rankings | Tasks | In Tasks |
+| RNK-03 | P2: Rankings | Tasks | In Tasks |
+| RNK-04 | P2: Rankings | Tasks | In Tasks |
+| RNK-05 | P2: Rankings | Tasks | In Tasks |
+| DFE-01 | P2: NF-e × NFC-e | Tasks | In Tasks |
+| DFE-02 | P2: NF-e × NFC-e | Tasks | In Tasks |
+| PWA-01 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-02 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-03 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-04 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-05 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-06 | P2: PWA e responsividade | Tasks | In Tasks |
+| PWA-07 | P2: PWA e responsividade | Tasks | In Tasks |
 
-**Coverage:** 35 total, 0 mapped to tasks, 35 unmapped ⚠️ (esperado antes de Tasks)
+**Coverage:** 35 total, 35 mapped to tasks (`tasks.md`), 0 unmapped
 
 ---
 

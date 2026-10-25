@@ -130,13 +130,29 @@
 - **Date**: 2026-10-25
 - **Status**: active
 
+### AD-017
+- **Decision**: Gráficos do frontend com Apache ECharts (`ngx-echarts`), importado de forma modular (`echarts/core` + só os gráficos e componentes usados) e carregado apenas nas rotas lazy que exibem gráficos; cores e fontes vêm dos tokens do Design System.
+- **Reason**: Escolha do usuário; tooltips ricos e interação por toque.
+- **Trade-off**: Biblioteca pesada (~300 KB gz mesmo modular); o chunk inicial não pode incluí-la.
+- **Scope**: Frontend (painel e futuros relatórios).
+- **Date**: 2026-10-25
+- **Status**: active
+
+### AD-018
+- **Decision**: Todo agrupamento ou recorte de datas de vendas por dia/mês usa o fuso America/Sao_Paulo: na API via `AT TIME ZONE 'E. South America Standard Time'` (`EF.Functions.AtTimeZone`) e no Angular via `timezone` de São Paulo nos pipes; períodos informados como datas locais inclusivas viram faixas `[início 00:00, fim+1 00:00)` em `DateTimeOffset`.
+- **Reason**: Dia e mês corretos independentemente do fuso do servidor, do banco ou do navegador.
+- **Trade-off**: Clientes fora do fuso de São Paulo veriam o dia de Brasília (aceito; público brasileiro).
+- **Scope**: API (painel e relatórios), Frontend.
+- **Date**: 2026-10-25
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/plataforma-tenancy-acesso` — **concluída e verificada** (Verifier iteração 3: PASS; 54/54 ACs, 13/13 mutações mortas)
 - **Phase / Task**: Execute concluído (T1–T58 + correções da validação)
 - **Completed**: T1–T58; 238 testes API, 121 Web, 4 e2e
 - **In-progress** (file:line): none
-- **Next step**: Aprovar `.specs/features/sincronizacao-vendas/tasks.md` (45 tarefas, 7 fases) e executar a Fase 1 (T1); depois `painel-vendas`.
+- **Next step**: Aprovar `tasks.md` de `sincronizacao-vendas` (45 tarefas) e de `painel-vendas` (22 tarefas, design em rascunho). Ordem de execução: sincronizacao-vendas primeiro (o painel lê a tabela VENDA), depois painel-vendas.
 - **Blockers**: Regras da query de vendas confirmadas (2026-10-25); falta executá-la no ERP real e conferir o plano de execução antes do piloto. Testes de integração: `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true;Connect Timeout=60"` (Docker parado). SQL Server local sofre com pouca RAM livre: se a suíte oscilar por timeout, liberar memória ou reiniciar o serviço como administrador.
 - **Uncommitted files**: none
 - **Branch**: feat/plataforma-tenancy-acesso (sem remoto configurado)
