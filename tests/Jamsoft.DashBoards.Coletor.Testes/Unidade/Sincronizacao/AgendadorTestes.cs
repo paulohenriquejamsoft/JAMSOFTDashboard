@@ -51,9 +51,11 @@ public sealed class AgendadorTestes : IAsyncLifetime
         return configuracao;
     }
 
-    private async Task<Agendador> IniciarAsync(IExecutorSincronizacao? executor = null, ArmazenamentoConfiguracao? armazenamento = null)
+    private async Task<Agendador> IniciarAsync(IExecutorSincronizacao? executor = null, ArmazenamentoConfiguracao? armazenamento = null,
+        Checkpoints? checkpoints = null)
     {
-        var agendador = new Agendador(armazenamento ?? _armazenamento, executor ?? _executor, _relogio);
+        var agendador = new Agendador(armazenamento ?? _armazenamento, checkpoints ?? _checkpoints, executor ?? _executor,
+            new ComandosConfiguracao(), _relogio);
         _agendadores.Add(agendador);
         await agendador.StartAsync(CancellationToken.None);
         return agendador;
@@ -189,7 +191,7 @@ public sealed class AgendadorTestes : IAsyncLifetime
         // Novo processo: outras instâncias lendo a mesma pasta de dados, sem esperar o intervalo.
         var checkpointsRelidos = new Checkpoints(_pasta.Caminho);
         var segundo = await IniciarAsync(ExecutorQueAvanca(checkpointsRelidos),
-            new ArmazenamentoConfiguracao(_pasta.Caminho, checkpointsRelidos, _relogio));
+            new ArmazenamentoConfiguracao(_pasta.Caminho, checkpointsRelidos, _relogio), checkpointsRelidos);
         await AgendadaAsync(segundo, a.Id);
 
         Assert.Equal([null, new Checkpoint(new DateTime(2026, 10, 1), 1)], vistos);

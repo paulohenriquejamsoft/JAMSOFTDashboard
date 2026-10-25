@@ -968,9 +968,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: pausa durante execução conclui o lote e não agenda mais; retomar volta a agendar com checkpoint preservado; reiniciar durante execução só zera após o lote; reiniciar zera apenas a configuração alvo e aplica o novo período
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 4 new tests pass
+- [x] Testes: pausa durante execução conclui o lote e não agenda mais; retomar volta a agendar com checkpoint preservado; reiniciar durante execução só zera após o lote; reiniciar zera apenas a configuração alvo e aplica o novo período
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 4 new tests pass (+1: comando Recarregar inicia configuração ativa cadastrada depois, para a tela da Phase 6)
 
 **Tests**: unit
 **Gate**: quick
