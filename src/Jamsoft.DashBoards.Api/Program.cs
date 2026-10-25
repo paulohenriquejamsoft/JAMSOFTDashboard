@@ -25,6 +25,7 @@ builder.Services.AddColetores();
 builder.Services.AddEmpresas();
 builder.Services.AddUsuarios();
 builder.Services.AddExclusao();
+builder.Services.AddIngestao();
 
 var app = builder.Build();
 

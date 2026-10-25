@@ -653,9 +653,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: lotes de 31 dias apagados, de 29 dias mantidos (relógio falso); várias passadas quando passa do tamanho do lote
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Testes: lotes de 31 dias apagados, de 29 dias mantidos (relógio falso); várias passadas quando passa do tamanho do lote
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full

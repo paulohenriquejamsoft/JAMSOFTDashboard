@@ -13,7 +13,8 @@ public sealed class ApiFactory(BancoDeTestes banco) : WebApplicationFactory<Prog
         builder.UseEnvironment("Testes");
         builder.UseSetting("ConnectionStrings:Plataforma", Banco.ConnectionString);
         builder.UseSetting("Jwt:Chave", Acesso.ChaveJwt);
-        // O worker de exclusão fica desligado; os testes chamam o ProcessadorExclusao diretamente.
+        // Os workers de exclusão e de limpeza de lotes ficam desligados; os testes chamam a lógica diretamente.
         builder.UseSetting("Exclusao:WorkerAtivo", "false");
+        builder.UseSetting("LimpezaLotes:Ativa", "false");
     }
 }

@@ -35,6 +35,7 @@ public static class RotasDaApi
             builder.UseSetting("ConnectionStrings:Plataforma", "Server=nao-conecta;Database=nenhum");
             builder.UseSetting("Jwt:Chave", Acesso.ChaveJwt);
             builder.UseSetting("Exclusao:WorkerAtivo", "false");
+            builder.UseSetting("LimpezaLotes:Ativa", "false");
         }
     }
 }
