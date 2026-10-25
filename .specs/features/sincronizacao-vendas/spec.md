@@ -35,7 +35,8 @@ Os dados de vendas estão nos bancos dos ERPs, dentro dos servidores dos cliente
 | --------------------- | -------------- | --------- | ---------- |
 | Autenticação do Coletor | `client_id` + `client_secret` por instalação, emitidos por SuperAdmin, com lista de tenants autorizados | Decisão do usuário (AD-005) | y |
 | Alterações/cancelamentos | Upsert por (`TENANT_ID`, `COD_EMPRESA`, `VENDA_ID`) + janela de reprocessamento de 7 dias, configurável de 0 a 90 | Decisão do usuário (AD-006) | y |
-| Unicidade de `venda_id` | `NumNotaSaida` é único dentro de (banco do ERP, `Cod_Empresa`); chave de negócio usa `Cod_Empresa` | §11.3 pede avaliar; chave composta é segura nos dois casos | n |
+| Unicidade de `venda_id` | `NumNotaSaida` é a identity da tabela `NotaSaida`: único em todo o banco do ERP. A chave de negócio continua (`TENANT_ID`, `COD_EMPRESA`, `VENDA_ID`) | Confirmado pelo usuário em 2026-10-25; manter `Cod_Empresa` na chave não custa nada e protege contra dois bancos no mesmo tenant | y |
+| Origem da query | `c_NotaSaida` é uma **view** sobre a tabela `NotaSaida`; o usuário só de leitura recebe `SELECT` na view e em `NotaSaidaProd`; índices de apoio são criados na tabela base `NotaSaida` | Confirmado pelo usuário em 2026-10-25; índice em view não se aplica aqui | y |
 | Dois bancos de ERP no mesmo tenant com mesmo `Cod_Empresa` | Proibido: API rejeita lote (409) se a empresa já recebe dados de outra configuração | Evita colisão de `venda_id` entre bancos | n |
 | Coluna de data do filtro | Filtro por `datafatura`; `data_hora` exibida = `dataentrega` (como na query) | Mantém a query original; validar com ERP real | n |
 | Vendas excluídas fisicamente no ERP | Não tratadas; permanecem na plataforma | ERP cancela (situação 9) em vez de excluir; validar | n |
