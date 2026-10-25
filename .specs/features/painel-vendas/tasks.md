@@ -586,9 +586,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: manifest com `name = "JAMSOFT Dashboards"`, `display = standalone`, ícones 192 e 512 existentes no disco; `ngsw-config.json` sem `dataGroups` e sem nenhuma URL começando por `/api`
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes: manifest com `name = "JAMSOFT Dashboards"`, `display = standalone`, ícones 192 e 512 existentes no disco; `ngsw-config.json` sem `dataGroups` e sem nenhuma URL começando por `/api`
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

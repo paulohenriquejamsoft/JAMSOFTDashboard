@@ -2,6 +2,8 @@
   "name": "JAMSOFT Dashboards",
   "short_name": "JAMSOFT",
   "display": "standalone",
+  "theme_color": "#F2323F",
+  "background_color": "#FBFAF7",
   "scope": "./",
   "start_url": "./",
   "icons": [
