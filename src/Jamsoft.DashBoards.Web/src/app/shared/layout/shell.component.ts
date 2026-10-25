@@ -18,7 +18,7 @@ interface SecaoMenu {
   itens: ItemMenu[];
 }
 
-const ROTULO_PERFIL: Record<Perfil, string> = {
+export const ROTULO_PERFIL: Record<Perfil, string> = {
   SuperAdmin: 'SuperAdmin',
   Admin: 'Administrador',
   Consulta: 'Consulta',
@@ -97,20 +97,22 @@ export class ShellComponent {
     return estado?.aviso ?? null;
   });
 
+  /** Menu por perfil (UI-01..UI-03): Consulta só painel e perfil; Admin + gestão do tenant; SuperAdmin a área
+   * administrativa e, com tenant selecionado, as telas do tenant. */
   readonly secoes = computed<SecaoMenu[]>(() => {
     const perfil = this.usuario()?.perfil;
-    const tenant: ItemMenu[] = [
-      { rotulo: 'Painel', link: '/cliente', exato: true },
+    const painel: ItemMenu = { rotulo: 'Painel', link: '/cliente', exato: true };
+    const gestao: ItemMenu[] = [
       { rotulo: 'Usuários', link: '/cliente/usuarios' },
       { rotulo: 'Empresas', link: '/cliente/empresas' },
       { rotulo: 'Sincronização', link: '/cliente/sincronizacao' },
     ];
+    const conta: SecaoMenu = { titulo: 'Conta', itens: [{ rotulo: 'Meu perfil', link: '/conta/perfil' }] };
     if (perfil === 'SuperAdmin') {
       const secoes: SecaoMenu[] = [
         {
           titulo: 'Administração',
           itens: [
-            { rotulo: 'Início', link: '/admin', exato: true },
             { rotulo: 'Tenants', link: '/admin/tenants' },
             { rotulo: 'Coletores', link: '/admin/coletores' },
             { rotulo: 'Auditoria', link: '/admin/auditoria' },
@@ -118,11 +120,11 @@ export class ShellComponent {
         },
       ];
       const selecionado = this.contexto.selecionado();
-      if (selecionado) secoes.push({ titulo: selecionado.nome, itens: tenant });
+      if (selecionado) secoes.push({ titulo: selecionado.nome, itens: [painel, ...gestao] });
       return secoes;
     }
-    if (perfil === 'Admin') return [{ titulo: 'Principal', itens: tenant }];
-    return [{ titulo: 'Principal', itens: tenant.slice(0, 1) }];
+    if (perfil === 'Admin') return [{ titulo: 'Principal', itens: [painel, ...gestao] }, conta];
+    return [{ titulo: 'Principal', itens: [painel] }, conta];
   });
 
   sair(): void {

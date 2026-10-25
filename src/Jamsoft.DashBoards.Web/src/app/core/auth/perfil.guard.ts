@@ -23,6 +23,8 @@ export const LEITURA_TENANT: RegraAcesso = {
   perfis: ['SuperAdmin', 'Admin', 'Consulta'],
   superAdminExigeTenant: true,
 };
+/** Qualquer usuário logado (ex.: "Meu perfil"). */
+export const QUALQUER_PERFIL: RegraAcesso = { perfis: ['SuperAdmin', 'Admin', 'Consulta'] };
 /** Gestão do tenant: Admin ou SuperAdmin com tenant (policy AdminTenant da API). */
 export const ADMIN_TENANT: RegraAcesso = { perfis: ['SuperAdmin', 'Admin'], superAdminExigeTenant: true };
 

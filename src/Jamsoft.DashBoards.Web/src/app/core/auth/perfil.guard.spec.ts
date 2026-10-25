@@ -56,6 +56,13 @@ const matriz: [Ator, string, Esperado][] = [
   ['SuperAdmin com tenant', '/cliente/sincronizacao', liberado('/cliente/sincronizacao')],
   ['Admin', '/cliente/sincronizacao', liberado('/cliente/sincronizacao')],
   ['Consulta', '/cliente/sincronizacao', { url: '/cliente', aviso: NEGADO }],
+
+  // Meu perfil: qualquer usuário logado (UI-01); sem sessão, login.
+  ['SuperAdmin sem tenant', '/conta/perfil', liberado('/conta/perfil')],
+  ['SuperAdmin com tenant', '/conta/perfil', liberado('/conta/perfil')],
+  ['Admin', '/conta/perfil', liberado('/conta/perfil')],
+  ['Consulta', '/conta/perfil', liberado('/conta/perfil')],
+  ['anônimo', '/conta/perfil', login],
 ];
 
 function sessaoDe(ator: Ator): UsuarioSessao | null {

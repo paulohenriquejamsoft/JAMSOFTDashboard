@@ -508,9 +508,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: menu de cada perfil contém exatamente os itens esperados; "Meu perfil" mostra os dados do `/api/auth/eu`; matriz do guard inclui `/cliente`, `/cliente/sincronizacao`, `/admin/coletores`, `/conta/perfil` com o resultado esperado por perfil (incl. aviso "Acesso não permitido")
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: ≥ 8 new tests pass
+- [x] Testes: menu de cada perfil contém exatamente os itens esperados; "Meu perfil" mostra os dados do `/api/auth/eu`; matriz do guard inclui `/cliente`, `/cliente/sincronizacao`, `/admin/coletores`, `/conta/perfil` com o resultado esperado por perfil (incl. aviso "Acesso não permitido")
+- [x] Gate check passes: Quick-Web
+- [x] Test count: ≥ 8 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
