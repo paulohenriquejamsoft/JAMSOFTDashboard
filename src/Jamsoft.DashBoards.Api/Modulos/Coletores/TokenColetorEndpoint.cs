@@ -11,7 +11,7 @@ namespace Jamsoft.DashBoards.Api.Modulos.Coletores;
 /// <summary>
 /// Rotas do Coletor em <c>/api/coletor</c>. <c>POST /token</c> (COL-03, COL-04, AD-015) troca client credentials
 /// por um JWT de 15 minutos com os tenants autorizados e ativos. Credencial inexistente, secret errado e
-/// credencial revogada têm a mesma resposta.
+/// credencial revogada têm a mesma resposta. As demais rotas exigem a policy <see cref="Policies.Coletor"/>.
 /// </summary>
 public static class TokenColetorEndpoint
 {
@@ -38,7 +38,23 @@ public static class TokenColetorEndpoint
     {
         var grupo = app.MapGroup("/api/coletor");
         grupo.MapPost("/token", EmitirAsync).AllowAnonymous().RequireRateLimiting(LimiteToken);
+        grupo.MapGet("/tenants", ListarTenantsAsync).RequireAuthorization(Policies.Coletor);
         return app;
+    }
+
+    /// <summary>
+    /// Tenants autorizados ao token (claim <c>tenants</c>) e ainda ativos, por nome, para a tela de configuração
+    /// do Coletor (CFG-02, CFG-05).
+    /// </summary>
+    public static async Task<IResult> ListarTenantsAsync(ITenantAtual atual, PlataformaDbContext banco, CancellationToken ct)
+    {
+        var autorizados = atual.TenantsAutorizadosColetor.ToList();
+        var tenants = await banco.Tenants.AsNoTracking()
+            .Where(t => autorizados.Contains(t.IdPublico) && t.Ativo)
+            .OrderBy(t => t.Nome).ThenBy(t => t.Id)
+            .Select(t => new TenantAutorizado(t.IdPublico, t.Nome))
+            .ToListAsync(ct);
+        return Results.Ok(tenants);
     }
 
     public static IResult CredencialInvalida() =>

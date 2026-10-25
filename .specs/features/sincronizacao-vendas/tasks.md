@@ -443,9 +443,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: retorna exatamente os tenants autorizados e ativos, ordenados por nome; token de usuário → 403
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass
+- [x] Testes: retorna exatamente os tenants autorizados e ativos, ordenados por nome; token de usuário → 403
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass
 
 **Tests**: integration
 **Gate**: full

@@ -150,4 +150,40 @@ public sealed class TokenColetorTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.TooManyRequests, resposta.StatusCode);
         Assert.Equal("MUITAS_REQUISICOES", await Sessao.CodigoAsync(resposta));
     }
+
+    [Fact]
+    public async Task Tenants_do_coletor_retorna_os_autorizados_e_ativos_ordenados_por_nome()
+    {
+        var zeta = await Dados.NovoTenantAsync(banco, "Zeta Coletor");
+        var alfa = await Dados.NovoTenantAsync(banco, "Alfa Coletor");
+        var inativado = await Dados.NovoTenantAsync(banco, "Beta Inativado");
+        await Dados.NovoTenantAsync(banco, "Aaa Nao Autorizado");
+        var (coletor, segredo) = await Dados.NovoColetorComSegredoAsync(banco, zeta, inativado, alfa);
+        string token;
+        using (var emissao = await TokenAsync(coletor.ClientId, segredo))
+            token = (await Sessao.JsonAsync(emissao)).GetProperty("accessToken").GetString()!;
+        // Inativado depois da emissão: continua na claim, mas não volta na lista.
+        await using (var contexto = banco.CriarContexto())
+            await contexto.Tenants.Where(t => t.Id == inativado.Id).ExecuteUpdateAsync(t => t.SetProperty(x => x.Ativo, false));
+
+        using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/coletor/tenants", token));
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        var json = await Sessao.JsonAsync(resposta);
+        Assert.Equal(
+            [(alfa.IdPublico, "Alfa Coletor"), (zeta.IdPublico, "Zeta Coletor")],
+            json.EnumerateArray().Select(t => (t.GetProperty("idPublico").GetGuid(), t.GetProperty("nome").GetString())));
+    }
+
+    [Fact]
+    public async Task Tenants_do_coletor_com_token_de_usuario_responde_403()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco);
+        var admin = Acesso.Token(await Dados.NovoUsuarioAsync(banco, Api.Seguranca.Perfil.Admin, tenant), tenant);
+
+        using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/coletor/tenants", admin));
+
+        Assert.Equal(HttpStatusCode.Forbidden, resposta.StatusCode);
+        Assert.Equal("ACESSO_NEGADO", await Sessao.CodigoAsync(resposta));
+    }
 }
