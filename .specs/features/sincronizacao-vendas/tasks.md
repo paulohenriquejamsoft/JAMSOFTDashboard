@@ -1022,8 +1022,8 @@ T45
 
 **Done when**:
 
-- [ ] Build sem avisos; app abre, minimiza para a bandeja e encerra o host ao sair (verificado no roteiro T41)
-- [ ] Gate check passes: Build
+- [x] Build sem avisos; app abre, minimiza para a bandeja e encerra o host ao sair (verificado no roteiro T41)
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
