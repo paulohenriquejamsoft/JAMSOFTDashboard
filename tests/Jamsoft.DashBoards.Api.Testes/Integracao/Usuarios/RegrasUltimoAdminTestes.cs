@@ -1,8 +1,8 @@
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Jamsoft.DashBoards.Api.Testes.Infraestrutura;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -51,56 +51,54 @@ public sealed class RegrasUltimoAdminTestes(BancoDeTestes banco, ITestOutputHelp
         Assert.Null(erro);
     }
 
+    /// <summary>
+    /// Sincronização determinística, sem pausa: A passa pela regra e segura o lock; B chama a regra e o teste só
+    /// segue quando vê, em <c>sys.dm_exec_requests</c>, a sessão de B bloqueada pela de A. Aí A rebaixa e confirma,
+    /// e B tem de enxergar isso (422). Sem <c>UPDLOCK, HOLDLOCK</c> B não espera: a regra de B termina antes de A
+    /// confirmar e o teste falha.
+    /// </summary>
     [Fact]
     public async Task Dois_Admins_se_rebaixando_ao_mesmo_tempo_exatamente_um_falha()
     {
         var tenant = await Dados.NovoTenantAsync(banco);
-        var admins = new[]
-        {
-            await Dados.NovoUsuarioAsync(banco, Perfil.Admin, tenant),
-            await Dados.NovoUsuarioAsync(banco, Perfil.Admin, tenant),
-        };
-        var chamaram = 0;
-        var ambasChamaram = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var adminA = await Dados.NovoUsuarioAsync(banco, Perfil.Admin, tenant);
+        var adminB = await Dados.NovoUsuarioAsync(banco, Perfil.Admin, tenant);
 
-        async Task<string> RebaixarAsync(int alvoId)
-        {
-            await using var contexto = banco.CriarContexto(new TenantFixo(tenant.Id));
-            await using var transacao = await contexto.Database.BeginTransactionAsync();
-            try
-            {
-                var garantia = new RegrasUltimoAdmin(contexto).GarantirAsync(tenant.Id, alvoId);
-                if (Interlocked.Increment(ref chamaram) == 2) ambasChamaram.SetResult();
-                await garantia;
-                // Ninguém confirma antes de as duas transações terem chamado GarantirAsync; a pausa garante que a
-                // consulta da outra já chegou ao SQL Server (sem o lock, as duas veriam 1 Admin e passariam).
-                await ambasChamaram.Task;
-                await Task.Delay(500);
+        await using var contextoA = banco.CriarContexto(new TenantFixo(tenant.Id));
+        await using var transacaoA = await contextoA.Database.BeginTransactionAsync();
+        await using var contextoB = banco.CriarContexto(new TenantFixo(tenant.Id));
+        await using var transacaoB = await contextoB.Database.BeginTransactionAsync();
+        var sessaoA = await SessaoAsync(contextoA);
+        var sessaoB = await SessaoAsync(contextoB);
 
-                var usuario = await contexto.Usuarios.SingleAsync(u => u.Id == alvoId);
-                usuario.Perfil = Perfil.Consulta;
-                await contexto.SaveChangesAsync();
-                await transacao.CommitAsync();
-                return "ok";
-            }
-            catch (ProblemaApiException erro) when (erro.Codigo == "ULTIMO_ADMIN")
-            {
-                return "ULTIMO_ADMIN";
-            }
-            catch (Exception erro) when (erro is SqlException { Number: 1205 } || erro.InnerException is SqlException { Number: 1205 })
-            {
-                return "DEADLOCK";
-            }
+        await new RegrasUltimoAdmin(contextoA).GarantirAsync(tenant.Id, adminA.Id);
+        var garantiaB = Task.Run(() => new RegrasUltimoAdmin(contextoB).GarantirAsync(tenant.Id, adminB.Id));
+
+        var limite = DateTime.UtcNow.AddSeconds(60);
+        var bloqueada = false;
+        while (!bloqueada && !garantiaB.IsCompleted && DateTime.UtcNow < limite)
+        {
+            bloqueada = await banco.ConsultarEscalarAsync<int>(
+                $"SELECT COUNT(*) FROM sys.dm_exec_requests WHERE session_id = {sessaoB} AND blocking_session_id = {sessaoA}") > 0;
+            if (!bloqueada) await Task.Delay(20);
         }
+        saida.WriteLine($"Sessão B bloqueada pela A: {bloqueada}; regra de B já terminou: {garantiaB.IsCompleted}");
+        Assert.False(garantiaB.IsCompleted, "A regra de B terminou enquanto a transação de A ainda estava aberta.");
+        Assert.True(bloqueada, "A sessão de B não ficou esperando o lock da sessão de A.");
 
-        var resultados = await Task.WhenAll(admins.Select(a => Task.Run(() => RebaixarAsync(a.Id))));
+        var usuarioA = await contextoA.Usuarios.SingleAsync(u => u.Id == adminA.Id);
+        usuarioA.Perfil = Perfil.Consulta;
+        await contextoA.SaveChangesAsync();
+        await transacaoA.CommitAsync();
 
-        // Caso esperado: a segunda transação espera o lock da primeira e falha com ULTIMO_ADMIN. Um deadlock
-        // (o SQL Server desfaz uma delas) também deixa exatamente uma falha; o resultado fica no log do teste.
-        saida.WriteLine($"Resultados: {string.Join(", ", resultados)}");
-        Assert.Equal(1, resultados.Count(r => r == "ok"));
-        Assert.Equal(1, resultados.Count(r => r is "ULTIMO_ADMIN" or "DEADLOCK"));
+        var erro = await Assert.ThrowsAsync<ProblemaApiException>(() => garantiaB);
+        Assert.Equal(422, erro.Status);
+        Assert.Equal("ULTIMO_ADMIN", erro.Codigo);
+        await transacaoB.RollbackAsync();
         Assert.Equal(1, await banco.ConsultarEscalarAsync<int>(
             $"SELECT COUNT(*) FROM USUARIO WHERE TENANT_ID = {tenant.Id} AND PERFIL = 'Admin' AND ATIVO = 1"));
     }
+
+    private static Task<short> SessaoAsync(PlataformaDbContext contexto) =>
+        contexto.Database.SqlQuery<short>($"SELECT @@SPID AS [Value]").SingleAsync();
 }
