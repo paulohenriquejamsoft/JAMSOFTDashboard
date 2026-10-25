@@ -110,9 +110,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: sem datas → dia 1 do mês corrente até hoje (relógio falso, inclusive virada de mês em São Paulo × UTC); faixa UTC correta (00:00 −03:00); fim < início → erro em `fim`; exatamente 24 meses aceito e 1 dia a mais recusado; período anterior de 10 dias termina na véspera do início; 62 dias → `Dia` e 63 → `Mes`; buckets diários e mensais completos
-- [ ] Gate check passes: Quick
-- [ ] Test count: ≥ 9 tests pass
+- [x] Testes: sem datas → dia 1 do mês corrente até hoje (relógio falso, inclusive virada de mês em São Paulo × UTC); faixa UTC correta (00:00 −03:00); fim < início → erro em `fim`; exatamente 24 meses aceito e 1 dia a mais recusado; período anterior de 10 dias termina na véspera do início; 62 dias → `Dia` e 63 → `Mes`; buckets diários e mensais completos
+- [x] Gate check passes: Quick
+- [x] Test count: ≥ 9 tests pass
 
 **Tests**: unit
 **Gate**: quick
