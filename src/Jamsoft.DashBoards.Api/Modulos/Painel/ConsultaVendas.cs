@@ -3,6 +3,7 @@ using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Ingestao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Jamsoft.DashBoards.Api.Modulos.Painel;
 
@@ -44,6 +45,7 @@ public static class PainelExtensoes
 {
     public static IServiceCollection AddPainel(this IServiceCollection services)
     {
+        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<ConsultaVendas>();
         return services;
     }

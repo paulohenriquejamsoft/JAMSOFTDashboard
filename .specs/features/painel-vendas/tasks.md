@@ -162,9 +162,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes com `VendasSemeadas`: cada KPI igual ao valor calculado à mão (Contingência conta; Inutilizada não; Cancelada só no %); sem datas → mês corrente; período alterado recalcula; período sem vendas → zeros e `semVendas = true`; variação com anterior 0 → `null`; período inválido → 400 `VALIDACAO`; Consulta e Admin → 200; SuperAdmin sem tenant → 400 `TENANT_NAO_SELECIONADO`
-- [ ] Gate check passes: Full
-- [ ] Test count: 8 new tests pass
+- [x] Testes com `VendasSemeadas`: cada KPI igual ao valor calculado à mão (Contingência conta; Inutilizada não; Cancelada só no %); sem datas → mês corrente; período alterado recalcula; período sem vendas → zeros e `semVendas = true`; variação com anterior 0 → `null`; período inválido → 400 `VALIDACAO`; Consulta e Admin → 200; SuperAdmin sem tenant → 400 `TENANT_NAO_SELECIONADO`
+- [x] Gate check passes: Full
+- [x] Test count: 8 new tests pass
 
 **Tests**: integration
 **Gate**: full

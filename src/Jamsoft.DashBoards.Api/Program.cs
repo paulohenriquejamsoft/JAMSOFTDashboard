@@ -7,6 +7,7 @@ using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Ingestao;
+using Jamsoft.DashBoards.Api.Modulos.Painel;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -26,6 +27,7 @@ builder.Services.AddEmpresas();
 builder.Services.AddUsuarios();
 builder.Services.AddExclusao();
 builder.Services.AddIngestao();
+builder.Services.AddPainel();
 
 var app = builder.Build();
 
@@ -43,6 +45,7 @@ app.MapColetor();
 app.MapIngestao();
 app.MapExecucoes();
 app.MapSincronizacao();
+app.MapPainel();
 app.MapEmpresas();
 app.MapUsuarios();
 app.MapAuditoria();
