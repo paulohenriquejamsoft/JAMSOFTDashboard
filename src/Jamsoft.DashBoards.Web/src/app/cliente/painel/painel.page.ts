@@ -7,6 +7,7 @@ import { traduzirProblema } from '../../core/erros/problema';
 import { EstadoCarga } from '../../shared/paginado';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
 import { SincronizacaoApi } from '../sincronizacao/sincronizacao.api';
+import { DfeComponent } from './dfe.component';
 import { EvolucaoComponent } from './evolucao.component';
 import { FiltroPainelComponent } from './filtro-painel.component';
 import { KpisComponent } from './kpis.component';
@@ -53,7 +54,7 @@ class Bloco<T> {
  */
 @Component({
   selector: 'app-painel',
-  imports: [EstadoCargaComponent, EvolucaoComponent, FiltroPainelComponent, KpisComponent, RankingsComponent, SeletorTenantComponent],
+  imports: [DfeComponent, EstadoCargaComponent, EvolucaoComponent, FiltroPainelComponent, KpisComponent, RankingsComponent, SeletorTenantComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .grade {
@@ -141,8 +142,10 @@ class Bloco<T> {
               <div class="card-cabecalho"><h2 id="bloco-dfe">NF-e × NFC-e</h2></div>
               <app-estado-carga [estado]="dfe.estado()" [mensagemErro]="dfe.mensagemErro()"
                 (tentarNovamente)="recarregar(dfe)" />
-              @if (dfe.estado() === 'pronto') {
-                <div class="bloco-conteudo"></div>
+              @if (dfe.dados(); as dados) {
+                @if (dfe.estado() === 'pronto') {
+                  <app-dfe class="bloco-conteudo" [dados]="dados" />
+                }
               }
             </section>
           </div>

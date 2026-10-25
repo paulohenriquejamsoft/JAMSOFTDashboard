@@ -480,9 +480,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: série de pizza com 2 itens e valores da resposta; legenda com faturamento, vendas e participação formatados; tipo com zero aparece na legenda com "R$ 0,00"
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 3 new tests pass
+- [x] Testes de componente: série de pizza com 2 itens e valores da resposta; legenda com faturamento, vendas e participação formatados; tipo com zero aparece na legenda com "R$ 0,00"
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 3 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
