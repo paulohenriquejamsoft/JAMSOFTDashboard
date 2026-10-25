@@ -601,9 +601,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: Sucesso grava tudo e `ULTIMO_SUCESSO_EM`; Falha grava situação e mensagem e preserva o último sucesso anterior; tenant não autorizado → 403; mensagem longa truncada em 500
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: Sucesso grava tudo e `ULTIMO_SUCESSO_EM`; Falha grava situação e mensagem e preserva o último sucesso anterior; tenant não autorizado → 403; mensagem longa truncada em 500
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full

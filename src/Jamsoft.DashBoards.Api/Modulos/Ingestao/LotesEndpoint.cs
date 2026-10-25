@@ -72,9 +72,8 @@ public static class LotesEndpoint
         var erros = Validar(lote);
         if (erros.Count > 0) return ProblemasApi.Validacao(erros);
 
-        if (!atual.TenantsAutorizadosColetor.Contains(lote.Tenant)) return TenantNaoAutorizado();
-        if (!await status.TenantAtivoAsync(lote.Tenant, ct) || resolvedor.ObterId(lote.Tenant) is not { } tenantId)
-            return TenantInativo();
+        var (tenantId, recusa) = await AutorizarTenantAsync(lote.Tenant, atual, status, resolvedor, ct);
+        if (recusa is not null) return recusa;
 
         await using var banco = new PlataformaDbContext(opcoes, new TenantDoLote(tenantId, lote.Tenant, atual.UsuarioIdPublico));
         // Lote já processado: a resposta gravada, sem regravar nada (ING-05).
@@ -110,6 +109,19 @@ public static class LotesEndpoint
         return Json(resposta);
     }
 
+    /// <summary>
+    /// O tenant (ID público) está na claim <c>tenants</c> do token (ING-02) e ativo (ING-03); devolve o ID interno ou a
+    /// recusa 403.
+    /// </summary>
+    internal static async Task<(int TenantId, IResult? Recusa)> AutorizarTenantAsync(Guid tenant, ITenantAtual atual,
+        StatusAcessoCache status, IResolvedorTenant resolvedor, CancellationToken ct)
+    {
+        if (!atual.TenantsAutorizadosColetor.Contains(tenant)) return (0, TenantNaoAutorizado());
+        if (!await status.TenantAtivoAsync(tenant, ct) || resolvedor.ObterId(tenant) is not { } tenantId)
+            return (0, TenantInativo());
+        return (tenantId, null);
+    }
+
     private static Task<string?> RespostaGravadaAsync(PlataformaDbContext banco, Guid batchId, CancellationToken ct) =>
         banco.LotesIngestao.AsNoTracking().Where(l => l.BatchId == batchId).Select(l => l.Resposta).SingleOrDefaultAsync(ct);
 
@@ -123,7 +135,7 @@ public static class LotesEndpoint
         Guid? coletorIdPublico, LoteVendas lote, CancellationToken ct)
     {
         var validacao = ValidacaoVenda.Validar(lote.Vendas);
-        var origem = await OrigemAsync(banco, tenantId, coletorIdPublico, lote, ct);
+        var origem = await OrigemAsync(banco, tenantId, coletorIdPublico, lote.ConfiguracaoId, lote.Rotina, lote.BancoOrigem, ct);
 
         var empresas = new Dictionary<int, int>();
         var servico = new ServicoEmpresas(banco);
@@ -154,11 +166,14 @@ public static class LotesEndpoint
             || await banco.Empresas.Where(e => e.Id == empresa.Id).Select(e => e.OrigemId).SingleAsync(ct) == origemId;
     }
 
-    /// <summary>A origem (tenant, configuração, rotina) do lote, criada no primeiro lote.</summary>
-    private static async Task<OrigemSincronizacao> OrigemAsync(PlataformaDbContext banco, int tenantId,
-        Guid? coletorIdPublico, LoteVendas lote, CancellationToken ct)
+    /// <summary>
+    /// A origem (tenant, configuração, rotina), criada no primeiro lote ou relatório de execução. O contexto precisa
+    /// estar no tenant <paramref name="tenantId"/> (<see cref="TenantDoLote"/>).
+    /// </summary>
+    internal static async Task<OrigemSincronizacao> OrigemAsync(PlataformaDbContext banco, int tenantId,
+        Guid? coletorIdPublico, Guid configuracaoId, string rotina, string? bancoOrigem, CancellationToken ct)
     {
-        var existente = await LerOrigemAsync(banco, lote, ct);
+        var existente = await LerOrigemAsync(banco, configuracaoId, rotina, ct);
         if (existente is not null) return existente;
 
         var coletorId = await banco.Coletores.Where(c => c.IdPublico == coletorIdPublico).Select(c => c.Id).SingleAsync(ct);
@@ -166,9 +181,9 @@ public static class LotesEndpoint
         {
             TenantId = tenantId,
             ColetorId = coletorId,
-            ConfiguracaoId = lote.ConfiguracaoId,
-            Rotina = lote.Rotina,
-            BancoOrigem = Cortar(lote.BancoOrigem, OrigemSincronizacao.BancoOrigemMaximo),
+            ConfiguracaoId = configuracaoId,
+            Rotina = rotina,
+            BancoOrigem = Cortar(bancoOrigem, OrigemSincronizacao.BancoOrigemMaximo),
         };
         banco.OrigensSincronizacao.Add(origem);
         try
@@ -180,14 +195,15 @@ public static class LotesEndpoint
         {
             // Outro lote da mesma configuração criou a origem entre a leitura e a inserção.
             banco.Entry(origem).State = EntityState.Detached;
-            return await LerOrigemAsync(banco, lote, ct)
+            return await LerOrigemAsync(banco, configuracaoId, rotina, ct)
                 ?? throw new InvalidOperationException("Origem duplicada, mas não encontrada.", erro);
         }
     }
 
-    private static Task<OrigemSincronizacao?> LerOrigemAsync(PlataformaDbContext banco, LoteVendas lote, CancellationToken ct) =>
+    private static Task<OrigemSincronizacao?> LerOrigemAsync(PlataformaDbContext banco, Guid configuracaoId, string rotina,
+        CancellationToken ct) =>
         banco.OrigensSincronizacao.AsNoTracking()
-            .SingleOrDefaultAsync(o => o.ConfiguracaoId == lote.ConfiguracaoId && o.Rotina == lote.Rotina, ct);
+            .SingleOrDefaultAsync(o => o.ConfiguracaoId == configuracaoId && o.Rotina == rotina, ct);
 
     /// <summary>
     /// Lê o corpo até <see cref="Limites.BytesPorLote"/>; acima disso → 413. JSON ilegível → 400.
@@ -234,6 +250,6 @@ public static class LotesEndpoint
         return erros;
     }
 
-    private static string? Cortar(string? texto, int maximo) =>
+    internal static string? Cortar(string? texto, int maximo) =>
         texto is not null && texto.Length > maximo ? texto[..maximo] : texto;
 }
