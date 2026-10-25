@@ -100,11 +100,11 @@
 
 ## Handoff
 
-- **Feature**: `.specs/features/plataforma-tenancy-acesso`
-- **Phase / Task**: Execute — Fase 1 concluída (T1–T7); próxima é a Fase 2 (T8–T15)
-- **Completed**: T1, T2, T3, T4, T5, T6, T7 (gate de Build da Fase 1 verde: 25 testes)
+- **Feature**: `.specs/features/plataforma-tenancy-acesso` — **concluída e verificada** (Verifier iteração 3: PASS; 54/54 ACs, 13/13 mutações mortas)
+- **Phase / Task**: Execute concluído (T1–T58 + correções da validação)
+- **Completed**: T1–T58; 238 testes API, 121 Web, 4 e2e
 - **In-progress** (file:line): none
-- **Next step**: Executar a Fase 2 começando pela T8 (`src/Jamsoft.DashBoards.Api/Seguranca/TenantAtual.cs`).
-- **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP. Testes de integração rodam com `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true"` (Docker parado nesta máquina).
+- **Next step**: Design de `.specs/features/sincronizacao-vendas` (Coletor + ingestão); depois `painel-vendas`.
+- **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP. Testes de integração: `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true;Connect Timeout=60"` (Docker parado). SQL Server local sofre com pouca RAM livre: se a suíte oscilar por timeout, liberar memória ou reiniciar o serviço como administrador.
 - **Uncommitted files**: none
-- **Branch**: feat/plataforma-tenancy-acesso
+- **Branch**: feat/plataforma-tenancy-acesso (sem remoto configurado)

@@ -251,60 +251,60 @@ A JAMSOFT precisa oferecer um painel de métricas para vários clientes numa ún
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| AUTH-01 | P1: Login e sessão | Execute | Implementing |
-| AUTH-02 | P1: Login e sessão | Execute | Implementing |
-| AUTH-03 | P1: Login e sessão | Execute | Implementing |
-| AUTH-04 | P1: Login e sessão | Execute | Implementing |
-| AUTH-05 | P1: Login e sessão | Execute | Implementing |
-| AUTH-06 | P1: Login e sessão | Execute | Implementing |
-| AUTH-07 | P1: Login e sessão | Execute | Implementing |
-| AUTH-08 | P1: Login e sessão | Execute | Implementing |
-| AUTH-09 | P1: Login e sessão | Execute | Implementing |
-| TEN-01 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-02 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-03 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-04 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-05 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-06 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-07 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| TEN-08 | P1: SuperAdmin gerencia tenants | Execute | Implementing |
-| EMP-01 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-02 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-03 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-04 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-05 | P1: Empresas do tenant | Execute | Implementing |
-| EMP-06 | P1: Empresas do tenant | Execute | Implementing |
-| ISO-01 | P1: Isolamento entre tenants | Execute | Implementing |
-| ISO-02 | P1: Isolamento entre tenants | Execute | Implementing |
-| ISO-03 | P1: Isolamento entre tenants | Execute | Implementing |
-| ISO-04 | P1: Isolamento entre tenants | Execute | Implementing |
-| ISO-05 | P1: Isolamento entre tenants | Execute | Implementing |
-| USR-01 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-02 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-03 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-04 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-05 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-06 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-07 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-08 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-09 | P2: Admin gerencia usuários | Execute | Implementing |
-| USR-10 | P2: Admin gerencia usuários | Execute | Implementing |
-| CTX-01 | P2: SuperAdmin acessa contexto | Execute | Implementing |
-| CTX-02 | P2: SuperAdmin acessa contexto | Execute | Implementing |
-| CTX-03 | P2: SuperAdmin acessa contexto | Execute | Implementing |
-| DEL-01 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-02 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-03 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-04 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-05 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-06 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-07 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-08 | P2: Exclusão total de tenant | Execute | Implementing |
-| DEL-09 | P2: Exclusão total de tenant | Execute | Implementing |
-| AUD-01 | P3: Auditoria consultável | Execute | Implementing |
-| AUD-02 | P3: Auditoria consultável | Execute | Implementing |
-| AUD-03 | P3: Auditoria consultável | Execute | Implementing |
-| AUD-04 | P3: Auditoria consultável | Execute | Implementing |
+| AUTH-01 | P1: Login e sessão | Validate | Verified |
+| AUTH-02 | P1: Login e sessão | Validate | Verified |
+| AUTH-03 | P1: Login e sessão | Validate | Verified |
+| AUTH-04 | P1: Login e sessão | Validate | Verified |
+| AUTH-05 | P1: Login e sessão | Validate | Verified |
+| AUTH-06 | P1: Login e sessão | Validate | Verified |
+| AUTH-07 | P1: Login e sessão | Validate | Verified |
+| AUTH-08 | P1: Login e sessão | Validate | Verified |
+| AUTH-09 | P1: Login e sessão | Validate | Verified |
+| TEN-01 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-02 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-03 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-04 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-05 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-06 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-07 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| TEN-08 | P1: SuperAdmin gerencia tenants | Validate | Verified |
+| EMP-01 | P1: Empresas do tenant | Validate | Verified |
+| EMP-02 | P1: Empresas do tenant | Validate | Verified |
+| EMP-03 | P1: Empresas do tenant | Validate | Verified |
+| EMP-04 | P1: Empresas do tenant | Validate | Verified |
+| EMP-05 | P1: Empresas do tenant | Validate | Verified |
+| EMP-06 | P1: Empresas do tenant | Validate | Verified |
+| ISO-01 | P1: Isolamento entre tenants | Validate | Verified |
+| ISO-02 | P1: Isolamento entre tenants | Validate | Verified |
+| ISO-03 | P1: Isolamento entre tenants | Validate | Verified |
+| ISO-04 | P1: Isolamento entre tenants | Validate | Verified |
+| ISO-05 | P1: Isolamento entre tenants | Validate | Verified |
+| USR-01 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-02 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-03 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-04 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-05 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-06 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-07 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-08 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-09 | P2: Admin gerencia usuários | Validate | Verified |
+| USR-10 | P2: Admin gerencia usuários | Validate | Verified |
+| CTX-01 | P2: SuperAdmin acessa contexto | Validate | Verified |
+| CTX-02 | P2: SuperAdmin acessa contexto | Validate | Verified |
+| CTX-03 | P2: SuperAdmin acessa contexto | Validate | Verified |
+| DEL-01 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-02 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-03 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-04 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-05 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-06 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-07 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-08 | P2: Exclusão total de tenant | Validate | Verified |
+| DEL-09 | P2: Exclusão total de tenant | Validate | Verified |
+| AUD-01 | P3: Auditoria consultável | Validate | Verified |
+| AUD-02 | P3: Auditoria consultável | Validate | Verified |
+| AUD-03 | P3: Auditoria consultável | Validate | Verified |
+| AUD-04 | P3: Auditoria consultável | Validate | Verified |
 
 **Coverage:** 54 total, 54 mapped to tasks (`tasks.md`), 0 unmapped
 

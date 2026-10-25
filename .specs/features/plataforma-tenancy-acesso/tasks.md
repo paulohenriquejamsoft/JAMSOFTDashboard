@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Spec**: `.specs/features/plataforma-tenancy-acesso/spec.md`
 **Design**: `.specs/features/plataforma-tenancy-acesso/design.md`
-**Status**: In Progress
+**Status**: Done
 
 ---
 
