@@ -287,9 +287,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: segredo gerado tem 43 caracteres Base64Url e decodifica para 32 bytes; dois segredos seguidos diferem; hash tem 32 bytes; comparação aceita o segredo certo e recusa um com 1 caractere trocado
-- [ ] Gate check passes: Quick
-- [ ] Test count: 4 new tests pass
+- [x] Testes: segredo gerado tem 43 caracteres Base64Url e decodifica para 32 bytes; dois segredos seguidos diferem; hash tem 32 bytes; comparação aceita o segredo certo e recusa um com 1 caractere trocado
+- [x] Gate check passes: Quick
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick
