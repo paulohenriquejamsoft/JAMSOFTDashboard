@@ -612,9 +612,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: após logout, `sessionStorage` e `localStorage` sem chaves da aplicação (prefixo do app) e `usuario()`/token nulos; uma chave de outro app no storage é preservada
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 2 new tests pass
+- [x] Testes: após logout, `sessionStorage` e `localStorage` sem chaves da aplicação (prefixo do app) e `usuario()`/token nulos; uma chave de outro app no storage é preservada
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 2 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

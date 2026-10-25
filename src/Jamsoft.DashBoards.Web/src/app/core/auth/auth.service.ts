@@ -23,6 +23,9 @@ interface SessaoResposta extends UsuarioSessao {
   expiraEm: string;
 }
 
+/** Prefixo de toda chave que a aplicação grava em `sessionStorage`/`localStorage`. */
+export const PREFIXO_ARMAZENAMENTO = 'jamsoft.';
+
 /** Cabeçalho exigido pelo `/api/auth/refresh` (proteção contra CSRF). */
 export const CABECALHO_CSRF = { 'X-Requested-With': 'jamsoft' };
 
@@ -58,7 +61,10 @@ export class AuthService {
       .pipe(map((resposta) => this.abrir(resposta)));
   }
 
-  /** Revoga o refresh token na API e descarta a sessão local, mesmo se a chamada falhar. */
+  /**
+   * Revoga o refresh token na API e descarta a sessão local, mesmo se a chamada falhar: token, tenant selecionado e
+   * qualquer chave da aplicação no armazenamento do navegador (PWA-07).
+   */
   logout(): Observable<void> {
     return this.http.post<void>('/api/auth/logout', null, { withCredentials: true }).pipe(
       catchError(() => of(undefined)),
@@ -66,6 +72,7 @@ export class AuthService {
       finalize(() => {
         this.encerrar();
         this.tenantContexto.limpar();
+        limparArmazenamentoDaAplicacao();
       }),
     );
   }
@@ -110,5 +117,18 @@ export class AuthService {
   private encerrar(): void {
     this.token = null;
     this.sessao.set(null);
+  }
+}
+
+/** Remove de `sessionStorage` e `localStorage` só as chaves da aplicação; as de outros apps ficam. */
+function limparArmazenamentoDaAplicacao(): void {
+  for (const nome of ['sessionStorage', 'localStorage'] as const) {
+    try {
+      const storage = globalThis[nome];
+      const chaves = Array.from({ length: storage.length }, (_, i) => storage.key(i));
+      for (const chave of chaves) if (chave?.startsWith(PREFIXO_ARMAZENAMENTO)) storage.removeItem(chave);
+    } catch {
+      // Storage indisponível (modo privado, bloqueio): não há o que limpar.
+    }
   }
 }

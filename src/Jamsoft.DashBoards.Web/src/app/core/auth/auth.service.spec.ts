@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
+import { TenantContextoService } from './tenant-contexto.service';
 
 const sessaoAdmin = {
   accessToken: 'token-admin',
@@ -95,5 +96,51 @@ describe('AuthService', () => {
     expect(gravacoes).not.toHaveBeenCalled();
     expect(localStorage.length).toBe(0);
     expect(sessionStorage.length).toBe(0);
+  });
+  describe('logout limpa o armazenamento local (PWA-07)', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+    afterEach(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+
+    function sair(): void {
+      auth.logout().subscribe();
+      http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+    }
+
+    const chaves = (storage: Storage) => Array.from({ length: storage.length }, (_, i) => storage.key(i)!);
+
+    it('remove tokens, tenant selecionado e toda chave da aplicação de sessionStorage e localStorage', () => {
+      entrar();
+      TestBed.inject(TenantContextoService).selecionar({ idPublico: 'b2', nome: 'Loja B' });
+      sessionStorage.setItem('jamsoft.painel-filtro', '{"inicio":"2026-10-01"}');
+      localStorage.setItem('jamsoft.preferencias', '{"tema":"escuro"}');
+      expect(chaves(sessionStorage).some((c) => c.startsWith('jamsoft.'))).toBe(true);
+
+      sair();
+
+      expect(chaves(sessionStorage).filter((c) => c.startsWith('jamsoft.'))).toEqual([]);
+      expect(chaves(localStorage).filter((c) => c.startsWith('jamsoft.'))).toEqual([]);
+      expect(TestBed.inject(TenantContextoService).selecionado()).toBeNull();
+      expect(auth.usuario()).toBeNull();
+      expect(auth.accessToken).toBeNull();
+    });
+
+    it('preserva as chaves de outros apps no mesmo domínio', () => {
+      entrar();
+      sessionStorage.setItem('jamsoft.tenant-contexto', '{"idPublico":"b2","nome":"Loja B"}');
+      sessionStorage.setItem('outro-app.sessao', 'x');
+      localStorage.setItem('outro-app.preferencia', 'y');
+
+      sair();
+
+      expect(chaves(sessionStorage)).toEqual(['outro-app.sessao']);
+      expect(chaves(localStorage)).toEqual(['outro-app.preferencia']);
+      expect(localStorage.getItem('outro-app.preferencia')).toBe('y');
+    });
   });
 });
