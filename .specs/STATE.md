@@ -98,13 +98,45 @@
 - **Date**: 2026-10-24
 - **Status**: active
 
+### AD-013
+- **Decision**: O Coletor é dividido em três projetos: `Jamsoft.DashBoards.Contratos` (DTOs compartilhados com a API, sem dependências), `Jamsoft.DashBoards.Coletor.Nucleo` (agendamento, extração Dapper, cliente HTTP, checkpoint, logs) e `Jamsoft.DashBoards.Coletor` (casca Windows Forms + Generic Host).
+- **Reason**: Escolha do usuário; lógica testável sem UI e contrato único entre API e Coletor.
+- **Trade-off**: Mais projetos na solução; mudanças de contrato exigem atualizar API e Coletor juntos.
+- **Scope**: Coletor, API (ingestão), futuras rotinas de sincronização.
+- **Date**: 2026-10-25
+- **Status**: active
+
+### AD-014
+- **Decision**: A ingestão grava cada lote com um único `MERGE ... WITH (HOLDLOCK)` alimentado por `OPENJSON` (SQL fixo e parametrizado), na mesma transação que registra o lote em `LOTE_INGESTAO (TENANT_ID, BATCH_ID)` com a resposta, usada para responder reenvios de forma idêntica.
+- **Reason**: Escolha do usuário; uma ida ao banco por lote, atômico e com contagens via `OUTPUT $action`.
+- **Trade-off**: SQL específico do SQL Server fora do LINQ; `LOTE_INGESTAO` precisa de retenção.
+- **Scope**: API (ingestão de todas as rotinas futuras).
+- **Date**: 2026-10-25
+- **Status**: active
+
+### AD-015
+- **Decision**: O Coletor se autentica por client credentials (`POST /api/coletor/token`) e recebe um JWT de 15 min com perfil `Coletor`, claim `tenants` e `cred_ver`; um cache de 60 s revalida credencial ativa e versão a cada requisição.
+- **Reason**: Reaproveita `TokenService` e policies; revogação, rotação e troca de tenants passam a valer em até 60 s.
+- **Trade-off**: Mudança na lista de tenants só vale no próximo token (COL-07) e a revogação tem até 60 s de atraso.
+- **Scope**: API, Coletor.
+- **Date**: 2026-10-25
+- **Status**: active
+
+### AD-016
+- **Decision**: O estado local do Coletor (configurações, checkpoints, logs) fica em `%ProgramData%\Jamsoft\DashBoards.Coletor\` em JSON com gravação atômica; segredos (senhas de banco e `client_secret`) cifrados com DPAPI escopo `LocalMachine`.
+- **Reason**: Sem banco local; credenciais do ERP nunca saem do servidor do cliente; sobrevive a reinício.
+- **Trade-off**: Qualquer processo local com privilégio pode decifrar; mitigado por ACL e usuário de ERP só de leitura.
+- **Scope**: Coletor.
+- **Date**: 2026-10-25
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/plataforma-tenancy-acesso` — **concluída e verificada** (Verifier iteração 3: PASS; 54/54 ACs, 13/13 mutações mortas)
 - **Phase / Task**: Execute concluído (T1–T58 + correções da validação)
 - **Completed**: T1–T58; 238 testes API, 121 Web, 4 e2e
 - **In-progress** (file:line): none
-- **Next step**: Design de `.specs/features/sincronizacao-vendas` (Coletor + ingestão); depois `painel-vendas`.
+- **Next step**: Aprovar `.specs/features/sincronizacao-vendas/design.md` (rascunho) e gerar o `tasks.md`; depois `painel-vendas`.
 - **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP. Testes de integração: `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true;Connect Timeout=60"` (Docker parado). SQL Server local sofre com pouca RAM livre: se a suíte oscilar por timeout, liberar memória ou reiniciar o serviço como administrador.
 - **Uncommitted files**: none
 - **Branch**: feat/plataforma-tenancy-acesso (sem remoto configurado)

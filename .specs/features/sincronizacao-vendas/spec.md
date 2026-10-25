@@ -274,64 +274,64 @@ Os dados de vendas estão nos bancos dos ERPs, dentro dos servidores dos cliente
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| COL-01 | P1: Credencial do Coletor | - | Pending |
-| COL-02 | P1: Credencial do Coletor | - | Pending |
-| COL-03 | P1: Credencial do Coletor | - | Pending |
-| COL-04 | P1: Credencial do Coletor | - | Pending |
-| COL-05 | P1: Credencial do Coletor | - | Pending |
-| COL-06 | P1: Credencial do Coletor | - | Pending |
-| COL-07 | P1: Credencial do Coletor | - | Pending |
-| COL-08 | P1: Credencial do Coletor | - | Pending |
-| COL-09 | P1: Credencial do Coletor | - | Pending |
-| CFG-01 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-02 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-03 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-04 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-05 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-06 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-07 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-08 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-09 | P1: Login e configuração no Coletor | - | Pending |
-| CFG-10 | P1: Login e configuração no Coletor | - | Pending |
-| SYNC-01 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-02 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-03 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-04 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-05 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-06 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-07 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-08 | P1: Carga inicial e incremental | - | Pending |
-| SYNC-09 | P1: Carga inicial e incremental | - | Pending |
-| ING-01 | P1: Ingestão na API | - | Pending |
-| ING-02 | P1: Ingestão na API | - | Pending |
-| ING-03 | P1: Ingestão na API | - | Pending |
-| ING-04 | P1: Ingestão na API | - | Pending |
-| ING-05 | P1: Ingestão na API | - | Pending |
-| ING-06 | P1: Ingestão na API | - | Pending |
-| ING-07 | P1: Ingestão na API | - | Pending |
-| ING-08 | P1: Ingestão na API | - | Pending |
-| ING-09 | P1: Ingestão na API | - | Pending |
-| ING-10 | P1: Ingestão na API | - | Pending |
-| SCH-01 | P1: Agendamento e concorrência | - | Pending |
-| SCH-02 | P1: Agendamento e concorrência | - | Pending |
-| SCH-03 | P1: Agendamento e concorrência | - | Pending |
-| SCH-04 | P1: Agendamento e concorrência | - | Pending |
-| SCH-05 | P1: Agendamento e concorrência | - | Pending |
-| CTL-01 | P2: Pausar, retomar e reiniciar | - | Pending |
-| CTL-02 | P2: Pausar, retomar e reiniciar | - | Pending |
-| CTL-03 | P2: Pausar, retomar e reiniciar | - | Pending |
-| CTL-04 | P2: Pausar, retomar e reiniciar | - | Pending |
-| CTL-05 | P2: Pausar, retomar e reiniciar | - | Pending |
-| CTL-06 | P2: Pausar, retomar e reiniciar | - | Pending |
-| LOG-01 | P2: Logs diários do Coletor | - | Pending |
-| LOG-02 | P2: Logs diários do Coletor | - | Pending |
-| LOG-03 | P2: Logs diários do Coletor | - | Pending |
-| LOG-04 | P2: Logs diários do Coletor | - | Pending |
-| LOG-05 | P2: Logs diários do Coletor | - | Pending |
-| LOG-06 | P2: Logs diários do Coletor | - | Pending |
-| STS-01 | P3: Status de sincronização | - | Pending |
-| STS-02 | P3: Status de sincronização | - | Pending |
-| STS-03 | P3: Status de sincronização | - | Pending |
+| COL-01 | P1: Credencial do Coletor | Design | In Design |
+| COL-02 | P1: Credencial do Coletor | Design | In Design |
+| COL-03 | P1: Credencial do Coletor | Design | In Design |
+| COL-04 | P1: Credencial do Coletor | Design | In Design |
+| COL-05 | P1: Credencial do Coletor | Design | In Design |
+| COL-06 | P1: Credencial do Coletor | Design | In Design |
+| COL-07 | P1: Credencial do Coletor | Design | In Design |
+| COL-08 | P1: Credencial do Coletor | Design | In Design |
+| COL-09 | P1: Credencial do Coletor | Design | In Design |
+| CFG-01 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-02 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-03 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-04 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-05 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-06 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-07 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-08 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-09 | P1: Login e configuração no Coletor | Design | In Design |
+| CFG-10 | P1: Login e configuração no Coletor | Design | In Design |
+| SYNC-01 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-02 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-03 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-04 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-05 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-06 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-07 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-08 | P1: Carga inicial e incremental | Design | In Design |
+| SYNC-09 | P1: Carga inicial e incremental | Design | In Design |
+| ING-01 | P1: Ingestão na API | Design | In Design |
+| ING-02 | P1: Ingestão na API | Design | In Design |
+| ING-03 | P1: Ingestão na API | Design | In Design |
+| ING-04 | P1: Ingestão na API | Design | In Design |
+| ING-05 | P1: Ingestão na API | Design | In Design |
+| ING-06 | P1: Ingestão na API | Design | In Design |
+| ING-07 | P1: Ingestão na API | Design | In Design |
+| ING-08 | P1: Ingestão na API | Design | In Design |
+| ING-09 | P1: Ingestão na API | Design | In Design |
+| ING-10 | P1: Ingestão na API | Design | In Design |
+| SCH-01 | P1: Agendamento e concorrência | Design | In Design |
+| SCH-02 | P1: Agendamento e concorrência | Design | In Design |
+| SCH-03 | P1: Agendamento e concorrência | Design | In Design |
+| SCH-04 | P1: Agendamento e concorrência | Design | In Design |
+| SCH-05 | P1: Agendamento e concorrência | Design | In Design |
+| CTL-01 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| CTL-02 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| CTL-03 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| CTL-04 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| CTL-05 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| CTL-06 | P2: Pausar, retomar e reiniciar | Design | In Design |
+| LOG-01 | P2: Logs diários do Coletor | Design | In Design |
+| LOG-02 | P2: Logs diários do Coletor | Design | In Design |
+| LOG-03 | P2: Logs diários do Coletor | Design | In Design |
+| LOG-04 | P2: Logs diários do Coletor | Design | In Design |
+| LOG-05 | P2: Logs diários do Coletor | Design | In Design |
+| LOG-06 | P2: Logs diários do Coletor | Design | In Design |
+| STS-01 | P3: Status de sincronização | Design | In Design |
+| STS-02 | P3: Status de sincronização | Design | In Design |
+| STS-03 | P3: Status de sincronização | Design | In Design |
 
 **Coverage:** 58 total, 0 mapped to tasks, 58 unmapped ⚠️ (esperado antes de Tasks)
 
