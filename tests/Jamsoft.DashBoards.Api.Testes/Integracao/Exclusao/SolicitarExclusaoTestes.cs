@@ -143,4 +143,45 @@ public sealed class SolicitarExclusaoTestes(BancoDeTestes banco) : IAsyncLifetim
         Assert.Equal(SolicitarExclusaoEndpoint.CodigoExclusaoEmAndamento, corpo.GetProperty("codigo").GetString());
         Assert.Equal(jobId, corpo.GetProperty("jobId").GetGuid());
     }
+
+    [Fact]
+    public async Task Solicitacao_com_job_EmExecucao_responde_409_EXCLUSAO_EM_ANDAMENTO_sem_criar_job()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Em Execução");
+        var emExecucao = new ExclusaoTenant
+        {
+            TenantId = tenant.Id,
+            TenantIdPublico = tenant.IdPublico,
+            TenantNome = tenant.Nome,
+            Situacao = SituacaoExclusao.EmExecucao,
+            SolicitadoPorIdPublico = Guid.NewGuid(),
+            IniciadoEm = DateTime.UtcNow,
+            // Heartbeat recente: nenhum processador de outro teste o considera abandonado.
+            HeartbeatEm = DateTime.UtcNow,
+        };
+        await using (var contexto = banco.CriarContexto())
+        {
+            contexto.ExclusoesTenant.Add(emExecucao);
+            await contexto.SaveChangesAsync();
+        }
+
+        try
+        {
+            using var resposta = await SolicitarAsync(tenant, await Acesso.TokenSuperAdminAsync(banco), tenant.Nome);
+
+            Assert.Equal(HttpStatusCode.Conflict, resposta.StatusCode);
+            var corpo = await Sessao.JsonAsync(resposta);
+            Assert.Equal(SolicitarExclusaoEndpoint.CodigoExclusaoEmAndamento, corpo.GetProperty("codigo").GetString());
+            Assert.Equal(emExecucao.IdPublico, corpo.GetProperty("jobId").GetGuid());
+            var (_, jobs) = await EstadoAsync(tenant);
+            Assert.Equal(emExecucao.Id, Assert.Single(jobs).Id);
+        }
+        finally
+        {
+            // Encerra o job semeado para não ficar ativo no banco compartilhado da coleção.
+            await using var limpeza = banco.CriarContexto();
+            await limpeza.ExclusoesTenant.Where(j => j.Id == emExecucao.Id)
+                .ExecuteUpdateAsync(j => j.SetProperty(x => x.Situacao, SituacaoExclusao.Concluida));
+        }
+    }
 }
