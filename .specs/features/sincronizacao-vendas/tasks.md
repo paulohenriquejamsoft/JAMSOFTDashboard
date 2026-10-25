@@ -784,9 +784,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: um arquivo por dia; evento de fim com todos os campos do LOG-02; tipo de erro em uma das 4 categorias; mensagem com `Password=x` sai sem a senha; filtros por data, tenant, banco, rotina e resultado; arquivos de 31 dias apagados e de 29 mantidos
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 7 new tests pass
+- [x] Testes: um arquivo por dia; evento de fim com todos os campos do LOG-02; tipo de erro em uma das 4 categorias; mensagem com `Password=x` sai sem a senha; filtros por data, tenant, banco, rotina e resultado; arquivos de 31 dias apagados e de 29 mantidos
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 7 new tests pass
 
 **Tests**: unit
 **Gate**: quick
