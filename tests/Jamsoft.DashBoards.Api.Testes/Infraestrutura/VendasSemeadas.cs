@@ -78,7 +78,10 @@ public static class VendasSemeadas
         await using var contexto = banco.CriarContexto();
         var origem = new OrigemSincronizacao
         {
-            TenantId = tenant.Id, ColetorId = coletor.Id, ConfiguracaoId = Guid.NewGuid(), Rotina = "Vendas",
+            TenantId = tenant.Id,
+            ColetorId = coletor.Id,
+            ConfiguracaoId = Guid.NewGuid(),
+            Rotina = "Vendas",
         };
         contexto.OrigensSincronizacao.Add(origem);
         await contexto.SaveChangesAsync();

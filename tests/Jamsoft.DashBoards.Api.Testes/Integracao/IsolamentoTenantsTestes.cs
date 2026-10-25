@@ -173,6 +173,42 @@ public sealed class IsolamentoTenantsTestes(BancoDeTestes banco) : IAsyncLifetim
         Assert.Equal(antes, await DadosTenant.ImpressaoAsync(banco, b.Tenant.Id));
     }
 
+    [Theory]
+    [InlineData(nameof(Perfil.Admin))]
+    [InlineData(nameof(Perfil.Consulta))]
+    public async Task Valores_do_painel_de_A_nunca_incluem_vendas_de_B(string perfil)
+    {
+        var a = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Painel Isolado A"));
+        // B tem o mesmo conjunto (mesmos códigos e datas) e mais uma venda grande no período.
+        var b = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Painel Isolado B"));
+        await VendasSemeadas.InserirAsync(banco, b,
+            VendasSemeadas.Venda(b.Matriz, 99, VendasSemeadas.Sp(10, 15, 10, 0), 9999.00m, "Finalizada", "NF-e", 1, 10, "Cliente X", 1, "Ana"));
+        var usuario = await Dados.NovoUsuarioAsync(banco, Enum.Parse<Perfil>(perfil), a.Tenant);
+        var token = Acesso.Token(usuario, a.Tenant);
+        const string periodo = "inicio=2026-10-11&fim=2026-10-20";
+
+        async Task<System.Text.Json.JsonElement> GetAsync(string bloco)
+        {
+            using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, $"/api/painel/{bloco}?{periodo}", token));
+            Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+            return await Sessao.JsonAsync(resposta);
+        }
+
+        var kpis = (await GetAsync("kpis")).GetProperty("kpis");
+        Assert.Equal(VendasSemeadas.Faturamento, kpis.GetProperty("faturamento").GetProperty("atual").GetDecimal());
+        Assert.Equal(VendasSemeadas.Vendas, kpis.GetProperty("vendas").GetProperty("atual").GetDecimal());
+        Assert.Equal(VendasSemeadas.FaturamentoAnterior, kpis.GetProperty("faturamento").GetProperty("anterior").GetDecimal());
+        Assert.Equal(VendasSemeadas.Faturamento,
+            (await GetAsync("evolucao")).GetProperty("pontos").EnumerateArray().Sum(p => p.GetProperty("atual").GetDecimal()));
+        var rankings = await GetAsync("rankings");
+        Assert.Equal(VendasSemeadas.Faturamento, rankings.GetProperty("totalFaturamento").GetDecimal());
+        Assert.Equal(300.00m, rankings.GetProperty("vendedores")[0].GetProperty("faturamento").GetDecimal());
+        Assert.Equal(["Filial", "Matriz"],
+            rankings.GetProperty("empresas").EnumerateArray().Select(e => e.GetProperty("nome").GetString()));
+        Assert.Equal([300.00m, 75.50m],
+            (await GetAsync("dfe")).GetProperty("tipos").EnumerateArray().Select(t => t.GetProperty("faturamento").GetDecimal()));
+    }
+
     [Fact]
     public async Task Toda_tabela_com_TENANT_ID_tem_indice_iniciado_por_TENANT_ID()
     {

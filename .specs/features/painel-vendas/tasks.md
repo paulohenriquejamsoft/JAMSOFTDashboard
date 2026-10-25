@@ -266,10 +266,10 @@ T22
 
 **Done when**:
 
-- [ ] Suíte de isolamento cobre as 4 rotas novas e passa (valores de A nunca incluem vendas de B; `empresas` de B → 404; `X-Tenant` divergente → 403)
-- [ ] Testes: cada bloco gera um log com o nome do bloco e a duração; o log não contém valores nem nomes de clientes
-- [ ] Gate check passes: Full
-- [ ] Test count: 2 new tests pass (+ casos da suíte de isolamento)
+- [x] Suíte de isolamento cobre as 4 rotas novas e passa (valores de A nunca incluem vendas de B; `empresas` de B → 404; `X-Tenant` divergente → 403)
+- [x] Testes: cada bloco gera um log com o nome do bloco e a duração; o log não contém valores nem nomes de clientes
+- [x] Gate check passes: Full
+- [x] Test count: 2 new tests pass (+ casos da suíte de isolamento)
 
 **Tests**: integration
 **Gate**: full

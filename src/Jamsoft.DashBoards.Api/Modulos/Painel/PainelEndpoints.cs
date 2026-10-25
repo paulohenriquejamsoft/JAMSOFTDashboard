@@ -32,7 +32,8 @@ public static class PainelEndpoints
         var grupo = app.MapGroup("/api/painel")
             .RequireAuthorization(Policies.LeituraTenant)
             .ValidarContextoTenant()
-            .AuditarContextoSuperAdmin();
+            .AuditarContextoSuperAdmin()
+            .AddEndpointFilter<RouteGroupBuilder, DuracaoPainelFilter>();
         grupo.MapGet("/kpis", KpisAsync);
         grupo.MapGet("/evolucao", EvolucaoAsync);
         grupo.MapGet("/rankings", RankingsAsync);
