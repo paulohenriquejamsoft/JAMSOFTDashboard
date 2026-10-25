@@ -560,9 +560,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes (SwUpdate falso): `VERSION_READY` mostra a faixa; "Recarregar" chama `activateUpdate` e recarrega; outros eventos não mostram; service worker desabilitado não quebra
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes (SwUpdate falso): `VERSION_READY` mostra a faixa; "Recarregar" chama `activateUpdate` e recarrega; outros eventos não mostram; service worker desabilitado não quebra
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
