@@ -4,9 +4,11 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { trocarEcharts } from '../../../testes/echarts-falso';
 import { responderProblema } from '../../../testes/problemas';
 import { AuthService, Perfil, UsuarioSessao } from '../../core/auth/auth.service';
 import { RELOGIO } from '../../shared/layout/status-dados.component';
+import { EvolucaoComponent } from './evolucao.component';
 import { DfeResposta, EvolucaoResposta, Indicador, KpisResposta, RankingsResposta } from './painel.service';
 import { PainelPage } from './painel.page';
 
@@ -50,6 +52,7 @@ describe('PainelPage', () => {
         { provide: RELOGIO, useValue: () => Date.parse('2026-10-24T15:00:00Z') },
       ],
     });
+    trocarEcharts(EvolucaoComponent);
     http = TestBed.inject(HttpTestingController);
     harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/cliente');

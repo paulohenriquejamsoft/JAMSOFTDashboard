@@ -428,9 +428,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: as opções geradas têm 2 séries com os valores da resposta, eixo com os rótulos da granularidade e `tooltip.trigger = 'axis'`; o formatter do tooltip devolve data, "Atual R$ …" e "Anterior R$ …"; `triggerOn` cobre toque
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 4 new tests pass
+- [x] Testes de componente: as opções geradas têm 2 séries com os valores da resposta, eixo com os rótulos da granularidade e `tooltip.trigger = 'axis'`; o formatter do tooltip devolve data, "Atual R$ …" e "Anterior R$ …"; `triggerOn` cobre toque
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

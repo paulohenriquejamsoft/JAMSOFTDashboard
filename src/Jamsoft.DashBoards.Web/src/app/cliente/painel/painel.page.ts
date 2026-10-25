@@ -7,6 +7,7 @@ import { traduzirProblema } from '../../core/erros/problema';
 import { EstadoCarga } from '../../shared/paginado';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
 import { SincronizacaoApi } from '../sincronizacao/sincronizacao.api';
+import { EvolucaoComponent } from './evolucao.component';
 import { FiltroPainelComponent } from './filtro-painel.component';
 import { KpisComponent } from './kpis.component';
 import { FiltroPainel, PainelService } from './painel.service';
@@ -51,7 +52,7 @@ class Bloco<T> {
  */
 @Component({
   selector: 'app-painel',
-  imports: [EstadoCargaComponent, FiltroPainelComponent, KpisComponent, SeletorTenantComponent],
+  imports: [EstadoCargaComponent, EvolucaoComponent, FiltroPainelComponent, KpisComponent, SeletorTenantComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .grade {
@@ -117,8 +118,10 @@ class Bloco<T> {
               <div class="card-cabecalho"><h2 id="bloco-evolucao">Evolução do faturamento</h2></div>
               <app-estado-carga [estado]="evolucao.estado()" [mensagemErro]="evolucao.mensagemErro()"
                 (tentarNovamente)="recarregar(evolucao)" />
-              @if (evolucao.estado() === 'pronto') {
-                <div class="bloco-conteudo"></div>
+              @if (evolucao.dados(); as dados) {
+                @if (evolucao.estado() === 'pronto') {
+                  <app-evolucao class="bloco-conteudo" [dados]="dados" />
+                }
               }
             </section>
 
