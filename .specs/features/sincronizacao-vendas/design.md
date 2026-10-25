@@ -3,7 +3,7 @@
 **Spec**: `.specs/features/sincronizacao-vendas/spec.md`
 **Decisões aplicadas**: AD-001 a AD-012; novas AD-013 a AD-016 (`.specs/STATE.md`)
 **Depende de**: `plataforma-tenancy-acesso` (verificada, PASS)
-**Status**: Draft
+**Status**: Approved
 
 ---
 
@@ -305,6 +305,17 @@ ORDER BY ns.datafatura, ns.NumNotaSaida;
   - `FormLogs` (LOG-05).
   - Enquanto não houver login, só `FormLogin` e `FormLogs` ficam acessíveis (CFG-01).
 - "Iniciar com o Windows" é opcional: grava na chave `HKCU\...\Run` do usuário, só quando o técnico marca a opção.
+
+---
+
+## Components — Frontend (Angular)
+
+Segue o shell, os componentes `shared/ui` e os padrões das telas de `plataforma-tenancy-acesso`.
+
+- `admin/coletores/coletores-lista.page.ts` (`/admin/coletores`, SuperAdmin): lista paginada com nome, `clientId`, situação, tenants autorizados e último token, com as ações revogar e rotacionar (COL-05, COL-06).
+- `admin/coletores/coletor-form.page.ts` (`/admin/coletores/novo` e `/:id`): nome e tenants autorizados (multisseleção, só tenants ativos). Ao criar ou rotacionar, abre o `segredo-coletor.dialog.ts`, que mostra `clientId` e `clientSecret` **uma única vez**, com botão de copiar e o aviso "não será exibido novamente" (COL-01, COL-06, COL-07).
+- `cliente/sincronizacao/sincronizacao.page.ts` (`/cliente/sincronizacao`, Admin ou SuperAdmin com tenant): tabela de origens com rotina, banco, último sucesso, situação e mensagem (STS-01).
+- `shared/layout/status-dados.component.ts` no header do shell: "Dados atualizados em dd/MM/yyyy HH:mm" para qualquer perfil, vindo de `GET /api/sincronizacao/resumo` (STS-02). Para Admin e SuperAdmin, mostra o alerta "Dados desatualizados" quando passa de 24 h (STS-03). Com o tenant ainda sem sincronização, mostra "Nenhuma sincronização ainda".
 
 ---
 
