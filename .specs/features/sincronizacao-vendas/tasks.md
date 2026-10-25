@@ -1277,9 +1277,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de componente: texto com a data formatada; 25 h → alerta para Admin e não para Consulta; 23 h → sem alerta; `null` → "Nenhuma sincronização ainda"
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: texto com a data formatada; 25 h → alerta para Admin e não para Consulta; 23 h → sem alerta; `null` → "Nenhuma sincronização ainda"
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

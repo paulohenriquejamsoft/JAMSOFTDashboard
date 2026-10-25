@@ -4,6 +4,7 @@ import { AuthService, Perfil } from '../../core/auth/auth.service';
 import { EstadoAviso } from '../../core/auth/perfil.guard';
 import { TenantContextoService } from '../../core/auth/tenant-contexto.service';
 import { SeletorTenantComponent } from '../../admin/seletor-tenant/seletor-tenant.component';
+import { StatusDadosComponent } from './status-dados.component';
 
 interface ItemMenu {
   rotulo: string;
@@ -29,7 +30,7 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
  */
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SeletorTenantComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SeletorTenantComponent, StatusDadosComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './shell.component.scss',
   template: `
@@ -56,6 +57,7 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
       <header class="cabecalho">
         <!-- Só aparece para o SuperAdmin (CTX-01). -->
         <app-seletor-tenant />
+        <app-status-dados />
         <div class="usuario">
           <span class="avatar" aria-hidden="true">{{ iniciais() }}</span>
           <div class="usuario-texto">
