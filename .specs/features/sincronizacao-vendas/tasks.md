@@ -864,9 +864,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: conexão válida lista bancos incluindo o ERP falso; senha errada → "autenticação"; servidor inexistente → "rede" ou "timeout"; mensagem nunca contém a senha
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 4 new tests pass
+- [x] Testes: conexão válida lista bancos incluindo o ERP falso; senha errada → "autenticação"; servidor inexistente → "rede" ou "timeout"; mensagem nunca contém a senha
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
