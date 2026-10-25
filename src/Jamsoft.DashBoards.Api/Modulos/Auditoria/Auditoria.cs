@@ -37,6 +37,9 @@ public readonly record struct OperacaoAuditada(string Codigo)
     public static readonly OperacaoAuditada ExclusaoFalhou = new("EXCLUSAO_FALHOU");
     public static readonly OperacaoAuditada ExclusaoRetomada = new("EXCLUSAO_RETOMADA");
 
+    /// <summary>Credenciais do Coletor (parte Coletor do AUD-01).</summary>
+    public static readonly OperacaoAuditada ColetorCriado = new("COLETOR_CRIADO");
+
     public override string ToString() => Codigo;
 }
 

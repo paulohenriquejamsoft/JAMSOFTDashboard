@@ -313,9 +313,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: 201 com `idPublico`, `clientId`, `clientSecret`; banco guarda `SHA256(secret)` e nunca o secret; sem tenant → 400 `VALIDACAO`; tenant inativo → 400 `VALIDACAO`; nome com 2 caracteres → 400; Admin → 403 `ACESSO_NEGADO`; auditoria sem o secret
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: 201 com `idPublico`, `clientId`, `clientSecret`; banco guarda `SHA256(secret)` e nunca o secret; sem tenant → 400 `VALIDACAO`; tenant inativo → 400 `VALIDACAO`; nome com 2 caracteres → 400; Admin → 403 `ACESSO_NEGADO`; auditoria sem o secret
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full
