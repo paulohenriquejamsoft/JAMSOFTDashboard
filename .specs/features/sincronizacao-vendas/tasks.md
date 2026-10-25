@@ -417,9 +417,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: token válido acessa rota de Coletor; após revogar, token antigo → 401 em até 60 s (relógio falso) e imediatamente após invalidar o cache; após rotacionar ou trocar tenants, token antigo → 401; token de Coletor em rota de usuário → 403 (regressão COL-09); `TenantsAutorizadosColetor` = conjunto da claim
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: token válido acessa rota de Coletor; após revogar, token antigo → 401 em até 60 s (relógio falso) e imediatamente após invalidar o cache; após rotacionar ou trocar tenants, token antigo → 401; token de Coletor em rota de usuário → 403 (regressão COL-09); `TenantsAutorizadosColetor` = conjunto da claim
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

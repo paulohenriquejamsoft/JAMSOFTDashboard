@@ -96,9 +96,10 @@ public sealed class PoliciesTestes(BancoDeTestes banco) : IAsyncLifetime
     [Fact]
     public async Task Token_de_Coletor_responde_403_em_rota_de_usuario()
     {
-        // Credencial de Coletor não é usuário do portal: não existe em USUARIO.
-        var coletor = new Usuario { IdPublico = Guid.NewGuid(), Perfil = Perfil.Coletor, TrocarSenha = false };
-        var token = Acesso.Token(coletor, tenant: null);
+        // Credencial de Coletor não é usuário do portal: não existe em USUARIO. Precisa ser uma credencial
+        // real e ativa (COLETOR), senão a revalidação do token (StatusColetorCache) já responde 401.
+        var coletor = await Dados.NovoColetorAsync(banco);
+        var token = Acesso.TokenColetor(coletor, [(await Dados.NovoTenantAsync(banco)).IdPublico]);
 
         Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_NEGADO"), await EnviarAsync(HttpMethod.Get, RotaComum, token));
         Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_NEGADO"), await EnviarAsync(HttpMethod.Get, RotaAdmin, token));

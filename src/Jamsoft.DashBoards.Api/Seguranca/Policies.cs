@@ -1,6 +1,7 @@
 using Jamsoft.DashBoards.Api.Configuracao;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
+using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
@@ -44,6 +45,7 @@ public static class Policies
             });
         services.AddMemoryCache();
         services.AddSingleton<StatusAcessoCache>();
+        services.AddSingleton<StatusColetorCache>();
 
         services.AddScoped<IAuthorizationHandler, PerfilHandler>();
         services.AddScoped<IAuthorizationHandler, TrocaSenhaConcluidaHandler>();
@@ -83,8 +85,16 @@ public static class Policies
     private static async Task RevalidarAcessoAsync(TokenValidatedContext contexto)
     {
         var principal = contexto.Principal!;
-        // Credenciais de Coletor têm revalidação própria (feature sincronizacao-vendas).
-        if (principal.FindFirst(TiposClaim.Perfil)?.Value == nameof(Perfil.Coletor)) return;
+        // Coletor: credencial ativa e cred_ver atual (AD-015); senão 401 NAO_AUTENTICADO e o Coletor renova o token.
+        if (principal.FindFirst(TiposClaim.Perfil)?.Value == nameof(Perfil.Coletor))
+        {
+            var coletores = contexto.HttpContext.RequestServices.GetRequiredService<StatusColetorCache>();
+            var valido = Guid.TryParse(principal.FindFirst(TiposClaim.Usuario)?.Value, out var coletor)
+                && int.TryParse(principal.FindFirst(TiposClaim.VersaoCredencial)?.Value, out var versao)
+                && await coletores.ValidoAsync(coletor, versao, contexto.HttpContext.RequestAborted);
+            if (!valido) contexto.Fail("Credencial do Coletor revogada ou alterada.");
+            return;
+        }
 
         var status = contexto.HttpContext.RequestServices.GetRequiredService<StatusAcessoCache>();
         var ativo = Guid.TryParse(principal.FindFirst(TiposClaim.Usuario)?.Value, out var usuario)

@@ -40,6 +40,11 @@ public interface ITenantAtual
 
     /// <summary>O cabeçalho <c>X-Tenant</c> veio com valor que não é um GUID.</summary>
     bool CabecalhoTenantInvalido { get; }
+
+    /// <summary>Token de Coletor: ID públicos da claim <c>tenants</c>. Vazio para os demais perfis.</summary>
+    IReadOnlySet<Guid> TenantsAutorizadosColetor => SemTenants;
+
+    private static readonly IReadOnlySet<Guid> SemTenants = new HashSet<Guid>();
 }
 
 /// <summary>Sem usuário e sem tenant: usado fora de requisições (design-time, rotinas sem contexto).</summary>
@@ -86,6 +91,7 @@ public sealed class TenantAtual(IHttpContextAccessor acessor, IResolvedorTenant 
     public Guid? IdPublico => Atual.IdPublico;
     public bool Divergente => Atual.Divergente;
     public bool CabecalhoTenantInvalido => Atual.CabecalhoInvalido;
+    public IReadOnlySet<Guid> TenantsAutorizadosColetor => Atual.TenantsColetor;
 
     private Estado Resolver()
     {
@@ -109,6 +115,7 @@ public sealed class TenantAtual(IHttpContextAccessor acessor, IResolvedorTenant 
 
         Guid? idPublico;
         var divergente = false;
+        var tenantsColetor = Estado.SemTenantsColetor;
         switch (perfil)
         {
             case Seguranca.Perfil.SuperAdmin:
@@ -119,20 +126,25 @@ public sealed class TenantAtual(IHttpContextAccessor acessor, IResolvedorTenant 
                 divergente = cabecalho is not null && cabecalho != idPublico;
                 break;
             default:
-                // Coletor: tenants autorizados vêm da credencial (feature sincronizacao-vendas).
+                // Coletor: sem tenant efetivo; os autorizados vêm da claim tenants (a ingestão fixa o tenant do lote).
                 idPublico = null;
+                tenantsColetor = usuario.FindAll(TiposClaim.Tenants)
+                    .Select(c => Guid.TryParse(c.Value, out var t) ? t : Guid.Empty)
+                    .Where(t => t != Guid.Empty)
+                    .ToHashSet();
                 break;
         }
 
         var id = idPublico is { } guid ? resolvedor.ObterId(guid) : null;
-        return new Estado(perfil, usuarioIdPublico, trocaSenha, id, idPublico, divergente, cabecalhoInvalido);
+        return new Estado(perfil, usuarioIdPublico, trocaSenha, id, idPublico, divergente, cabecalhoInvalido, tenantsColetor);
     }
 
     private sealed record Estado(
         Perfil? Perfil, Guid? UsuarioIdPublico, bool TrocaSenhaPendente,
-        int? Id, Guid? IdPublico, bool Divergente, bool CabecalhoInvalido)
+        int? Id, Guid? IdPublico, bool Divergente, bool CabecalhoInvalido, IReadOnlySet<Guid> TenantsColetor)
     {
-        public static readonly Estado Anonimo = new(null, null, false, null, null, false, false);
+        public static readonly IReadOnlySet<Guid> SemTenantsColetor = new HashSet<Guid>();
+        public static readonly Estado Anonimo = new(null, null, false, null, null, false, false, SemTenantsColetor);
     }
 }
 

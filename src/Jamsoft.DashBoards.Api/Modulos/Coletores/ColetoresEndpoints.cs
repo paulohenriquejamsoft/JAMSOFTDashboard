@@ -50,7 +50,7 @@ public static class ColetoresEndpoints
     /// Revoga a credencial (COL-05): novos tokens são recusados e a versão nova derruba os tokens já emitidos.
     /// </summary>
     public static async Task<IResult> RevogarAsync(Guid idPublico, PlataformaDbContext banco, IAuditoria auditoria,
-        TimeProvider tempo, CancellationToken ct)
+        StatusColetorCache status, TimeProvider tempo, CancellationToken ct)
     {
         var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
         if (coletor is null) return TenantsEndpoints.NaoEncontrado();
@@ -61,6 +61,7 @@ public static class ColetoresEndpoints
         auditoria.Registrar(OperacaoAuditada.ColetorRevogado, coletor.IdPublico, null, null, ResultadoAuditoria.Sucesso,
             new { coletor.Nome, coletor.ClientId });
         await banco.SaveChangesAsync(ct);
+        status.Invalidar(coletor.IdPublico);
 
         var tenants = await TenantsDosColetoresAsync(banco, [coletor.Id], ct);
         return Results.Ok(ColetorResposta.De(coletor, tenants.GetValueOrDefault(coletor.Id, [])));
@@ -70,7 +71,7 @@ public static class ColetoresEndpoints
     /// Gera um secret novo, exibido só nesta resposta, e invalida o anterior (COL-06). Coletor revogado → 409.
     /// </summary>
     public static async Task<IResult> RotacionarAsync(Guid idPublico, PlataformaDbContext banco, IAuditoria auditoria,
-        CancellationToken ct)
+        StatusColetorCache status, CancellationToken ct)
     {
         var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
         if (coletor is null) return TenantsEndpoints.NaoEncontrado();
@@ -83,6 +84,7 @@ public static class ColetoresEndpoints
         auditoria.Registrar(OperacaoAuditada.ColetorSecretRotacionado, coletor.IdPublico, null, null,
             ResultadoAuditoria.Sucesso, new { coletor.Nome, coletor.ClientId });
         await banco.SaveChangesAsync(ct);
+        status.Invalidar(coletor.IdPublico);
 
         return Results.Ok(new ColetorCriadoResposta(coletor.IdPublico, coletor.ClientId, segredo));
     }
@@ -108,7 +110,7 @@ public static class ColetoresEndpoints
     /// o que derruba os tokens já emitidos. <c>versao</c> é a recebida na leitura; se o registro mudou depois, 409.
     /// </summary>
     public static async Task<IResult> AlterarTenantsAsync(Guid idPublico, AlterarTenantsColetorRequisicao corpo,
-        PlataformaDbContext banco, IAuditoria auditoria, CancellationToken ct)
+        PlataformaDbContext banco, IAuditoria auditoria, StatusColetorCache status, CancellationToken ct)
     {
         var erros = new Dictionary<string, string[]>();
         var tenants = await TenantsAtivosAsync(banco, corpo.Tenants, erros, ct);
@@ -140,6 +142,7 @@ public static class ColetoresEndpoints
                 return TenantsEndpoints.ConflitoVersao();
             }
         }
+        status.Invalidar(coletor.IdPublico);
 
         return Results.Ok(ColetorResposta.De(coletor,
             [.. tenants.OrderBy(t => t.Nome).Select(t => new TenantResumo(t.IdPublico, t.Nome))]));

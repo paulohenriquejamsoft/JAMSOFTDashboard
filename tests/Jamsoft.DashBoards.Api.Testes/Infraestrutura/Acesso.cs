@@ -3,6 +3,7 @@ using Jamsoft.DashBoards.Api.Configuracao;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Auditoria;
+using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -37,6 +38,11 @@ public static class Acesso
     public static string Token(Usuario usuario, Tenant? tenant, TimeProvider? tempo = null) =>
         new TokenService(Options.Create(new JwtOptions { Chave = ChaveJwt }), tempo ?? TimeProvider.System)
             .Emitir(usuario, tenant).Token;
+
+    /// <summary>Token de Coletor (como o de <c>POST /api/coletor/token</c>) para os <paramref name="tenants"/>.</summary>
+    public static string TokenColetor(Coletor coletor, IEnumerable<Guid> tenants, TimeProvider? tempo = null) =>
+        new TokenService(Options.Create(new JwtOptions { Chave = ChaveJwt }), tempo ?? TimeProvider.System)
+            .EmitirColetor(coletor, tenants).Token;
 
     /// <summary>Grava um SuperAdmin ativo e devolve um token dele.</summary>
     public static async Task<string> TokenSuperAdminAsync(BancoDeTestes banco) =>
