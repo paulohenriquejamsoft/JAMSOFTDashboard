@@ -523,9 +523,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: lote válido → 200 com contagens; 1 inválida entre 10 → 9 gravadas e 1 rejeitada com motivo; tenant não autorizado → 403 sem gravar; tenant inativo → 403 `TENANT_INATIVO`; 501 vendas → 413; corpo > 2 MB → 413; token de usuário → 403
-- [ ] Gate check passes: Full
-- [ ] Test count: 7 new tests pass
+- [x] Testes: lote válido → 200 com contagens; 1 inválida entre 10 → 9 gravadas e 1 rejeitada com motivo; tenant não autorizado → 403 sem gravar; tenant inativo → 403 `TENANT_INATIVO`; 501 vendas → 413; corpo > 2 MB → 413; token de usuário → 403
+- [x] Gate check passes: Full
+- [x] Test count: 7 new tests pass
 
 **Tests**: integration
 **Gate**: full

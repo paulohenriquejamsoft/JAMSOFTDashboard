@@ -26,6 +26,11 @@ public sealed class StatusAcessoCache(IMemoryCache cache, IServiceScopeFactory e
             .Where(t => t.IdPublico == tenant).Select(t => t.Ativo).SingleOrDefaultAsync(ct));
     }
 
+    /// <summary>Tenant existe e está ativo (ingestão do Coletor, ING-03).</summary>
+    public Task<bool> TenantAtivoAsync(Guid tenantIdPublico, CancellationToken ct = default) =>
+        ObterAsync(ChaveTenant(tenantIdPublico), banco => banco.Tenants
+            .Where(t => t.IdPublico == tenantIdPublico).Select(t => t.Ativo).SingleOrDefaultAsync(ct));
+
     public void InvalidarUsuario(Guid usuarioIdPublico) => cache.Remove(ChaveUsuario(usuarioIdPublico));
 
     public void InvalidarTenant(Guid tenantIdPublico) => cache.Remove(ChaveTenant(tenantIdPublico));
