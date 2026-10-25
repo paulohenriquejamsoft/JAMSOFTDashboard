@@ -21,15 +21,15 @@ public sealed class OrigemSincronizacaoEsquemaTestes(BancoDeTestes banco) : IAsy
         await using (var contexto = banco.CriarContexto())
         {
             contexto.OrigensSincronizacao.Add(new OrigemSincronizacao
-                { TenantId = tenantA, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
+            { TenantId = tenantA, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
             contexto.OrigensSincronizacao.Add(new OrigemSincronizacao
-                { TenantId = tenantB, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
+            { TenantId = tenantB, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
             await contexto.SaveChangesAsync();
         }
 
         await using var duplicada = banco.CriarContexto();
         duplicada.OrigensSincronizacao.Add(new OrigemSincronizacao
-            { TenantId = tenantA, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
+        { TenantId = tenantA, ColetorId = coletor.Id, ConfiguracaoId = configuracao, Rotina = "Vendas" });
         var erro = await Dados.FalhaSqlAsync(() => duplicada.SaveChangesAsync());
 
         Assert.Equal(Dados.ErroIndiceUnico, erro.Number);

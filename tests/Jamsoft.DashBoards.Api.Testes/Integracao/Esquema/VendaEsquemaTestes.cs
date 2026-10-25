@@ -20,7 +20,7 @@ public sealed class VendaEsquemaTestes(BancoDeTestes banco) : IAsyncLifetime
         var coletor = await Dados.NovoColetorAsync(banco);
         await using var contexto = banco.CriarContexto();
         var origem = new OrigemSincronizacao
-            { TenantId = tenant, ColetorId = coletor.Id, ConfiguracaoId = Guid.NewGuid(), Rotina = "Vendas" };
+        { TenantId = tenant, ColetorId = coletor.Id, ConfiguracaoId = Guid.NewGuid(), Rotina = "Vendas" };
         contexto.OrigensSincronizacao.Add(origem);
         await contexto.SaveChangesAsync();
         var empresa = new Empresa { TenantId = tenant, CodEmpresa = 1, Nome = "Matriz", OrigemId = origem.Id };
@@ -31,18 +31,18 @@ public sealed class VendaEsquemaTestes(BancoDeTestes banco) : IAsyncLifetime
 
     private static Venda NovaVenda((int Tenant, int Empresa, int Origem) dados, int vendaId = 1,
         string situacao = "Finalizada", decimal valor = 10m) => new()
-    {
-        TenantId = dados.Tenant,
-        EmpresaId = dados.Empresa,
-        OrigemId = dados.Origem,
-        CodEmpresa = 1,
-        VendaId = vendaId,
-        TipoDfe = "NFC-e",
-        DataHora = new DateTimeOffset(2026, 10, 20, 14, 3, 0, TimeSpan.FromHours(-3)),
-        Valor = valor,
-        Situacao = situacao,
-        QtdItens = 2,
-    };
+        {
+            TenantId = dados.Tenant,
+            EmpresaId = dados.Empresa,
+            OrigemId = dados.Origem,
+            CodEmpresa = 1,
+            VendaId = vendaId,
+            TipoDfe = "NFC-e",
+            DataHora = new DateTimeOffset(2026, 10, 20, 14, 3, 0, TimeSpan.FromHours(-3)),
+            Valor = valor,
+            Situacao = situacao,
+            QtdItens = 2,
+        };
 
     private async Task<SqlException> FalhaAoGravarAsync(Venda venda)
     {

@@ -184,8 +184,12 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
         Assert.Equal(
             LinhasEsperadas(Plano.Tabelas, new()
             {
-                ["VENDA"] = 1_000, ["LOTE_INGESTAO"] = 3, ["EMPRESA"] = 1, ["ORIGEM_SINCRONIZACAO"] = 1,
-                ["COLETOR_TENANT"] = 1, ["TENANT"] = 1,
+                ["VENDA"] = 1_000,
+                ["LOTE_INGESTAO"] = 3,
+                ["EMPRESA"] = 1,
+                ["ORIGEM_SINCRONIZACAO"] = 1,
+                ["COLETOR_TENANT"] = 1,
+                ["TENANT"] = 1,
             }),
             Linhas(concluido));
         Assert.All(await DadosTenant.LinhasAsync(banco, a.Id), p => Assert.Equal(0, p.Value));

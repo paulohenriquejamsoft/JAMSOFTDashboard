@@ -16,14 +16,14 @@ public sealed class LoteIngestaoEsquemaTestes(BancoDeTestes banco) : IAsyncLifet
         var tenant = await Dados.CriarTenantAsync(banco);
         await using var contexto = banco.CriarContexto();
         var origem = new OrigemSincronizacao
-            { TenantId = tenant, ColetorId = coletor, ConfiguracaoId = Guid.NewGuid(), Rotina = "Vendas" };
+        { TenantId = tenant, ColetorId = coletor, ConfiguracaoId = Guid.NewGuid(), Rotina = "Vendas" };
         contexto.OrigensSincronizacao.Add(origem);
         await contexto.SaveChangesAsync();
         return (tenant, origem.Id);
     }
 
     private static LoteIngestao Lote((int Tenant, int Origem) destino, Guid batchId) => new()
-        { TenantId = destino.Tenant, OrigemId = destino.Origem, BatchId = batchId, Resposta = "{}" };
+    { TenantId = destino.Tenant, OrigemId = destino.Origem, BatchId = batchId, Resposta = "{}" };
 
     [Fact]
     public async Task Mesmo_BATCH_ID_e_recusado_no_mesmo_tenant_e_aceito_em_outro()
