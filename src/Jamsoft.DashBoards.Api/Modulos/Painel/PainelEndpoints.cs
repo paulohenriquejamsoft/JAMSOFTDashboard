@@ -1,4 +1,8 @@
+using System.Globalization;
+using System.Linq.Expressions;
+using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
+using Jamsoft.DashBoards.Api.Modulos.Ingestao;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +22,11 @@ public static class PainelEndpoints
     /// <summary>America/Sao_Paulo no SQL Server (AD-018).</summary>
     public const string FusoSqlServer = "E. South America Standard Time";
 
+    public const string NaoInformado = "Não informado";
+    public const int TamanhoRanking = 10;
+
+    private static readonly StringComparer NomesPtBr = StringComparer.Create(CultureInfo.GetCultureInfo("pt-BR"), false);
+
     public static IEndpointRouteBuilder MapPainel(this IEndpointRouteBuilder app)
     {
         var grupo = app.MapGroup("/api/painel")
@@ -26,6 +35,7 @@ public static class PainelEndpoints
             .AuditarContextoSuperAdmin();
         grupo.MapGet("/kpis", KpisAsync);
         grupo.MapGet("/evolucao", EvolucaoAsync);
+        grupo.MapGet("/rankings", RankingsAsync);
         return app;
     }
 
@@ -103,7 +113,7 @@ public static class PainelEndpoints
         var diario = filtro.Granularidade == Granularidade.Dia;
 
         var pontos = buckets.Select((bucket, i) => new PontoEvolucao(
-            bucket.ToString(diario ? "dd/MM" : "MM/yyyy", System.Globalization.CultureInfo.InvariantCulture),
+            bucket.ToString(diario ? "dd/MM" : "MM/yyyy", CultureInfo.InvariantCulture),
             bucket,
             Arredondar(atual.GetValueOrDefault(bucket)),
             Arredondar(i < bucketsAnteriores.Count ? anterior.GetValueOrDefault(bucketsAnteriores[i]) : 0))).ToList();
@@ -131,6 +141,75 @@ public static class PainelEndpoints
             .ToListAsync(ct);
         return meses.ToDictionary(m => new DateOnly(m.Year, m.Month, 1), m => m.Total);
     }
+
+    /// <summary>
+    /// Top 10 de vendedores, clientes e empresas por faturamento das efetivadas (RNK-01). Agrupa por código dentro do
+    /// índice e só depois busca os nomes desses 10 (último nome recebido no período; empresa: <c>EMPRESA.NOME</c>, que
+    /// guarda o nome manual). Código nulo vira "Não informado" (RNK-03); empate de faturamento, ordem alfabética
+    /// pt-BR (RNK-04). Participação = faturamento ÷ total do período × 100 (RNK-02).
+    /// </summary>
+    public static async Task<IResult> RankingsAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
+        ConsultaVendas consulta, PlataformaDbContext banco, TimeProvider tempo, CancellationToken ct)
+    {
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        if (erro is not null) return erro;
+
+        var efetivadas = consulta.Do(filtro, empresaIds).Where(v => v.Situacao == Finalizada || v.Situacao == Contingencia);
+        var total = await efetivadas.SumAsync(v => v.Valor, ct);
+
+        var vendedores = await TopAsync(efetivadas, v => v.VendedorCodigo, ct);
+        var codigosVendedores = Codigos(vendedores);
+        var nomesVendedores = await efetivadas
+            .Where(v => v.VendedorCodigo != null && codigosVendedores.Contains(v.VendedorCodigo.Value))
+            .GroupBy(v => v.VendedorCodigo!.Value)
+            .Select(g => new { Codigo = g.Key, Nome = g.OrderByDescending(v => v.DataHora).Select(v => v.VendedorNome).First() })
+            .ToDictionaryAsync(x => x.Codigo, x => x.Nome, ct);
+
+        var clientes = await TopAsync(efetivadas, v => v.CodCliente, ct);
+        var codigosClientes = Codigos(clientes);
+        var nomesClientes = await efetivadas
+            .Where(v => v.CodCliente != null && codigosClientes.Contains(v.CodCliente.Value))
+            .GroupBy(v => v.CodCliente!.Value)
+            .Select(g => new { Codigo = g.Key, Nome = g.OrderByDescending(v => v.DataHora).Select(v => v.NomeCliente).First() })
+            .ToDictionaryAsync(x => x.Codigo, x => x.Nome, ct);
+
+        var porEmpresa = await TopAsync(efetivadas, v => (int?)v.EmpresaId, ct);
+        var idsEmpresas = Codigos(porEmpresa);
+        var nomesEmpresas = await banco.Empresas.AsNoTracking()
+            .Where(e => idsEmpresas.Contains(e.Id))
+            .ToDictionaryAsync(e => e.Id, e => (string?)e.Nome, ct);
+
+        return Results.Ok(new RankingsResposta(Arredondar(total),
+            Itens(vendedores, nomesVendedores, total),
+            Itens(clientes, nomesClientes, total),
+            Itens(porEmpresa, nomesEmpresas, total)));
+    }
+
+    private sealed record Grupo(int? Codigo, decimal Faturamento, int Vendas);
+
+    /// <summary>
+    /// Os 10 códigos de maior faturamento. Empate no 10º lugar é decidido pelo código (o nome ainda não foi lido).
+    /// </summary>
+    private static async Task<List<Grupo>> TopAsync(IQueryable<Venda> efetivadas, Expression<Func<Venda, int?>> codigo,
+        CancellationToken ct)
+    {
+        var grupos = await efetivadas.GroupBy(codigo)
+            .Select(g => new { Codigo = g.Key, Faturamento = g.Sum(v => v.Valor), Vendas = g.Count() })
+            .OrderByDescending(g => g.Faturamento).ThenBy(g => g.Codigo)
+            .Take(TamanhoRanking)
+            .ToListAsync(ct);
+        return grupos.Select(g => new Grupo(g.Codigo, g.Faturamento, g.Vendas)).ToList();
+    }
+
+    private static int[] Codigos(List<Grupo> grupos) => grupos.Where(g => g.Codigo is not null).Select(g => g.Codigo!.Value).ToArray();
+
+    private static List<ItemRanking> Itens(List<Grupo> grupos, Dictionary<int, string?> nomes, decimal total) =>
+        grupos
+            .Select(g => new ItemRanking(
+                g.Codigo is { } c ? nomes.GetValueOrDefault(c) ?? $"Código {c}" : NaoInformado,
+                Arredondar(g.Faturamento), g.Vendas, total == 0 ? 0 : Arredondar(g.Faturamento / total * 100)))
+            .OrderByDescending(i => i.Faturamento).ThenBy(i => i.Nome, NomesPtBr)
+            .ToList();
 
     private static Indicador Indicador(decimal atual, decimal anterior) =>
         new(Arredondar(atual), Arredondar(anterior), anterior == 0 ? null : Arredondar((atual - anterior) / anterior * 100));

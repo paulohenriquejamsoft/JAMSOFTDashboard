@@ -77,6 +77,11 @@ public sealed class IsolamentoTenantsTestes(BancoDeTestes banco) : IAsyncLifetim
             PeloId(HttpMethod.Get, $"/api/painel/evolucao?empresas={b.Empresa.IdPublico}", t),
             PeloCabecalho(HttpMethod.Get, "/api/painel/evolucao", t, b),
         ]),
+        ["GET /api/painel/rankings"] = new(false, (b, t) =>
+        [
+            PeloId(HttpMethod.Get, $"/api/painel/rankings?empresas={b.Empresa.IdPublico}", t),
+            PeloCabecalho(HttpMethod.Get, "/api/painel/rankings", t, b),
+        ]),
         ["GET /api/painel/kpis"] = new(false, (b, t) =>
         [
             PeloId(HttpMethod.Get, $"/api/painel/kpis?empresas={b.Empresa.IdPublico}", t),

@@ -18,3 +18,9 @@ public sealed record PontoEvolucao(string Rotulo, DateOnly Data, decimal Atual, 
 
 /// <summary><c>Granularidade</c>: "dia" ou "mes".</summary>
 public sealed record EvolucaoResposta(string Granularidade, IReadOnlyList<PontoEvolucao> Pontos);
+
+/// <summary><c>Participacao</c>: % do faturamento total do período (RNK-02).</summary>
+public sealed record ItemRanking(string Nome, decimal Faturamento, int Vendas, decimal Participacao);
+
+public sealed record RankingsResposta(decimal TotalFaturamento, IReadOnlyList<ItemRanking> Vendedores,
+    IReadOnlyList<ItemRanking> Clientes, IReadOnlyList<ItemRanking> Empresas);

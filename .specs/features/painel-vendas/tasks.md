@@ -214,9 +214,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: 12 vendedores → 10, em ordem decrescente; campos nome/faturamento/vendas/participação exatos; vendas sem vendedor e sem cliente → "Não informado"; empate de faturamento → ordem alfabética; empresa renomeada à mão aparece com o nome manual; soma das participações ≤ 100
-- [ ] Gate check passes: Full
-- [ ] Test count: 6 new tests pass
+- [x] Testes: 12 vendedores → 10, em ordem decrescente; campos nome/faturamento/vendas/participação exatos; vendas sem vendedor e sem cliente → "Não informado"; empate de faturamento → ordem alfabética; empresa renomeada à mão aparece com o nome manual; soma das participações ≤ 100
+- [x] Gate check passes: Full
+- [x] Test count: 6 new tests pass
 
 **Tests**: integration
 **Gate**: full
