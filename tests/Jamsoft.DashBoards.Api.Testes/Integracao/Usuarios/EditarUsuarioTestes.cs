@@ -71,6 +71,27 @@ public sealed class EditarUsuarioTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Contains("\"perfil\":\"Admin\"", auditoria.Detalhes);
     }
 
+    [Theory]
+    [InlineData("SuperAdmin")]
+    [InlineData("Coletor")]
+    public async Task Promover_a_perfil_nao_permitido_responde_403_PERFIL_NAO_PERMITIDO_sem_alterar(string perfil)
+    {
+        var (tenant, _, token) = await TenantComAdminAsync();
+        var alvo = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, tenant);
+
+        using var resposta = await EditarAsync(token, alvo, "Promovido", perfil, ativo: true);
+
+        Assert.Equal(HttpStatusCode.Forbidden, resposta.StatusCode);
+        Assert.Equal("PERFIL_NAO_PERMITIDO", await Sessao.CodigoAsync(resposta));
+        var gravado = await GravadoAsync(alvo);
+        Assert.Equal(alvo.Nome, gravado.Nome);
+        Assert.Equal(Perfil.Consulta, gravado.Perfil);
+        Assert.True(gravado.Ativo);
+        Assert.Equal(alvo.Versao, gravado.Versao);
+        await using var contexto = banco.CriarContexto();
+        Assert.False(await contexto.Auditoria.AsNoTracking().AnyAsync(a => a.RecursoIdPublico == alvo.IdPublico));
+    }
+
     [Fact]
     public async Task Rebaixar_o_unico_Admin_responde_422_ULTIMO_ADMIN_com_a_mensagem_do_spec()
     {
