@@ -1172,8 +1172,8 @@ T45
 
 **Done when**:
 
-- [ ] Roteiro cobre cada AC listado com passo e resultado esperado
-- [ ] Gate check passes: Build
+- [x] Roteiro cobre cada AC listado com passo e resultado esperado
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
