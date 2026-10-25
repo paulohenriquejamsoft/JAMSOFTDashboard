@@ -141,6 +141,38 @@ public sealed class EditarUsuarioTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Inativar_o_unico_Admin_responde_422_ULTIMO_ADMIN_sem_inativar_nem_revogar_sessoes()
+    {
+        var (tenant, admin, token) = await TenantComAdminAsync();
+        await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, tenant);
+        await using (var contexto = banco.CriarContexto())
+        {
+            contexto.RefreshTokens.Add(new Api.Modulos.Autenticacao.RefreshToken
+            {
+                UsuarioId = admin.Id,
+                TenantId = tenant.Id,
+                Hash = System.Security.Cryptography.SHA256.HashData(Guid.NewGuid().ToByteArray()),
+                Familia = Guid.NewGuid(),
+                ExpiraEm = DateTime.UtcNow.AddDays(7),
+            });
+            await contexto.SaveChangesAsync();
+        }
+
+        using var resposta = await EditarAsync(token, admin, admin.Nome, "Admin", ativo: false);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
+        var corpo = await Sessao.JsonAsync(resposta);
+        Assert.Equal("ULTIMO_ADMIN", corpo.GetProperty("codigo").GetString());
+        Assert.Equal("O tenant precisa de ao menos um Admin ativo", corpo.GetProperty("title").GetString());
+        var gravado = await GravadoAsync(admin);
+        Assert.Equal(Perfil.Admin, gravado.Perfil);
+        Assert.True(gravado.Ativo);
+        await using var leitura = banco.CriarContexto();
+        var sessao = await leitura.RefreshTokens.AsNoTracking().SingleAsync(r => r.UsuarioId == admin.Id);
+        Assert.Null(sessao.RevogadoEm);
+    }
+
+    [Fact]
     public async Task Inativar_usuario_revoga_refresh_tokens_e_derruba_o_access_token()
     {
         var (tenant, _, token) = await TenantComAdminAsync();
