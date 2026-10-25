@@ -1047,8 +1047,8 @@ T45
 
 **Done when**:
 
-- [ ] Build sem avisos; comportamento coberto pelo roteiro T41 (lógica no Nucleo, já testada)
-- [ ] Gate check passes: Build
+- [x] Build sem avisos; comportamento coberto pelo roteiro T41 (lógica no Nucleo, já testada)
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
