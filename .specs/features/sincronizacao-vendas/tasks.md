@@ -365,9 +365,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: revogar → credencial inativa e versão +1; rotacionar → resposta com secret novo, hash trocado, versão +1; rotacionar coletor revogado → 409; auditoria das duas sem segredo
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: revogar → credencial inativa e versão +1; rotacionar → resposta com secret novo, hash trocado, versão +1; rotacionar coletor revogado → 409; auditoria das duas sem segredo
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full

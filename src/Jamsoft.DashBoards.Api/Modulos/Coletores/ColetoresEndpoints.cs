@@ -39,7 +39,52 @@ public static class ColetoresEndpoints
         grupo.MapPost("/", CriarAsync);
         grupo.MapGet("/", ListarAsync);
         grupo.MapPut("/{idPublico}/tenants", AlterarTenantsAsync);
+        grupo.MapPost("/{idPublico}/revogar", RevogarAsync);
+        grupo.MapPost("/{idPublico}/rotacionar", RotacionarAsync);
         return app;
+    }
+
+    public const string CodigoColetorRevogado = "COLETOR_REVOGADO";
+
+    /// <summary>
+    /// Revoga a credencial (COL-05): novos tokens são recusados e a versão nova derruba os tokens já emitidos.
+    /// </summary>
+    public static async Task<IResult> RevogarAsync(Guid idPublico, PlataformaDbContext banco, IAuditoria auditoria,
+        TimeProvider tempo, CancellationToken ct)
+    {
+        var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
+        if (coletor is null) return TenantsEndpoints.NaoEncontrado();
+
+        coletor.Ativo = false;
+        coletor.RevogadoEm ??= tempo.GetUtcNow().UtcDateTime;
+        coletor.VersaoCredencial++;
+        auditoria.Registrar(OperacaoAuditada.ColetorRevogado, coletor.IdPublico, null, null, ResultadoAuditoria.Sucesso,
+            new { coletor.Nome, coletor.ClientId });
+        await banco.SaveChangesAsync(ct);
+
+        var tenants = await TenantsDosColetoresAsync(banco, [coletor.Id], ct);
+        return Results.Ok(ColetorResposta.De(coletor, tenants.GetValueOrDefault(coletor.Id, [])));
+    }
+
+    /// <summary>
+    /// Gera um secret novo, exibido só nesta resposta, e invalida o anterior (COL-06). Coletor revogado → 409.
+    /// </summary>
+    public static async Task<IResult> RotacionarAsync(Guid idPublico, PlataformaDbContext banco, IAuditoria auditoria,
+        CancellationToken ct)
+    {
+        var coletor = await banco.Coletores.SingleOrDefaultAsync(c => c.IdPublico == idPublico, ct);
+        if (coletor is null) return TenantsEndpoints.NaoEncontrado();
+        if (!coletor.Ativo)
+            return ProblemasApi.Problema(StatusCodes.Status409Conflict, CodigoColetorRevogado, "Credencial revogada");
+
+        var segredo = SegredoColetor.Gerar();
+        coletor.SecretHash = SegredoColetor.Hash(segredo);
+        coletor.VersaoCredencial++;
+        auditoria.Registrar(OperacaoAuditada.ColetorSecretRotacionado, coletor.IdPublico, null, null,
+            ResultadoAuditoria.Sucesso, new { coletor.Nome, coletor.ClientId });
+        await banco.SaveChangesAsync(ct);
+
+        return Results.Ok(new ColetorCriadoResposta(coletor.IdPublico, coletor.ClientId, segredo));
     }
 
     /// <summary>Lista paginada (<c>pagina</c> a partir de 1, <c>tamanho</c> até 100) com os tenants autorizados.</summary>
