@@ -457,6 +457,111 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.ToTable("ORIGEM_SINCRONIZACAO");
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.Venda", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("AlteradoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ALTERADO_EM");
+
+                    b.Property<int?>("CodCliente")
+                        .HasColumnType("int")
+                        .HasColumnName("COD_CLIENTE");
+
+                    b.Property<int>("CodEmpresa")
+                        .HasColumnType("int")
+                        .HasColumnName("COD_EMPRESA");
+
+                    b.Property<DateTimeOffset>("DataHora")
+                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnName("DATA_HORA");
+
+                    b.Property<int>("EmpresaId")
+                        .HasColumnType("int")
+                        .HasColumnName("EMPRESA_ID");
+
+                    b.Property<string>("NomeCliente")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("NOME_CLIENTE");
+
+                    b.Property<int>("OrigemId")
+                        .HasColumnType("int")
+                        .HasColumnName("ORIGEM_ID");
+
+                    b.Property<int>("QtdItens")
+                        .HasColumnType("int")
+                        .HasColumnName("QTD_ITENS");
+
+                    b.Property<DateTime>("RecebidoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("RECEBIDO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Situacao")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)")
+                        .HasColumnName("SITUACAO");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<string>("TipoDfe")
+                        .IsRequired()
+                        .HasColumnType("varchar(6)")
+                        .HasColumnName("TIPO_DFE");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("decimal(19,4)")
+                        .HasColumnName("VALOR");
+
+                    b.Property<int>("VendaId")
+                        .HasColumnType("int")
+                        .HasColumnName("VENDA_ID");
+
+                    b.Property<int?>("VendedorCodigo")
+                        .HasColumnType("int")
+                        .HasColumnName("VENDEDOR_CODIGO");
+
+                    b.Property<string>("VendedorNome")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .HasColumnName("VENDEDOR_NOME");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpresaId");
+
+                    b.HasIndex("OrigemId");
+
+                    b.HasIndex("TenantId", "DataHora");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("TenantId", "DataHora"), new[] { "EmpresaId", "Valor", "Situacao", "TipoDfe", "QtdItens", "VendedorCodigo", "CodCliente" });
+
+                    b.HasIndex("TenantId", "CodEmpresa", "VendaId")
+                        .IsUnique();
+
+                    b.ToTable("VENDA", t =>
+                        {
+                            t.HasCheckConstraint("CK_VENDA_QTD_ITENS", "QTD_ITENS >= 0");
+
+                            t.HasCheckConstraint("CK_VENDA_SITUACAO", "SITUACAO IN (N'Finalizada',N'Cancelada',N'Inutilizada',N'Contingência')");
+
+                            t.HasCheckConstraint("CK_VENDA_TIPO_DFE", "TIPO_DFE IN ('NF-e','NFC-e')");
+
+                            t.HasCheckConstraint("CK_VENDA_VALOR", "VALOR >= 0");
+                        });
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -655,6 +760,27 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", null)
                         .WithMany()
                         .HasForeignKey("ColetorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Ingestao.Venda", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", null)
+                        .WithMany()
+                        .HasForeignKey("EmpresaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Ingestao.OrigemSincronizacao", null)
+                        .WithMany()
+                        .HasForeignKey("OrigemId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

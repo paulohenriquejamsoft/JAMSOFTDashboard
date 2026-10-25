@@ -45,6 +45,7 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public DbSet<Coletor> Coletores => Set<Coletor>();
     public DbSet<ColetorTenant> ColetoresTenant => Set<ColetorTenant>();
     public DbSet<OrigemSincronizacao> OrigensSincronizacao => Set<OrigemSincronizacao>();
+    public DbSet<Venda> Vendas => Set<Venda>();
 
     /// <summary>Lido a cada consulta: o EF troca a referência ao contexto pela instância em uso.</summary>
     private int TenantIdFiltro => TenantAtual.IdOuSemAcesso;

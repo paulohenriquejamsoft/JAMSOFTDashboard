@@ -207,9 +207,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de esquema: chave de negócio duplicada recusada (2601); situação fora do domínio recusada (547); `Contingência` aceita (com acento); valor negativo recusado; índice `(TENANT_ID, DATA_HORA)` começa por `TENANT_ID`
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes de esquema: chave de negócio duplicada recusada (2601); situação fora do domínio recusada (547); `Contingência` aceita (com acento); valor negativo recusado; índice `(TENANT_ID, DATA_HORA)` começa por `TENANT_ID`
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full
