@@ -38,9 +38,12 @@ Os dados de vendas estão nos bancos dos ERPs, dentro dos servidores dos cliente
 | Unicidade de `venda_id` | `NumNotaSaida` é a identity da tabela `NotaSaida`: único em todo o banco do ERP. A chave de negócio continua (`TENANT_ID`, `COD_EMPRESA`, `VENDA_ID`) | Confirmado pelo usuário em 2026-10-25; manter `Cod_Empresa` na chave não custa nada e protege contra dois bancos no mesmo tenant | y |
 | Origem da query | `c_NotaSaida` é uma **view** sobre a tabela `NotaSaida`; o usuário só de leitura recebe `SELECT` na view e em `NotaSaidaProd`; índices de apoio são criados na tabela base `NotaSaida` | Confirmado pelo usuário em 2026-10-25; índice em view não se aplica aqui | y |
 | Dois bancos de ERP no mesmo tenant com mesmo `Cod_Empresa` | Proibido: API rejeita lote (409) se a empresa já recebe dados de outra configuração | Evita colisão de `venda_id` entre bancos | n |
-| Coluna de data do filtro | Filtro por `datafatura`; `data_hora` exibida = `dataentrega` (como na query) | Mantém a query original; validar com ERP real | n |
+| Coluna de data | Filtro de período e checkpoint por `datafatura` (só data); `data_hora` enviada = `DataHoraFechamento` (data e hora), usada pelo painel | Confirmado pelo usuário em 2026-10-25: `datafatura` não tem hora | y |
 | Vendas excluídas fisicamente no ERP | Não tratadas; permanecem na plataforma | ERP cancela (situação 9) em vez de excluir; validar | n |
-| Classificação de situação e `QtdItens` | Regras da query do §11 como estão | §11.3 exige validação no ERP real (bloqueio listado no STATE) | n |
+| Classificação de situação | `situacaonota` 5 e 6 → `Finalizada`; 9 → `Cancelada`; 11 → `Inutilizada`; 12 → `Contingência`. **Somente esses códigos** entram na extração (`situacaonota IN (5,6,9,11,12)`) | Confirmado pelo usuário em 2026-10-25 | y |
+| Valor neutro | Somente vendas sem valor neutro: `TotalCondNeutra = 0` | Confirmado pelo usuário em 2026-10-25 | y |
+| `QtdItens` | Subconsulta `(SELECT COUNT(*) FROM NotaSaidaProd WHERE NotaSaidaProd.numnotasaida = ns.numnotasaida)` | Confirmado pelo usuário em 2026-10-25 | y |
+| `DataHoraFechamento` nula | Se vier nula, o Coletor envia `datafatura` às 00:00 (hora local) e registra aviso no log | Evita rejeitar a venda; o ERP pode não fechar notas antigas ou inutilizadas | n |
 | Hospedagem do Coletor | Aplicação Windows Forms que agenda em background enquanto aberta; minimiza para a bandeja e inicia com o Windows | Documento define WinForms; Windows Service fica para evolução | n |
 | Armazenamento local das configurações | Arquivo JSON local; senhas de banco e `client_secret` cifrados com DPAPI (escopo máquina) | §9.2 exige armazenamento seguro sem expor em arquivos | n |
 | Configurações são locais ou na API? | Locais ao Coletor; a API guarda só o estado de sincronização reportado (última execução, situação) | Credenciais de banco do cliente não saem do servidor do cliente | n |
@@ -65,13 +68,13 @@ Os dados de vendas estão nos bancos dos ERPs, dentro dos servidores dos cliente
 | ----- | ---- | ----- |
 | `venda_id` | INT | Obrigatório, > 0 |
 | `tipo_dfe` | VARCHAR(20) | `NF-e` ou `NFC-e` |
-| `data_hora` | DATETIMEOFFSET | Obrigatório |
+| `data_hora` | DATETIMEOFFSET | Obrigatório; vem de `DataHoraFechamento` |
 | `valor` | DECIMAL(19,4) (MONEY no ERP) | ≥ 0 |
 | `cod_cliente` | INT | Opcional |
 | `nome_cliente` | VARCHAR(120) | Opcional, truncado em 120 |
 | `vendedor_codigo` | INT | Opcional |
 | `vendedor_nome` | VARCHAR(80) | Opcional, truncado em 80 |
-| `situacao` | VARCHAR(20) | `Finalizada`, `Cancelada` ou `Inutilizada` |
+| `situacao` | VARCHAR(20) | `Finalizada`, `Cancelada`, `Inutilizada` ou `Contingência` |
 | `nome_empresa` | VARCHAR(80) | Obrigatório (o §11.2 indica VARCHAR(20); ampliado para não truncar nomes) |
 | `cod_empresa` | INT | Obrigatório, > 0 |
 | `qtd_itens` | INT | ≥ 0 |

@@ -137,6 +137,6 @@
 - **Completed**: T1–T58; 238 testes API, 121 Web, 4 e2e
 - **In-progress** (file:line): none
 - **Next step**: Aprovar `.specs/features/sincronizacao-vendas/design.md` (rascunho) e gerar o `tasks.md`; depois `painel-vendas`.
-- **Blockers**: Validar a query de vendas (§11 do documento original) no banco real do ERP. Testes de integração: `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true;Connect Timeout=60"` (Docker parado). SQL Server local sofre com pouca RAM livre: se a suíte oscilar por timeout, liberar memória ou reiniciar o serviço como administrador.
+- **Blockers**: Regras da query de vendas confirmadas (2026-10-25); falta executá-la no ERP real e conferir o plano de execução antes do piloto. Testes de integração: `TESTES_SQLSERVER="Server=localhost;Integrated Security=true;TrustServerCertificate=true;Connect Timeout=60"` (Docker parado). SQL Server local sofre com pouca RAM livre: se a suíte oscilar por timeout, liberar memória ou reiniciar o serviço como administrador.
 - **Uncommitted files**: none
 - **Branch**: feat/plataforma-tenancy-acesso (sem remoto configurado)

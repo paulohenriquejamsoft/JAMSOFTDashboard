@@ -32,11 +32,11 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | Indicadores do MVP | KPIs gerais, evolução temporal, rankings, NF-e × NFC-e | Escolha do usuário | y |
-| Base do faturamento | Soma de `valor` apenas de vendas "Finalizada" | Canceladas e inutilizadas não são receita | n |
+| Base do faturamento | Soma de `valor` apenas de vendas "Finalizada"; "Contingência" fica fora do faturamento | Canceladas e inutilizadas não são receita; contingência ainda não foi autorizada pela SEFAZ | n |
 | Ticket médio | Faturamento ÷ nº de vendas "Finalizada"; 0 quando não há vendas | Definição usual | n |
 | Itens por venda | Soma de `qtd_itens` ÷ nº de vendas "Finalizada" | Coerente com ticket médio | n |
 | % canceladas | Nº "Cancelada" ÷ (nº "Finalizada" + nº "Cancelada") × 100 | Inutilizadas não são vendas emitidas | n |
-| Data de referência dos indicadores | `data_hora` da venda (campo `dataentrega` do ERP) | É a data trafegada no contrato | n |
+| Data de referência dos indicadores | `data_hora` da venda, que vem de `DataHoraFechamento` do ERP (data e hora) | Confirmado pelo usuário em 2026-10-25: `datafatura` não tem hora | y |
 | Fuso horário | America/Sao_Paulo para agrupar por dia/mês | Clientes no Brasil | n |
 | Período padrão | Mês corrente (dia 1 até hoje) | Uso mais comum | n |
 | Período máximo por consulta | 24 meses | Limita custo de consulta | n |

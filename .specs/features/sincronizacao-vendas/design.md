@@ -186,7 +186,7 @@ MERGE dbo.VENDA WITH (HOLDLOCK) AS v
 USING (SELECT @TenantId AS TENANT_ID, j.* FROM OPENJSON(@Vendas) WITH (
          COD_EMPRESA int, VENDA_ID int, EMPRESA_ID int, TIPO_DFE varchar(6), DATA_HORA datetimeoffset(0),
          VALOR decimal(19,4), COD_CLIENTE int, NOME_CLIENTE nvarchar(120), VENDEDOR_CODIGO int,
-         VENDEDOR_NOME nvarchar(80), SITUACAO varchar(12), QTD_ITENS int) j) AS s
+         VENDEDOR_NOME nvarchar(80), SITUACAO nvarchar(12), QTD_ITENS int) j) AS s
    ON v.TENANT_ID = s.TENANT_ID AND v.COD_EMPRESA = s.COD_EMPRESA AND v.VENDA_ID = s.VENDA_ID
 WHEN MATCHED THEN UPDATE SET ... , ALTERADO_EM = SYSUTCDATETIME(), ORIGEM_ID = @OrigemId
 WHEN NOT MATCHED THEN INSERT (...) VALUES (...)
@@ -230,13 +230,44 @@ OUTPUT $action;
 - **Interfaces**:
   - `Task<DateTimeOffset> AgoraDoServidorAsync(ct)`: `SELECT SYSDATETIMEOFFSET()`, o limite superior da execução (edge case do relógio).
   - `Task<IReadOnlyList<VendaErp>> LerLoteAsync(inicio, fimExclusivo, cursor?, tamanho = 500, ct)`.
-- **SQL**: a query do §11, mais a coluna `datafatura` para o checkpoint, com paginação por keyset:
-  `WHERE ns.situacaonota >= 5 AND ns.TotalCondNeutra = 0 AND ns.datafatura >= @Inicio AND ns.datafatura < @Fim AND (ns.datafatura > @CursorData OR (ns.datafatura = @CursorData AND ns.NumNotaSaida > @CursorNum)) ORDER BY ns.datafatura, ns.NumNotaSaida` com `TOP (@Tamanho)`.
-  Só parâmetros, nunca concatenação (SYNC-07). `CommandTimeout = 120` (SYNC-08). `READ COMMITTED`.
+- **SQL**: a query do §11 com as regras confirmadas pelo usuário em 2026-10-25, mais a `datafatura` para o checkpoint e paginação por keyset:
+
+```sql
+SELECT TOP (@Tamanho)
+    ns.NumNotaSaida                                    AS venda_id,
+    CASE WHEN ns.modelo = 65 THEN 'NFC-e' ELSE 'NF-e' END AS tipo_dfe,
+    ns.DataHoraFechamento                              AS data_hora,      -- data e hora (painel)
+    ns.datafatura                                      AS data_fatura,    -- só data (filtro/checkpoint)
+    ns.totnota                                         AS valor,
+    ns.codcliente                                      AS cod_cliente,
+    ns.FANTASIA                                        AS nome_cliente,
+    ns.codvendedor                                     AS vendedor_codigo,
+    ns.nomevend                                        AS vendedor_nome,
+    CASE ns.situacaonota
+        WHEN 5  THEN 'Finalizada'
+        WHEN 6  THEN 'Finalizada'
+        WHEN 9  THEN 'Cancelada'
+        WHEN 11 THEN 'Inutilizada'
+        WHEN 12 THEN 'Contingência'
+    END                                                AS situacao,
+    ns.Empresa                                         AS nome_empresa,
+    ns.codEmpresa                                      AS cod_empresa,
+    (SELECT COUNT(*) FROM NotaSaidaProd
+      WHERE NotaSaidaProd.numnotasaida = ns.numnotasaida) AS qtd_itens
+FROM c_NotaSaida AS ns
+WHERE ns.situacaonota IN (5, 6, 9, 11, 12)             -- somente estes status
+  AND ns.TotalCondNeutra = 0                          -- somente vendas sem valor neutro
+  AND ns.datafatura >= @Inicio AND ns.datafatura < @Fim
+  AND (ns.datafatura > @CursorData
+       OR (ns.datafatura = @CursorData AND ns.NumNotaSaida > @CursorNum))
+ORDER BY ns.datafatura, ns.NumNotaSaida;
+```
+
+  Na primeira página do ciclo, o cursor começa em (`@Inicio`, 0). Só parâmetros, nunca concatenação (SYNC-07). `CommandTimeout = 120` (SYNC-08). `READ COMMITTED`.
 - **Origem confirmada (2026-10-25)**: `c_NotaSaida` é uma **view** sobre a tabela `NotaSaida`, e `NumNotaSaida` é a identity dessa tabela, única em todo o banco do ERP. O que isso implica:
-  - **Índice e permissões**: o índice que sustenta o keyset vai na **tabela base**, `NotaSaida (datafatura, NumNotaSaida) INCLUDE (situacaonota, TotalCondNeutra, modelo, dataentrega, totnota, codcliente, codvendedor, codEmpresa)`, mais `NotaSaidaProd (numnotasaida)` para o `QtdItens`. O usuário só de leitura recebe `SELECT` na view `c_NotaSaida` e em `NotaSaidaProd`, sem acesso à tabela base. Tudo isso vai num script a ser executado no ERP, `sql/coletor/001_erp_usuario_leitura_e_indices.sql`, derivado do `002_banco_cliente_indices_e_usuario.sql` do Sge.Mcp. O técnico confere o plano de execução antes de criar os índices.
+  - **Índice e permissões**: o índice que sustenta o keyset vai na **tabela base**, `NotaSaida (datafatura, NumNotaSaida) INCLUDE (situacaonota, TotalCondNeutra, modelo, DataHoraFechamento, totnota, codcliente, codvendedor, codEmpresa)`, mais `NotaSaidaProd (numnotasaida)` para o `QtdItens`. O usuário só de leitura recebe `SELECT` na view `c_NotaSaida` e em `NotaSaidaProd`, sem acesso à tabela base. Tudo isso vai num script a ser executado no ERP, `sql/coletor/001_erp_usuario_leitura_e_indices.sql`, derivado do `002_banco_cliente_indices_e_usuario.sql` do Sge.Mcp. O técnico confere o plano de execução antes de criar os índices.
   - **Ordem de inserção**: como `NumNotaSaida` é identity, uma nota nova nunca recebe número menor que outra já gravada. Mesmo assim, a janela de reprocessamento continua necessária: cancelamentos e alterações em notas já sincronizadas mudam a situação sem criar nota nova, e uma nota pode ter `datafatura` retroativa.
-- **Mapeamento**: aplica o contrato (truncamentos e domínio de `situacao`/`tipoDfe`) antes de enviar. `dataentrega` vira `dataHora` com o offset de America/Sao_Paulo.
+- **Mapeamento**: aplica o contrato (truncamentos e domínio de `situacao`/`tipoDfe`) antes de enviar. `DataHoraFechamento` vira `dataHora` com o offset de America/Sao_Paulo. Se vier nula, usa `datafatura` às 00:00 e grava aviso no log (premissa a confirmar).
 
 ### ClienteApi
 
@@ -305,13 +336,13 @@ VENDA (                                          -- IPertenceAoTenant
   ID BIGINT IDENTITY PK, TENANT_ID INT FK→TENANT, EMPRESA_ID INT FK→EMPRESA, COD_EMPRESA INT NOT NULL,
   VENDA_ID INT NOT NULL, TIPO_DFE VARCHAR(6) NOT NULL, DATA_HORA DATETIMEOFFSET(0) NOT NULL,
   VALOR DECIMAL(19,4) NOT NULL, COD_CLIENTE INT NULL, NOME_CLIENTE NVARCHAR(120) NULL,
-  VENDEDOR_CODIGO INT NULL, VENDEDOR_NOME NVARCHAR(80) NULL, SITUACAO VARCHAR(12) NOT NULL,
+  VENDEDOR_CODIGO INT NULL, VENDEDOR_NOME NVARCHAR(80) NULL, SITUACAO NVARCHAR(12) NOT NULL,
   QTD_ITENS INT NOT NULL, ORIGEM_ID INT FK→ORIGEM_SINCRONIZACAO,
   RECEBIDO_EM DATETIME2(0) DEFAULT SYSUTCDATETIME(), ALTERADO_EM DATETIME2(0) NULL,
   UQ (TENANT_ID, COD_EMPRESA, VENDA_ID),
   IX (TENANT_ID, DATA_HORA) INCLUDE (EMPRESA_ID, VALOR, SITUACAO, TIPO_DFE, QTD_ITENS,
                                      VENDEDOR_CODIGO, COD_CLIENTE),            -- painel-vendas
-  CK SITUACAO IN ('Finalizada','Cancelada','Inutilizada'), CK TIPO_DFE IN ('NF-e','NFC-e'),
+  CK SITUACAO IN (N'Finalizada',N'Cancelada',N'Inutilizada',N'Contingência'), CK TIPO_DFE IN ('NF-e','NFC-e'),
   CK VALOR >= 0, CK QTD_ITENS >= 0 )
 
 LOTE_INGESTAO (                                  -- IPertenceAoTenant
@@ -363,7 +394,7 @@ public static class Limites { public const int VendasPorLote = 500; public const
 
 | Concern | Location (file:line) | Impact | Mitigation |
 | ------- | -------------------- | ------ | ---------- |
-| A query do §11 ainda não foi totalmente validada no ERP real. Já confirmado: `c_NotaSaida` é view e `NumNotaSaida` é a identity de `NotaSaida`. Falta validar a regra de situação, `TotalCondNeutra`, `datafatura` × `dataentrega` e `QtdItens` | `Coletor.Nucleo/Erp/ExtratorVendas.cs` (a criar) | Dados errados ou incompletos | Tarefa explícita de validação com o ERP real antes do piloto. A query fica isolada numa constante única. Os testes do extrator rodam contra um ERP falso que reproduz a estrutura: tabela `NotaSaida` com identity, a view `c_NotaSaida` sobre ela e `NotaSaidaProd` |
+| A extração do §11 está definida (situações, valor neutro, `DataHoraFechamento`, `QtdItens`, view e identity confirmados em 2026-10-25). Ainda não foi executada no ERP real, e não se sabe se `DataHoraFechamento` pode vir nula | `Coletor.Nucleo/Erp/ExtratorVendas.cs` (a criar) | Plano de execução ruim no ERP ou vendas sem hora | A query fica isolada numa constante única e é executada no ERP real antes do piloto, com conferência do plano de execução. `DataHoraFechamento` nula cai em `datafatura` 00:00 com aviso no log. Os testes do extrator rodam contra um ERP falso que reproduz a estrutura: tabela `NotaSaida` com identity, view `c_NotaSaida` e `NotaSaidaProd` |
 | `EMPRESA.ORIGEM_ID` cria um ciclo lógico entre empresa e origem | `Modulos/Empresas/Empresa.cs:9` | `PlanoExclusao` sem ordem válida | O ciclo é só lógico: as FKs são EMPRESA→ORIGEM e ORIGEM→TENANT/COLETOR, sem FK de volta. O teste de ordem do plano (T35) cobre o caso |
 | `COLETOR_TENANT` é do tenant, mas a listagem do admin atravessa tenants | `Modulos/Coletores` | Bypass do filtro fora da allowlist | Acrescentar `Modulos.Coletores` à allowlist de `RegrasArquiteturaTestes` (mudança explícita e revisada); a leitura no admin usa `IgnoreQueryFilters([FiltroTenant])` |
 | DPAPI `LocalMachine`: qualquer processo local com privilégio decifra os segredos | `ProtetorSegredos.cs` | Exposição no servidor do cliente | Aceito: o servidor do ERP já guarda credenciais equivalentes. Mitigações: ACL na pasta de dados, usuário do ERP só de leitura (script do Sge.Mcp) e credencial do Coletor revogável |
