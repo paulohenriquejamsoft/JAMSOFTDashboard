@@ -50,6 +50,12 @@ const matriz: [Ator, string, Esperado][] = [
   ['Admin', '/admin/coletores', { url: '/cliente', aviso: NEGADO }],
   ['Consulta', '/admin/coletores', { url: '/cliente', aviso: NEGADO }],
   ['anônimo', '/admin/coletores', login],
+
+  // Sincronização do tenant: Admin ou SuperAdmin com tenant (STS-01).
+  ['SuperAdmin sem tenant', '/cliente/sincronizacao', { url: '/admin', aviso: SEM_TENANT }],
+  ['SuperAdmin com tenant', '/cliente/sincronizacao', liberado('/cliente/sincronizacao')],
+  ['Admin', '/cliente/sincronizacao', liberado('/cliente/sincronizacao')],
+  ['Consulta', '/cliente/sincronizacao', { url: '/cliente', aviso: NEGADO }],
 ];
 
 function sessaoDe(ator: Ator): UsuarioSessao | null {

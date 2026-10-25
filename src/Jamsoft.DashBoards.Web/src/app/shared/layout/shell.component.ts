@@ -101,6 +101,7 @@ export class ShellComponent {
       { rotulo: 'Painel', link: '/cliente', exato: true },
       { rotulo: 'Usuários', link: '/cliente/usuarios' },
       { rotulo: 'Empresas', link: '/cliente/empresas' },
+      { rotulo: 'Sincronização', link: '/cliente/sincronizacao' },
     ];
     if (perfil === 'SuperAdmin') {
       const secoes: SecaoMenu[] = [

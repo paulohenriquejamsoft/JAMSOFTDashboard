@@ -29,6 +29,11 @@ export default [
         canMatch: [perfilGuard(ADMIN_TENANT)],
         loadComponent: () => import('./empresas/empresas.page').then((m) => m.EmpresasPage),
       },
+      {
+        path: 'sincronizacao',
+        canMatch: [perfilGuard(ADMIN_TENANT)],
+        loadComponent: () => import('./sincronizacao/sincronizacao.page').then((m) => m.SincronizacaoPage),
+      },
     ],
   },
 ] satisfies Routes;
