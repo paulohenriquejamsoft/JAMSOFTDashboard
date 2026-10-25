@@ -131,11 +131,15 @@ public sealed class BancoDeTestes : IAsyncLifetime
         return new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = nome }.ConnectionString;
     }
 
+    /// <remarks>
+    /// CREATE/DROP DATABASE com o SQL Server local sob pressão de memória passa dos 30 s padrão; mesmo limite de
+    /// <see cref="ExecutarAsync"/>.
+    /// </remarks>
     private async Task ExecutarNoServidorAsync(string sql)
     {
         await using var conexao = new SqlConnection(_conexaoServidor);
         await conexao.OpenAsync();
-        await using var comando = new SqlCommand(sql, conexao);
+        await using var comando = new SqlCommand(sql, conexao) { CommandTimeout = 120 };
         await comando.ExecuteNonQueryAsync();
     }
 }
