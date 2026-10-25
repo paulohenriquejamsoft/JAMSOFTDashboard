@@ -1097,8 +1097,8 @@ T45
 
 **Done when**:
 
-- [ ] Build sem avisos; roteiro T41
-- [ ] Gate check passes: Build
+- [x] Build sem avisos; roteiro T41
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
