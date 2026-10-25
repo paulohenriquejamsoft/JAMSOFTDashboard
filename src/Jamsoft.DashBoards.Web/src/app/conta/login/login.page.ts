@@ -72,7 +72,10 @@ export class LoginPage {
     senha: ['', [Validators.required]],
   });
   readonly enviando = signal(false);
-  readonly erro = signal<string | null>(null);
+  /** Começa com o aviso da navegação, quando houver (ex.: "Acesso desativado" vindo do interceptor). */
+  readonly erro = signal<string | null>(
+    (this.router.currentNavigation()?.extras.state as { aviso?: string } | undefined)?.aviso ?? null,
+  );
   private readonly tentouEnviar = signal(false);
 
   invalido(campo: 'email' | 'senha'): boolean {

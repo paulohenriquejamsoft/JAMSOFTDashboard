@@ -122,7 +122,7 @@ public sealed class RefreshTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Refresh_de_usuario_inativo_responde_401()
+    public async Task Refresh_de_usuario_inativo_responde_403_ACESSO_DESATIVADO()
     {
         var (usuario, refresh) = await LogadoAsync();
         await using (var contexto = banco.CriarContexto())
@@ -130,8 +130,23 @@ public sealed class RefreshTestes(BancoDeTestes banco) : IAsyncLifetime
 
         using var resposta = await Sessao.EnviarAsync(_cliente, "refresh", refresh);
 
-        Assert.Equal(HttpStatusCode.Unauthorized, resposta.StatusCode);
-        Assert.Equal("NAO_AUTENTICADO", await Sessao.CodigoAsync(resposta));
+        Assert.Equal(HttpStatusCode.Forbidden, resposta.StatusCode);
+        Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(resposta));
         Assert.Null(Sessao.SetCookieRefresh(resposta));
+    }
+
+    [Fact]
+    public async Task Refresh_com_tenant_inativado_durante_a_sessao_responde_403_ACESSO_DESATIVADO()
+    {
+        var (usuario, refresh) = await LogadoAsync();
+        await using (var contexto = banco.CriarContexto())
+            await contexto.Tenants.Where(t => t.Id == usuario.TenantId).ExecuteUpdateAsync(t => t.SetProperty(x => x.Ativo, false));
+
+        using var resposta = await Sessao.EnviarAsync(_cliente, "refresh", refresh);
+
+        Assert.Equal(HttpStatusCode.Forbidden, resposta.StatusCode);
+        Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(resposta));
+        Assert.Null(Sessao.SetCookieRefresh(resposta));
+        Assert.Null(Assert.Single(await TokensAsync(usuario)).UsadoEm);
     }
 }

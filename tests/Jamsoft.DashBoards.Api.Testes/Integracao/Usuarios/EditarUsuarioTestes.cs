@@ -157,10 +157,12 @@ public sealed class EditarUsuarioTestes(BancoDeTestes banco) : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
         Assert.False((await Sessao.JsonAsync(resposta)).GetProperty("ativo").GetBoolean());
+        // Os refresh tokens foram revogados ao inativar (USR-06): a renovação cai em token revogado → 401.
         using var renovacao = await Sessao.EnviarAsync(_cliente, "refresh", refresh);
         Assert.Equal(HttpStatusCode.Unauthorized, renovacao.StatusCode);
         using var depois = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/auth/eu", accessToken));
-        Assert.Equal(HttpStatusCode.Unauthorized, depois.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, depois.StatusCode);
+        Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(depois));
         await using var contexto = banco.CriarContexto();
         var tokens = await contexto.RefreshTokens.AsNoTracking().Where(r => r.UsuarioId == alvo.Id).ToListAsync();
         Assert.NotEmpty(tokens);

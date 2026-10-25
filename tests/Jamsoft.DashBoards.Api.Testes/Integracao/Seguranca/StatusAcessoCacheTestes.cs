@@ -57,7 +57,7 @@ public sealed class StatusAcessoCacheTestes(BancoDeTestes banco) : IAsyncLifetim
     }
 
     [Fact]
-    public async Task Usuario_inativado_com_token_valido_recebe_401_apos_Invalidar()
+    public async Task Usuario_inativado_com_token_valido_recebe_403_apos_Invalidar()
     {
         var tenant = await Dados.NovoTenantAsync(banco);
         var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.Admin, tenant);
@@ -67,7 +67,7 @@ public sealed class StatusAcessoCacheTestes(BancoDeTestes banco) : IAsyncLifetim
         await InativarUsuarioNoBancoAsync(usuario);
         Cache.InvalidarUsuario(usuario.IdPublico);
 
-        Assert.Equal((HttpStatusCode.Unauthorized, "NAO_AUTENTICADO"), await ChamarAsync(token));
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_DESATIVADO"), await ChamarAsync(token));
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public sealed class StatusAcessoCacheTestes(BancoDeTestes banco) : IAsyncLifetim
         await InativarTenantNoBancoAsync(tenant);
         Cache.InvalidarTenant(tenant.IdPublico);
 
-        Assert.Equal((HttpStatusCode.Unauthorized, "NAO_AUTENTICADO"), await ChamarAsync(admin));
-        Assert.Equal((HttpStatusCode.Unauthorized, "NAO_AUTENTICADO"), await ChamarAsync(consulta));
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_DESATIVADO"), await ChamarAsync(admin));
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_DESATIVADO"), await ChamarAsync(consulta));
         Assert.Equal(HttpStatusCode.OK, (await ChamarAsync(deOutroTenant)).Status);
     }
 
@@ -115,6 +115,6 @@ public sealed class StatusAcessoCacheTestes(BancoDeTestes banco) : IAsyncLifetim
 
         // Vencido o TTL, consulta de novo e enxerga a inativação.
         _tempo.Advance(TimeSpan.FromSeconds(2));
-        Assert.Equal((HttpStatusCode.Unauthorized, "NAO_AUTENTICADO"), await ChamarAsync(token));
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_DESATIVADO"), await ChamarAsync(token));
     }
 }

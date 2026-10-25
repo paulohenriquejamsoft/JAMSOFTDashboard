@@ -52,6 +52,17 @@ describe('LoginPage', () => {
     };
   }
 
+  it('chegando com o aviso da navegação (acesso desativado) mostra o aviso', async () => {
+    vi.spyOn(TestBed.inject(Router), 'currentNavigation').mockReturnValue({
+      extras: { state: { aviso: 'Acesso desativado' } },
+    } as unknown as ReturnType<Router['currentNavigation']>);
+    const comAviso = TestBed.createComponent(LoginPage);
+    await comAviso.whenStable();
+
+    const alerta = (comAviso.nativeElement as HTMLElement).querySelector('[role=alert]');
+    expect(alerta?.textContent?.trim()).toBe('Acesso desativado');
+  });
+
   it('campos vazios mostram as mensagens e não chamam a API', async () => {
     await enviar('', '');
 

@@ -11,11 +11,13 @@ import { AuthService } from './auth.service';
 import { TenantContextoService } from './tenant-contexto.service';
 
 const ROTAS_AUTH = '/api/auth/';
+export const AVISO_ACESSO_DESATIVADO = 'Acesso desativado';
 
 /**
  * Põe `Authorization` e, para o SuperAdmin com tenant selecionado, `X-Tenant` (CTX-01) nas chamadas à API.
  * Em 401 renova a sessão uma vez e repete a requisição; se não der, encerra a sessão e leva ao login
- * (AUTH-04). Em 403 `TROCA_SENHA_PENDENTE` leva à troca de senha (USR-08).
+ * (AUTH-04). Em 403 `TROCA_SENHA_PENDENTE` leva à troca de senha (USR-08). Em 403 `ACESSO_DESATIVADO`
+ * (usuário ou tenant inativado durante a sessão) encerra a sessão e leva ao login com o aviso.
  */
 export const authInterceptor: HttpInterceptorFn = (requisicao, next) => {
   if (!requisicao.url.startsWith('/api/')) return next(requisicao);
@@ -28,9 +30,11 @@ export const authInterceptor: HttpInterceptorFn = (requisicao, next) => {
   const enviar = (): Observable<HttpEvent<unknown>> =>
     next(comCabecalhos(requisicao, auth, contexto, rotaAuth));
 
-  const irParaLogin = (erro: unknown): Observable<never> => {
+  const irParaLogin = (erro: unknown, aviso?: string): Observable<never> => {
     auth.logout().subscribe();
-    void router.navigateByUrl('/conta/login');
+    void (aviso
+      ? router.navigateByUrl('/conta/login', { state: { aviso } })
+      : router.navigateByUrl('/conta/login'));
     return throwError(() => erro);
   };
 
@@ -43,10 +47,18 @@ export const authInterceptor: HttpInterceptorFn = (requisicao, next) => {
         return throwError(() => erro);
       }
 
+      if (erro.status === 403 && codigo(erro) === 'ACESSO_DESATIVADO' && !rotaAuth) {
+        return irParaLogin(erro, AVISO_ACESSO_DESATIVADO);
+      }
+
       if (erro.status !== 401 || rotaAuth) return throwError(() => erro);
 
       return auth.renovar().pipe(
-        catchError(() => irParaLogin(erro)),
+        catchError((falha: unknown) =>
+          falha instanceof HttpErrorResponse && codigo(falha) === 'ACESSO_DESATIVADO'
+            ? irParaLogin(falha, AVISO_ACESSO_DESATIVADO)
+            : irParaLogin(erro),
+        ),
         switchMap(() =>
           enviar().pipe(
             catchError((repetida: unknown) =>

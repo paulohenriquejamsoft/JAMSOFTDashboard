@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
@@ -68,7 +69,10 @@ public sealed class RefreshTokens(PlataformaDbContext banco, TimeProvider tempo)
         var tenant = usuario.TenantId is { } tenantId
             ? await banco.Tenants.AsNoTracking().SingleAsync(t => t.Id == tenantId, ct)
             : null;
-        if (!usuario.Ativo || tenant is { Ativo: false }) return null;
+        // Tenant (ou usuário) inativado durante a sessão: 403 ACESSO_DESATIVADO na renovação (edge case de TEN-05).
+        if (!usuario.Ativo || tenant is { Ativo: false })
+            throw new ProblemaApiException(StatusCodes.Status403Forbidden, LoginEndpoint.CodigoAcessoDesativado,
+                "Acesso desativado");
 
         // Marca o uso só se ninguém usou antes: duas renovações simultâneas do mesmo token = reuso.
         var marcados = await banco.RefreshTokens

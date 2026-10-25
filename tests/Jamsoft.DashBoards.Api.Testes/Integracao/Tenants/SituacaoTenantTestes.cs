@@ -46,7 +46,7 @@ public sealed class SituacaoTenantTestes(BancoDeTestes banco) : IAsyncLifetime
         _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/auth/eu", accessToken));
 
     [Fact]
-    public async Task Apos_inativar_token_ja_emitido_recebe_401_e_login_recebe_403()
+    public async Task Apos_inativar_token_ja_emitido_e_login_recebem_403_ACESSO_DESATIVADO()
     {
         var (tenant, admin) = await TenantComAdminAsync();
         using var login = await Sessao.LoginAsync(_cliente, admin.Email);
@@ -59,7 +59,8 @@ public sealed class SituacaoTenantTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, inativar.StatusCode);
         Assert.False((await Sessao.JsonAsync(inativar)).GetProperty("ativo").GetBoolean());
         using var depois = await EuAsync(token);
-        Assert.Equal(HttpStatusCode.Unauthorized, depois.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, depois.StatusCode);
+        Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(depois));
         using var novoLogin = await Sessao.LoginAsync(_cliente, admin.Email);
         Assert.Equal(HttpStatusCode.Forbidden, novoLogin.StatusCode);
         Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(novoLogin));

@@ -96,7 +96,10 @@ public sealed class SolicitarExclusaoTestes(BancoDeTestes banco) : IAsyncLifetim
         Assert.Equal(superAdmin.IdPublico, job.SolicitadoPorIdPublico);
         // Inativação imediata: o cache do tenant foi invalidado.
         using (var depois = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/auth/eu", tokenAdmin)))
-            Assert.Equal(HttpStatusCode.Unauthorized, depois.StatusCode);
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, depois.StatusCode);
+            Assert.Equal("ACESSO_DESATIVADO", await Sessao.CodigoAsync(depois));
+        }
 
         await using var contexto = banco.CriarContexto();
         var registro = await contexto.Auditoria.AsNoTracking().SingleAsync(a => a.RecursoIdPublico == jobId);

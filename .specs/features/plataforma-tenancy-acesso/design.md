@@ -49,7 +49,7 @@ sequenceDiagram
     W->>J: GET /api/usuarios (Bearer, X-Tenant opcional)
     J->>J: valida assinatura/expiração
     J->>J: OnTokenValidated: usuário e tenant ativos? (cache 60 s)
-    J-->>W: 401 se inativo
+    J-->>W: 403 ACESSO_DESATIVADO se inativo
     J->>T: claims (perfil, tenant, trocar_senha)
     T->>T: SuperAdmin → tenant = X-Tenant<br/>Admin/Consulta → tenant do token;<br/>X-Tenant diferente → 403 + auditoria
     T->>E: policy aprovada
@@ -172,7 +172,7 @@ tests/
   - Bloqueio: `FALHAS_LOGIN` incrementa em transação; na 5ª falha, `BLOQUEADO_ATE = agora + 15 min` → 423 (AUTH-03). Sucesso zera.
   - E-mail inexistente também roda `PasswordHasher.VerifyHashedPassword` contra um hash fictício, para igualar o tempo de resposta (AUTH-02).
   - Rate limiter nativo (`AddRateLimiter`) no `/api/auth/login`: 20 req/min por IP.
-  - `OnTokenValidated` consulta o `StatusAcessoCache` (60 s): usuário ou tenant inativo → falha → 401 (AUTH-07, USR-06, edge "tenant inativado durante sessão").
+  - `OnTokenValidated` consulta o `StatusAcessoCache` (60 s): usuário ou tenant inativo → falha de autenticação respondida como 403 `ACESSO_DESATIVADO` (via `OnChallenge`), não 401, para o frontend não tentar renovar; a renovação (`/api/auth/refresh`) também responde 403 `ACESSO_DESATIVADO` (AUTH-07, USR-06, edge "tenant inativado durante sessão"; decisão do usuário em 2026-10-25).
 - **Dependencies**: `Microsoft.AspNetCore.Authentication.JwtBearer`, `Microsoft.Extensions.Identity.Core` (`PasswordHasher<Usuario>`).
 - **Reuses**: padrão de geração/hash de `ApiKey.cs`, `FixedTimeEquals`, cache de `RepositorioChaves`.
 - **Requisitos**: AUTH-01..AUTH-09, USR-08

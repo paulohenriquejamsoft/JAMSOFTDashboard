@@ -136,6 +136,42 @@ describe('authInterceptor', () => {
     expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
 
+  it('403 ACESSO_DESATIVADO encerra a sessão e vai para o login com o aviso, sem renovar', () => {
+    entrarComo('Admin');
+    let erro: unknown;
+
+    http.get('/api/usuarios').subscribe({ error: (e) => (erro = e) });
+    api
+      .expectOne('/api/usuarios')
+      .flush({ codigo: 'ACESSO_DESATIVADO' }, { status: 403, statusText: 'Forbidden' });
+    api.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(erro).toMatchObject({ status: 403 });
+    expect(auth.usuario()).toBeNull();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/conta/login', {
+      state: { aviso: 'Acesso desativado' },
+    });
+    api.expectNone('/api/auth/refresh');
+  });
+
+  it('401 e renovação respondendo 403 ACESSO_DESATIVADO: vai para o login com o aviso', () => {
+    entrarComo('Admin');
+    let erro: unknown;
+
+    http.get('/api/usuarios').subscribe({ error: (e) => (erro = e) });
+    api.expectOne('/api/usuarios').flush(problemaNaoAutenticado, naoAutenticado);
+    api
+      .expectOne('/api/auth/refresh')
+      .flush({ codigo: 'ACESSO_DESATIVADO' }, { status: 403, statusText: 'Forbidden' });
+    api.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(erro).toMatchObject({ status: 403 });
+    expect(auth.usuario()).toBeNull();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/conta/login', {
+      state: { aviso: 'Acesso desativado' },
+    });
+  });
+
   it('403 TROCA_SENHA_PENDENTE redireciona para a troca de senha', () => {
     entrarComo('Admin');
     let erro: unknown;

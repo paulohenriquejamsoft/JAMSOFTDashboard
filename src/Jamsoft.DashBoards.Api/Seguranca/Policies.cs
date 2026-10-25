@@ -1,5 +1,6 @@
 using Jamsoft.DashBoards.Api.Configuracao;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
+using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
@@ -35,7 +36,11 @@ public static class Policies
                 // Mantém os nomes das claims do token (sub, perfil, tenant, trocar_senha).
                 bearer.MapInboundClaims = false;
                 bearer.TokenValidationParameters = TokenService.ParametrosValidacao(jwt.Value);
-                bearer.Events = new JwtBearerEvents { OnTokenValidated = RevalidarAcessoAsync };
+                bearer.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = RevalidarAcessoAsync,
+                    OnChallenge = ResponderAcessoDesativadoAsync,
+                };
             });
         services.AddMemoryCache();
         services.AddSingleton<StatusAcessoCache>();
@@ -69,7 +74,12 @@ public static class Policies
     public static TBuilder AllowTrocaSenhaPendente<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder =>
         builder.WithMetadata(new PermiteTrocaSenhaPendente());
 
-    /// <summary>Usuário ou tenant inativo derruba a autenticação: 401 mesmo com token ainda válido.</summary>
+    private const string ItemAcessoDesativado = "Jamsoft.DashBoards.AcessoDesativado";
+
+    /// <summary>
+    /// Usuário ou tenant inativo derruba a autenticação mesmo com token ainda válido; a resposta é
+    /// 403 ACESSO_DESATIVADO (edge case de TEN-05), não 401, para o frontend não tentar renovar.
+    /// </summary>
     private static async Task RevalidarAcessoAsync(TokenValidatedContext contexto)
     {
         var principal = contexto.Principal!;
@@ -81,7 +91,17 @@ public static class Policies
             && await status.AtivoAsync(usuario,
                 Guid.TryParse(principal.FindFirst(TiposClaim.Tenant)?.Value, out var tenant) ? tenant : null,
                 contexto.HttpContext.RequestAborted);
-        if (!ativo) contexto.Fail("Acesso desativado.");
+        if (ativo) return;
+        contexto.HttpContext.Items[ItemAcessoDesativado] = true;
+        contexto.Fail("Acesso desativado.");
+    }
+
+    private static async Task ResponderAcessoDesativadoAsync(JwtBearerChallengeContext contexto)
+    {
+        if (!contexto.HttpContext.Items.ContainsKey(ItemAcessoDesativado)) return;
+        contexto.HandleResponse();
+        await ProblemasApi.Problema(StatusCodes.Status403Forbidden, LoginEndpoint.CodigoAcessoDesativado, "Acesso desativado")
+            .ExecuteAsync(contexto.HttpContext);
     }
 
     private static AuthorizationPolicy PolicyDeUsuario(PerfilRequirement perfil) =>
