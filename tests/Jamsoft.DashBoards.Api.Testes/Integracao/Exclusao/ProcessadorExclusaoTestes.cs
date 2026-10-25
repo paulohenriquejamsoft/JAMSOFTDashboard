@@ -7,6 +7,7 @@ using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Jamsoft.DashBoards.Api.Testes.Infraestrutura;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,8 +36,11 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
 
     public async Task DisposeAsync() => await _servicos.DisposeAsync();
 
-    /// <summary>Mesmos registros do Program.cs, com lote pequeno e sem pausa.</summary>
-    internal static ServiceProvider ServicosProcessador(BancoDeTestes banco)
+    /// <summary>
+    /// Mesmos registros do Program.cs, sem pausa e com lote pequeno; <paramref name="tamanhoLote"/> nulo mantém o
+    /// lote padrão das opções.
+    /// </summary>
+    internal static ServiceProvider ServicosProcessador(BancoDeTestes banco, int? tamanhoLote = Lote)
     {
         var servicos = new ServiceCollection();
         servicos.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
@@ -46,7 +50,7 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
         servicos.AddExclusao();
         servicos.Configure<ExclusaoOptions>(o =>
         {
-            o.TamanhoLote = Lote;
+            if (tamanhoLote is { } lote) o.TamanhoLote = lote;
             o.PausaEntreLotes = TimeSpan.Zero;
         });
         return servicos.BuildServiceProvider();
@@ -144,6 +148,52 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
         });
         Assert.Contains("\"situacao\":\"EmExecucao\"", registros[0].Detalhes);
         Assert.Contains("\"situacao\":\"Concluida\"", registros[1].Detalhes);
+    }
+
+    /// <summary>
+    /// DEL-04 com o lote padrão (sem trocar o valor no teste): um trigger de teste em EMPRESA registra, a cada DELETE,
+    /// a transação e quantas linhas do tenant saíram. 12.000 linhas → 5.000 + 5.000 + 2.000 + lote vazio que encerra
+    /// a etapa, cada um na sua transação.
+    /// </summary>
+    [Fact]
+    public async Task Lote_padrao_apaga_no_maximo_5000_linhas_por_transacao()
+    {
+        await using var servicos = ServicosProcessador(banco, tamanhoLote: null);
+        var a = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Lote Padrão");
+        await DadosTenant.SemearAsync(banco, a.Id, empresas: 12_000, usuarios: 1);
+        var job = await NovoJobAsync(banco, a, Guid.NewGuid());
+        await banco.ExecutarAsync($"""
+            CREATE TABLE [TESTE_LOTE_EXCLUSAO] ([ORDEM] int IDENTITY PRIMARY KEY, [TRANSACAO] bigint NOT NULL,
+                [LINHAS] int NOT NULL);
+            EXEC ('CREATE TRIGGER [TR_TESTE_LOTE_EXCLUSAO] ON [EMPRESA] AFTER DELETE AS
+                SET NOCOUNT ON; -- sem isto, o INSERT entra nas linhas afetadas do DELETE e o lote vazio não chega a 0
+                INSERT INTO [TESTE_LOTE_EXCLUSAO] ([TRANSACAO], [LINHAS])
+                SELECT CURRENT_TRANSACTION_ID(), COUNT(*) FROM deleted WHERE TENANT_ID = {a.Id}');
+            """);
+        List<(long Transacao, int Linhas)> lotes = [];
+        try
+        {
+            Assert.True(await ActivatorUtilities.CreateInstance<ProcessadorExclusao>(servicos).ProcessarProximoAsync());
+
+            await using var conexao = new SqlConnection(banco.ConnectionString);
+            await conexao.OpenAsync();
+            await using var comando = new SqlCommand(
+                "SELECT [TRANSACAO], [LINHAS] FROM [TESTE_LOTE_EXCLUSAO] ORDER BY [ORDEM]", conexao);
+            await using var leitor = await comando.ExecuteReaderAsync();
+            while (await leitor.ReadAsync()) lotes.Add((leitor.GetInt64(0), leitor.GetInt32(1)));
+        }
+        finally
+        {
+            await banco.ExecutarAsync("DROP TRIGGER [TR_TESTE_LOTE_EXCLUSAO]; DROP TABLE [TESTE_LOTE_EXCLUSAO];");
+        }
+
+        Assert.Equal([5_000, 5_000, 2_000, 0], lotes.Select(l => l.Linhas));
+        // Um DELETE por transação: nenhuma transação soma mais que o lote.
+        Assert.Equal(lotes.Count, lotes.Select(l => l.Transacao).Distinct().Count());
+        var concluido = await JobAsync(job.Id);
+        Assert.Equal(SituacaoExclusao.Concluida, concluido.Situacao);
+        Assert.Equal(12_000, Linhas(concluido)["EMPRESA"]);
+        Assert.Equal(0, (await DadosTenant.LinhasAsync(banco, a.Id))["EMPRESA"]);
     }
 
     [Fact]
