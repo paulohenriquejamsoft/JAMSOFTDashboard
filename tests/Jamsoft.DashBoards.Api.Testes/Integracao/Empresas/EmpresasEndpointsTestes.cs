@@ -119,6 +119,59 @@ public sealed class EmpresasEndpointsTestes(BancoDeTestes banco) : IAsyncLifetim
     }
 
     [Fact]
+    public async Task SuperAdmin_com_X_Tenant_cria_empresa_201_no_tenant_escolhido()
+    {
+        var escolhido = await Dados.NovoTenantAsync(banco, "Cliente Escolhido Empresas");
+        var outro = await Dados.NovoTenantAsync(banco);
+        var token = await Acesso.TokenSuperAdminAsync(banco);
+
+        using var resposta = await _cliente.SendAsync(Acesso.ComCorpo(HttpMethod.Post, Rota, token,
+            new { codEmpresa = 7, nome = "Filial do SuperAdmin" }, escolhido.IdPublico));
+
+        Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);
+        var idPublico = (await Sessao.JsonAsync(resposta)).GetProperty("idPublico").GetGuid();
+        await using var contexto = banco.CriarContexto(new TenantFixo(escolhido.Id));
+        var gravada = await contexto.Empresas.AsNoTracking().SingleAsync(e => e.IdPublico == idPublico);
+        Assert.Equal(escolhido.Id, gravada.TenantId);
+        Assert.Equal(7, gravada.CodEmpresa);
+        Assert.Equal("Filial do SuperAdmin", gravada.Nome);
+        await using var doOutro = banco.CriarContexto(new TenantFixo(outro.Id));
+        Assert.Equal(0, await doOutro.Empresas.CountAsync());
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task Nome_vazio_responde_400_VALIDACAO(string nome)
+    {
+        var (tenant, token) = await TenantComUsuarioAsync(Perfil.Admin);
+
+        using var resposta = await CriarAsync(token, new { codEmpresa = 5, nome });
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+        var corpo = await Sessao.JsonAsync(resposta);
+        Assert.Equal("VALIDACAO", corpo.GetProperty("codigo").GetString());
+        Assert.True(corpo.GetProperty("erros").TryGetProperty("nome", out _));
+        await using var contexto = banco.CriarContexto(new TenantFixo(tenant.Id));
+        Assert.Equal(0, await contexto.Empresas.CountAsync());
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(80)]
+    public async Task Nome_de_1_ou_80_caracteres_e_aceito(int tamanho)
+    {
+        var (tenant, token) = await TenantComUsuarioAsync(Perfil.Admin);
+        var nome = new string('n', tamanho);
+
+        using var resposta = await CriarAsync(token, new { codEmpresa = 6, nome });
+
+        Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);
+        await using var contexto = banco.CriarContexto(new TenantFixo(tenant.Id));
+        Assert.Equal([nome], await contexto.Empresas.Select(e => e.Nome).ToListAsync());
+    }
+
+    [Fact]
     public async Task Consulta_criando_empresa_responde_403()
     {
         var (tenant, token) = await TenantComUsuarioAsync(Perfil.Consulta);
