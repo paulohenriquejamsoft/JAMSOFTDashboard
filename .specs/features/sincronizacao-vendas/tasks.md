@@ -812,9 +812,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: só situações 5/6/9/11/12 voltam e com o texto certo (incl. `Contingência`); venda com valor neutro fica fora; `data_hora` = `DataHoraFechamento`; nula → `datafatura` 00:00; `qtd_itens` = linhas em `NotaSaidaProd`; 1.200 vendas em lotes de 500/500/200 em ordem (`datafatura`, `NumNotaSaida`) sem repetição; limite superior exclusivo; consulta acima do timeout (configurável no teste) cancela com erro de Consulta
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 8 new tests pass
+- [x] Testes: só situações 5/6/9/11/12 voltam e com o texto certo (incl. `Contingência`); venda com valor neutro fica fora; `data_hora` = `DataHoraFechamento`; nula → `datafatura` 00:00; `qtd_itens` = linhas em `NotaSaidaProd`; 1.200 vendas em lotes de 500/500/200 em ordem (`datafatura`, `NumNotaSaida`) sem repetição; limite superior exclusivo; consulta acima do timeout (configurável no teste) cancela com erro de Consulta
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 8 new tests pass
 
 **Tests**: integration
 **Gate**: full
