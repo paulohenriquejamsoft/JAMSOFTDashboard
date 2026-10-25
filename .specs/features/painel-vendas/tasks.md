@@ -136,9 +136,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: só vendas do tenant do contexto e da faixa (limite superior exclusivo à meia-noite de São Paulo); filtro por empresa restringe; empresa de outro tenant → `ProblemaApiException` 404 `NAO_ENCONTRADO`; avaliação no cliente desligada (`ConfigureWarnings` lançando) e nenhuma exceção
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: só vendas do tenant do contexto e da faixa (limite superior exclusivo à meia-noite de São Paulo); filtro por empresa restringe; empresa de outro tenant → `ProblemaApiException` 404 `NAO_ENCONTRADO`; avaliação no cliente desligada (`ConfigureWarnings` lançando) e nenhuma exceção
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full
