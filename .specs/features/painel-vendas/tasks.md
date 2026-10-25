@@ -322,9 +322,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: cada método chama a rota certa com a query string esperada (sem `empresas` quando vazio; repetido quando vários); com o `authInterceptor` real no TestBed, 401 em `/api/painel/kpis` renova e repete com o token novo; SuperAdmin com tenant envia `X-Tenant`
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 6 new tests pass
+- [x] Testes: cada método chama a rota certa com a query string esperada (sem `empresas` quando vazio; repetido quando vários); com o `authInterceptor` real no TestBed, 401 em `/api/painel/kpis` renova e repete com o token novo; SuperAdmin com tenant envia `X-Tenant`
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 6 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
