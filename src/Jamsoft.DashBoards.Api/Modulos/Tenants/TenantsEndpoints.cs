@@ -118,7 +118,7 @@ public static class TenantsEndpoints
             "Registro alterado por outra pessoa. Recarregue.");
 
     /// <summary>ROWVERSION em Base64 (8 bytes).</summary>
-    private static bool TentarLerVersao(string? texto, out byte[] versao)
+    internal static bool TentarLerVersao(string? texto, out byte[] versao)
     {
         versao = new byte[8];
         return texto is not null && Convert.TryFromBase64String(texto, versao, out var lidos) && lidos == 8;

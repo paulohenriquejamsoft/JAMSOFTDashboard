@@ -339,9 +339,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: lista traz tenants (id, nome) e nunca `secret`/`hash`; PUT troca a lista e incrementa `VERSAO_CREDENCIAL`; versão antiga → 409 `CONFLITO_VERSAO`; lista vazia → 400; Admin → 403
-- [ ] Gate check passes: Full
-- [ ] Test count: 5 new tests pass
+- [x] Testes: lista traz tenants (id, nome) e nunca `secret`/`hash`; PUT troca a lista e incrementa `VERSAO_CREDENCIAL`; versão antiga → 409 `CONFLITO_VERSAO`; lista vazia → 400; Admin → 403
+- [x] Gate check passes: Full
+- [x] Test count: 5 new tests pass
 
 **Tests**: integration
 **Gate**: full

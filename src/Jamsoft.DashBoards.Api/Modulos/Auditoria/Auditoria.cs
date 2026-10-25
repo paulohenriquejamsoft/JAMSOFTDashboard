@@ -39,6 +39,7 @@ public readonly record struct OperacaoAuditada(string Codigo)
 
     /// <summary>Credenciais do Coletor (parte Coletor do AUD-01).</summary>
     public static readonly OperacaoAuditada ColetorCriado = new("COLETOR_CRIADO");
+    public static readonly OperacaoAuditada ColetorTenantsAlterados = new("COLETOR_TENANTS_ALTERADOS");
 
     public override string ToString() => Codigo;
 }
