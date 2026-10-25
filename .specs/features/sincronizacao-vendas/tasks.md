@@ -758,9 +758,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: avançar e reler; configurações diferentes independentes; zerar uma não afeta outra; arquivo ausente → sem checkpoint
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 4 new tests pass
+- [x] Testes: avançar e reler; configurações diferentes independentes; zerar uma não afeta outra; arquivo ausente → sem checkpoint
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 4 new tests pass
 
 **Tests**: unit
 **Gate**: quick
