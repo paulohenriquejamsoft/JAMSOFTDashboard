@@ -105,6 +105,17 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
     private static Dictionary<string, long> Linhas(ExclusaoTenant job) =>
         JsonSerializer.Deserialize<Dictionary<string, long>>(job.LinhasRemovidas!)!;
 
+    /// <summary>
+    /// Linhas removidas esperadas num job: toda tabela executada aparece, com 0 quando o tenant não tinha linhas nela;
+    /// <paramref name="removidas"/> dá as contagens das demais. Assim tabelas novas do plano não quebram o teste.
+    /// </summary>
+    internal static Dictionary<string, long> LinhasEsperadas(IEnumerable<string> executadas, Dictionary<string, long> removidas)
+    {
+        var esperadas = executadas.ToDictionary(t => t, _ => 0L);
+        foreach (var (tabela, linhas) in removidas) esperadas[tabela] = linhas;
+        return esperadas;
+    }
+
     [Fact]
     public async Task Exclui_todas_as_linhas_de_A_sem_alterar_B_e_conclui_o_job()
     {
@@ -134,7 +145,8 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
         Assert.NotNull(concluido.ConcluidoEm);
         Assert.Equal("TENANT", concluido.EtapaAtual);
         Assert.Equal(
-            new Dictionary<string, long> { ["EMPRESA"] = 10_000, ["REFRESH_TOKEN"] = 1_000, ["USUARIO"] = 1_000, ["TENANT"] = 1 },
+            LinhasEsperadas(Plano.Tabelas,
+                new() { ["EMPRESA"] = 10_000, ["REFRESH_TOKEN"] = 1_000, ["USUARIO"] = 1_000, ["TENANT"] = 1 }),
             Linhas(concluido));
 
         var registros = await AuditoriaAsync(job.IdPublico);
@@ -201,7 +213,11 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
     {
         var a = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Falha");
         await DadosTenant.SemearAsync(banco, a.Id, empresas: 1_000, usuarios: 5);
-        var segunda = Plano.Etapas[1].Tabela;
+        // As duas primeiras etapas com linhas do tenant (o trigger só dispara quando o DELETE apaga algo).
+        var semeadas = new Dictionary<string, long> { ["EMPRESA"] = 1_000, ["REFRESH_TOKEN"] = 5, ["USUARIO"] = 5 };
+        var comLinhas = Plano.Tabelas.Where(semeadas.ContainsKey).ToList();
+        var primeira = comLinhas[0];
+        var segunda = comLinhas[1];
         var job = await NovoJobAsync(banco, a, Guid.NewGuid());
         await banco.ExecutarAsync($"""
             CREATE TRIGGER [TR_TESTE_FALHA_EXCLUSAO] ON [{segunda}] AFTER DELETE AS
@@ -224,10 +240,10 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
         Assert.DoesNotContain(" at ", falhou.Erro); // sem stack trace
         Assert.Null(falhou.ConcluidoEm);
         // A primeira etapa foi concluída; o lote da segunda foi desfeito.
-        Assert.Equal(1_000, Linhas(falhou)[Plano.Etapas[0].Tabela]);
+        Assert.Equal(semeadas[primeira], Linhas(falhou)[primeira]);
         var linhas = await DadosTenant.LinhasAsync(banco, a.Id);
-        Assert.Equal(0, linhas[Plano.Etapas[0].Tabela]);
-        Assert.Equal(5, linhas[segunda]);
+        Assert.Equal(0, linhas[primeira]);
+        Assert.Equal(semeadas[segunda], linhas[segunda]);
         Assert.Equal(1, linhas["TENANT"]);
         Assert.False(await banco.ConsultarEscalarAsync<bool>($"SELECT ATIVO FROM TENANT WHERE ID = {a.Id}"));
 

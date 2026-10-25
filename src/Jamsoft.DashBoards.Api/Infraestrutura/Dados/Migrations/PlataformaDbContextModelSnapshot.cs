@@ -145,6 +145,98 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.ToTable("REFRESH_TOKEN");
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("ATIVO");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CLIENT_ID");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .HasColumnName("NOME");
+
+                    b.Property<DateTime?>("RevogadoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("REVOGADO_EM");
+
+                    b.Property<byte[]>("SecretHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(32)")
+                        .HasColumnName("SECRET_HASH");
+
+                    b.Property<DateTime?>("UltimoTokenEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("ULTIMO_TOKEN_EM");
+
+                    b.Property<byte[]>("Versao")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion")
+                        .HasColumnName("VERSAO");
+
+                    b.Property<int>("VersaoCredencial")
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasColumnName("VERSAO_CREDENCIAL");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.ToTable("COLETOR", t =>
+                        {
+                            t.HasCheckConstraint("CK_COLETOR_SECRET_HASH", "DATALENGTH(SECRET_HASH) = 32");
+                        });
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorTenant", b =>
+                {
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.Property<int>("ColetorId")
+                        .HasColumnType("int")
+                        .HasColumnName("COLETOR_ID");
+
+                    b.HasKey("TenantId", "ColetorId");
+
+                    b.HasIndex("ColetorId");
+
+                    b.ToTable("COLETOR_TENANT");
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Empresas.Empresa", b =>
                 {
                     b.Property<int>("Id")
@@ -444,6 +536,21 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Usuarios.Usuario", null)
                         .WithMany()
                         .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Coletores.ColetorTenant", b =>
+                {
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Coletores.Coletor", null)
+                        .WithMany()
+                        .HasForeignKey("ColetorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });

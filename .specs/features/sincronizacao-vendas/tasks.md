@@ -155,9 +155,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de esquema: `CLIENT_ID` duplicado recusado; mesmo coletor/tenant duplicado recusado; `SECRET_HASH` aceita só 32 bytes
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes de esquema: `CLIENT_ID` duplicado recusado; mesmo coletor/tenant duplicado recusado; `SECRET_HASH` aceita só 32 bytes
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

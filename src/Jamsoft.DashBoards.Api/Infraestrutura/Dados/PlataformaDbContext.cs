@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
 using Jamsoft.DashBoards.Api.Modulos.Auditoria;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
+using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
@@ -40,6 +41,8 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<RegistroAuditoria> Auditoria => Set<RegistroAuditoria>();
     public DbSet<ExclusaoTenant> ExclusoesTenant => Set<ExclusaoTenant>();
+    public DbSet<Coletor> Coletores => Set<Coletor>();
+    public DbSet<ColetorTenant> ColetoresTenant => Set<ColetorTenant>();
 
     /// <summary>Lido a cada consulta: o EF troca a referência ao contexto pela instância em uso.</summary>
     private int TenantIdFiltro => TenantAtual.IdOuSemAcesso;

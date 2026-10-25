@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -14,6 +16,10 @@ public static class Dados
     public const int ErroIndiceUnico = 2601;
     /// <summary>Erro do SQL Server para violação de CHECK constraint.</summary>
     public const int ErroCheck = 547;
+    /// <summary>Erro do SQL Server para chave primária duplicada.</summary>
+    public const int ErroChavePrimaria = 2627;
+    /// <summary>Erro do SQL Server para valor maior que a coluna (truncamento).</summary>
+    public const int ErroTruncamento = 2628;
 
     /// <summary>14 dígitos aleatórios: só o esquema é testado aqui, não os dígitos verificadores.</summary>
     public static string CnpjQualquer() =>
@@ -80,6 +86,21 @@ public static class Dados
         contexto.Usuarios.Add(usuario);
         await contexto.SaveChangesAsync();
         return usuario;
+    }
+
+    /// <summary>Grava um coletor ativo com <c>CLIENT_ID</c> único e hash qualquer e devolve a entidade.</summary>
+    public static async Task<Coletor> NovoColetorAsync(BancoDeTestes banco, string nome = "Coletor de teste")
+    {
+        await using var contexto = banco.CriarContexto();
+        var coletor = new Coletor
+        {
+            Nome = nome,
+            ClientId = Guid.NewGuid(),
+            SecretHash = SHA256.HashData(Guid.NewGuid().ToByteArray()),
+        };
+        contexto.Coletores.Add(coletor);
+        await contexto.SaveChangesAsync();
+        return coletor;
     }
 
     public static async Task<SqlException> FalhaSqlAsync(Func<Task> acao)

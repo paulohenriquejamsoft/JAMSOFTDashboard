@@ -126,8 +126,10 @@ public sealed class ExclusoesEndpointsTestes(BancoDeTestes banco) : IAsyncLifeti
 
         var concluido = await JobAsync(job.Id);
         Assert.Equal(SituacaoExclusao.Concluida, concluido.Situacao);
+        // A retomada executa a partir da 2ª etapa; a 1ª mantém as 4 linhas já registradas.
         Assert.Equal(
-            new Dictionary<string, long> { [primeira] = 4, ["REFRESH_TOKEN"] = 3, ["USUARIO"] = 3, ["TENANT"] = 1 },
+            ProcessadorExclusaoTestes.LinhasEsperadas(Plano.Tabelas.Skip(1),
+                new() { [primeira] = 4, ["REFRESH_TOKEN"] = 3, ["USUARIO"] = 3, ["TENANT"] = 1 }),
             JsonSerializer.Deserialize<Dictionary<string, long>>(concluido.LinhasRemovidas!));
         Assert.All(await DadosTenant.LinhasAsync(banco, job.TenantId), p => Assert.Equal(0, p.Value));
 
