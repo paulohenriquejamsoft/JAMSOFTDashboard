@@ -163,6 +163,37 @@ public sealed class ProcessadorExclusaoTestes(BancoDeTestes banco) : IAsyncLifet
     }
 
     /// <summary>
+    /// Tabelas da sincronização de vendas no plano: VENDA, LOTE_INGESTAO, ORIGEM_SINCRONIZACAO (dona da EMPRESA) e
+    /// COLETOR_TENANT saem com o tenant; o COLETOR, compartilhado com outro tenant, fica.
+    /// </summary>
+    [Fact]
+    public async Task Exclui_vendas_lotes_e_origens_de_A_sem_alterar_B_nem_o_coletor()
+    {
+        var a = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Vendas A");
+        var b = await Dados.NovoTenantAsync(banco, "Cliente Exclusão Vendas B");
+        var coletor = await Dados.NovoColetorAsync(banco);
+        await DadosTenant.SemearSincronizacaoAsync(banco, a.Id, coletor.Id, vendas: 1_000, lotes: 3);
+        await DadosTenant.SemearSincronizacaoAsync(banco, b.Id, coletor.Id, vendas: 1_000, lotes: 3);
+        var impressaoB = await DadosTenant.ImpressaoAsync(banco, b.Id);
+        var job = await NovoJobAsync(banco, a, Guid.NewGuid());
+
+        Assert.True(await Processador().ProcessarProximoAsync());
+
+        var concluido = await JobAsync(job.Id);
+        Assert.Equal(SituacaoExclusao.Concluida, concluido.Situacao);
+        Assert.Equal(
+            LinhasEsperadas(Plano.Tabelas, new()
+            {
+                ["VENDA"] = 1_000, ["LOTE_INGESTAO"] = 3, ["EMPRESA"] = 1, ["ORIGEM_SINCRONIZACAO"] = 1,
+                ["COLETOR_TENANT"] = 1, ["TENANT"] = 1,
+            }),
+            Linhas(concluido));
+        Assert.All(await DadosTenant.LinhasAsync(banco, a.Id), p => Assert.Equal(0, p.Value));
+        Assert.Equal(impressaoB, await DadosTenant.ImpressaoAsync(banco, b.Id));
+        Assert.Equal(1, await banco.ConsultarEscalarAsync<int>($"SELECT COUNT(*) FROM COLETOR WHERE ID = {coletor.Id}"));
+    }
+
+    /// <summary>
     /// DEL-04 com o lote padrão (sem trocar o valor no teste): um trigger de teste em EMPRESA registra, a cada DELETE,
     /// a transação e quantas linhas do tenant saíram. 12.000 linhas → 5.000 + 5.000 + 2.000 + lote vazio que encerra
     /// a etapa, cada um na sua transação.

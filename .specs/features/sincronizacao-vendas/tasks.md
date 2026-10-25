@@ -259,9 +259,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: ordem do plano (VENDA < EMPRESA < ORIGEM_SINCRONIZACAO; LOTE_INGESTAO < ORIGEM_SINCRONIZACAO; COLETOR_TENANT antes de TENANT; COLETOR ausente); exclusão de um tenant com vendas, lotes e origens apaga tudo dele e nada de outro tenant (reaproveitando o teste do processador)
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes: ordem do plano (VENDA < EMPRESA < ORIGEM_SINCRONIZACAO; LOTE_INGESTAO < ORIGEM_SINCRONIZACAO; COLETOR_TENANT antes de TENANT; COLETOR ausente); exclusão de um tenant com vendas, lotes e origens apaga tudo dele e nada de outro tenant (reaproveitando o teste do processador)
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

@@ -35,6 +35,34 @@ public static class DadosTenant
             FROM USUARIO u WHERE u.TENANT_ID = {tenantId};
             """);
 
+    /// <summary>
+    /// Insere, para o tenant, a autorização do coletor (COLETOR_TENANT), uma ORIGEM_SINCRONIZACAO dona de uma EMPRESA,
+    /// <paramref name="vendas"/> linhas em VENDA e <paramref name="lotes"/> em LOTE_INGESTAO, todas dessa origem.
+    /// </summary>
+    public static Task SemearSincronizacaoAsync(BancoDeTestes banco, int tenantId, int coletorId, int vendas, int lotes) =>
+        banco.ExecutarAsync($"""
+            INSERT INTO COLETOR_TENANT (TENANT_ID, COLETOR_ID) VALUES ({tenantId}, {coletorId});
+
+            INSERT INTO ORIGEM_SINCRONIZACAO (TENANT_ID, COLETOR_ID, CONFIGURACAO_ID, ROTINA)
+            VALUES ({tenantId}, {coletorId}, NEWID(), 'Vendas');
+            DECLARE @origem int = SCOPE_IDENTITY();
+
+            INSERT INTO EMPRESA (TENANT_ID, COD_EMPRESA, NOME, ORIGEM_ID) VALUES ({tenantId}, 1, 'Loja sincronizada', @origem);
+            DECLARE @empresa int = SCOPE_IDENTITY();
+
+            WITH d AS (SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)),
+                 n AS (SELECT TOP ({vendas}) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS i
+                       FROM d a CROSS JOIN d b CROSS JOIN d c CROSS JOIN d e CROSS JOIN d f)
+            INSERT INTO VENDA (TENANT_ID, EMPRESA_ID, COD_EMPRESA, VENDA_ID, TIPO_DFE, DATA_HORA, VALOR, SITUACAO,
+                               QTD_ITENS, ORIGEM_ID)
+            SELECT {tenantId}, @empresa, 1, i, 'NFC-e', SYSDATETIMEOFFSET(), 10, N'Finalizada', 1, @origem FROM n;
+
+            WITH d AS (SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)),
+                 n AS (SELECT TOP ({lotes}) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS i FROM d a CROSS JOIN d b)
+            INSERT INTO LOTE_INGESTAO (TENANT_ID, BATCH_ID, ORIGEM_ID, INSERIDOS, ATUALIZADOS, REJEITADOS, RESPOSTA)
+            SELECT {tenantId}, NEWID(), @origem, 1, 0, 0, N'[]' FROM n;
+            """);
+
     /// <summary>Tabelas de dbo com a coluna TENANT_ID.</summary>
     public static async Task<List<string>> TabelasComTenantIdAsync(BancoDeTestes banco)
     {

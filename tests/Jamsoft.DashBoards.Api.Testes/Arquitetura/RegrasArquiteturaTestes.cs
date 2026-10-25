@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados.Convencoes;
+using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,8 @@ public sealed class RegrasArquiteturaTestes
         "Jamsoft.DashBoards.Api.Modulos.Auditoria",
         "Jamsoft.DashBoards.Api.Modulos.Exclusao",
         "Jamsoft.DashBoards.Api.Modulos.Autenticacao",
+        // Admin de coletores: COLETOR_TENANT é do tenant, mas a listagem atravessa tenants (design, Risks).
+        "Jamsoft.DashBoards.Api.Modulos.Coletores",
     ];
 
     /// <summary>Infraestrutura que define <c>OperacaoGlobal</c> e aplica o filtro global.</summary>
@@ -87,6 +90,40 @@ public sealed class RegrasArquiteturaTestes
         using var contexto = new PlataformaDbContextDesign().CreateDbContext([]);
 
         Assert.Empty(RegraEntidadesTenant.Violacoes(contexto.Model));
+    }
+
+    private static List<string> TabelasDoPlano()
+    {
+        using var contexto = new PlataformaDbContextDesign().CreateDbContext([]);
+        return PlanoExclusao.De(contexto.Model).Tabelas.ToList();
+    }
+
+    [Fact]
+    public void Plano_de_exclusao_apaga_vendas_e_lotes_antes_da_empresa_e_a_empresa_antes_da_origem()
+    {
+        var tabelas = TabelasDoPlano();
+        int Posicao(string tabela)
+        {
+            Assert.Contains(tabela, tabelas);
+            return tabelas.IndexOf(tabela);
+        }
+
+        // FKs: VENDA → EMPRESA → ORIGEM_SINCRONIZACAO e LOTE_INGESTAO → ORIGEM_SINCRONIZACAO (filhos antes dos pais).
+        Assert.True(Posicao("VENDA") < Posicao("EMPRESA"), string.Join(", ", tabelas));
+        Assert.True(Posicao("EMPRESA") < Posicao("ORIGEM_SINCRONIZACAO"), string.Join(", ", tabelas));
+        Assert.True(Posicao("LOTE_INGESTAO") < Posicao("ORIGEM_SINCRONIZACAO"), string.Join(", ", tabelas));
+    }
+
+    [Fact]
+    public void Plano_de_exclusao_apaga_COLETOR_TENANT_antes_de_TENANT_e_deixa_COLETOR_fora()
+    {
+        var tabelas = TabelasDoPlano();
+
+        Assert.Contains("COLETOR_TENANT", tabelas);
+        Assert.True(tabelas.IndexOf("COLETOR_TENANT") < tabelas.IndexOf("TENANT"), string.Join(", ", tabelas));
+        Assert.Equal("TENANT", tabelas[^1]);
+        // COLETOR não pertence a um tenant: atende vários e sobrevive à exclusão de um deles.
+        Assert.DoesNotContain("COLETOR", tabelas);
     }
 
     [Fact]
