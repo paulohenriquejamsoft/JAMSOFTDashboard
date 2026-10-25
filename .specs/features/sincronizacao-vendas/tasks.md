@@ -916,9 +916,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes (ERP falso + cliente falso controlável): carga inicial desde hoje − 6 meses; checkpoint só avança após ACK; falha no 2º lote mantém checkpoint do 1º e o próximo ciclo reenvia a partir dele; incremental começa em `checkpoint − janela`; período vazio → Sucesso com 0 registros; erro de consulta → Falha classificada e checkpoint intacto; evento de fim no log com contagens
-- [ ] Gate check passes: Full-Coletor
-- [ ] Test count: 7 new tests pass
+- [x] Testes (ERP falso + cliente falso controlável): carga inicial desde hoje − 6 meses; checkpoint só avança após ACK; falha no 2º lote mantém checkpoint do 1º e o próximo ciclo reenvia a partir dele; incremental começa em `checkpoint − janela`; período vazio → Sucesso com 0 registros; erro de consulta → Falha classificada e checkpoint intacto; evento de fim no log com contagens
+- [x] Gate check passes: Full-Coletor
+- [x] Test count: 7 new tests pass (+1: parada entre lotes, do "para entre lotes se pedido" do What)
 
 **Tests**: integration
 **Gate**: full
