@@ -129,9 +129,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: um `LoteVendas` serializado com `JsonSerializerDefaults.Web` produz exatamente os nomes do contrato (`batchId`, `tenant`, `configuracaoId`, `vendas[].vendaId`, `dataHora`, ...) e volta igual; `Limites.VendasPorLote == 500` e `BytesPorLote == 2 MB`
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 3 tests pass
+- [x] Testes: um `LoteVendas` serializado com `JsonSerializerDefaults.Web` produz exatamente os nomes do contrato (`batchId`, `tenant`, `configuracaoId`, `vendas[].vendaId`, `dataHora`, ...) e volta igual; `Limites.VendasPorLote == 500` e `BytesPorLote == 2 MB`
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 3 tests pass
 
 **Tests**: unit
 **Gate**: quick

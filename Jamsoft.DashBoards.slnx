@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Jamsoft.DashBoards.Api/Jamsoft.DashBoards.Api.csproj" />
+    <Project Path="src/Jamsoft.DashBoards.Contratos/Jamsoft.DashBoards.Contratos.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Jamsoft.DashBoards.Api.Testes/Jamsoft.DashBoards.Api.Testes.csproj" />
+    <Project Path="tests/Jamsoft.DashBoards.Coletor.Testes/Jamsoft.DashBoards.Coletor.Testes.csproj" />
   </Folder>
 </Solution>
