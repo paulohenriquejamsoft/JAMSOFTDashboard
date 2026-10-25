@@ -155,6 +155,37 @@ public sealed class CriarTenantTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Equal(0, await TenantsComCnpjAsync(cnpj));
     }
 
+    [Theory]
+    [InlineData(3)]
+    [InlineData(120)]
+    public async Task Nome_de_3_ou_120_caracteres_responde_201(int tamanho)
+    {
+        var cnpj = Dados.CnpjValido();
+        var nome = new string('t', tamanho);
+
+        using var resposta = await CriarAsync(new { nome, cnpj });
+
+        Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);
+        Assert.Equal(nome, (await Sessao.JsonAsync(resposta)).GetProperty("nome").GetString());
+        Assert.Equal(1, await TenantsComCnpjAsync(cnpj));
+    }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(121)]
+    public async Task Nome_de_2_ou_121_caracteres_responde_400_VALIDACAO(int tamanho)
+    {
+        var cnpj = Dados.CnpjValido();
+
+        using var resposta = await CriarAsync(new { nome = new string('t', tamanho), cnpj });
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+        var corpo = await Sessao.JsonAsync(resposta);
+        Assert.Equal("VALIDACAO", corpo.GetProperty("codigo").GetString());
+        Assert.True(corpo.GetProperty("erros").TryGetProperty("nome", out _));
+        Assert.Equal(0, await TenantsComCnpjAsync(cnpj));
+    }
+
     [Fact]
     public async Task Admin_chamando_responde_403_ACESSO_NEGADO()
     {
