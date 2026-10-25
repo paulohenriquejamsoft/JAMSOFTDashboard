@@ -4,6 +4,7 @@ import { SeletorTenantComponent } from '../../admin/seletor-tenant/seletor-tenan
 import { AVISO_SELECIONE_TENANT } from '../../core/auth/perfil.guard';
 import { tenantEfetivo } from '../../core/auth/tenant-efetivo';
 import { traduzirProblema } from '../../core/erros/problema';
+import { ConexaoService } from '../../core/pwa/conexao.service';
 import { EstadoCarga } from '../../shared/paginado';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
 import { SincronizacaoApi } from '../sincronizacao/sincronizacao.api';
@@ -16,6 +17,7 @@ import { RankingsComponent } from './rankings.component';
 
 export const MENSAGEM_SEM_VENDAS = 'Nenhuma venda no período';
 export const MENSAGEM_SEM_SINCRONIZACAO = 'Nenhuma venda sincronizada ainda';
+export const MENSAGEM_SEM_CONEXAO = 'Sem conexão';
 
 /** Um bloco do painel: carrega e falha sozinho (UI-07, UI-08). */
 class Bloco<T> {
@@ -65,6 +67,12 @@ class Bloco<T> {
     .bloco {
       min-width: 0;
     }
+    .sem-conexao {
+      margin: 0;
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--text-muted);
+    }
     h2 {
       margin: 0;
       font-size: var(--titulo-card-size);
@@ -107,44 +115,60 @@ class Bloco<T> {
           <div class="grade">
             <section class="card bloco largura-total" data-bloco="kpis" aria-labelledby="bloco-kpis">
               <div class="card-cabecalho"><h2 id="bloco-kpis">Indicadores</h2></div>
-              <app-estado-carga [estado]="kpis.estado()" [mensagemErro]="kpis.mensagemErro()"
-                (tentarNovamente)="recarregar(kpis)" />
-              @if (kpis.dados(); as dados) {
-                @if (kpis.estado() === 'pronto') {
-                  <app-kpis class="bloco-conteudo" [kpis]="dados.kpis" />
+              @if (!online()) {
+                <p class="sem-conexao" role="status">{{ mensagemSemConexao }}</p>
+              } @else {
+                <app-estado-carga [estado]="kpis.estado()" [mensagemErro]="kpis.mensagemErro()"
+                  (tentarNovamente)="recarregar(kpis)" />
+                @if (kpis.dados(); as dados) {
+                  @if (kpis.estado() === 'pronto') {
+                    <app-kpis class="bloco-conteudo" [kpis]="dados.kpis" />
+                  }
                 }
               }
             </section>
 
             <section class="card bloco largura-total" data-bloco="evolucao" aria-labelledby="bloco-evolucao">
               <div class="card-cabecalho"><h2 id="bloco-evolucao">Evolução do faturamento</h2></div>
-              <app-estado-carga [estado]="evolucao.estado()" [mensagemErro]="evolucao.mensagemErro()"
-                (tentarNovamente)="recarregar(evolucao)" />
-              @if (evolucao.dados(); as dados) {
-                @if (evolucao.estado() === 'pronto') {
-                  <app-evolucao class="bloco-conteudo" [dados]="dados" />
+              @if (!online()) {
+                <p class="sem-conexao" role="status">{{ mensagemSemConexao }}</p>
+              } @else {
+                <app-estado-carga [estado]="evolucao.estado()" [mensagemErro]="evolucao.mensagemErro()"
+                  (tentarNovamente)="recarregar(evolucao)" />
+                @if (evolucao.dados(); as dados) {
+                  @if (evolucao.estado() === 'pronto') {
+                    <app-evolucao class="bloco-conteudo" [dados]="dados" />
+                  }
                 }
               }
             </section>
 
             <section class="card bloco" data-bloco="rankings" aria-labelledby="bloco-rankings">
               <div class="card-cabecalho"><h2 id="bloco-rankings">Rankings</h2></div>
-              <app-estado-carga [estado]="rankings.estado()" [mensagemErro]="rankings.mensagemErro()"
-                (tentarNovamente)="recarregar(rankings)" />
-              @if (rankings.dados(); as dados) {
-                @if (rankings.estado() === 'pronto') {
-                  <app-rankings class="bloco-conteudo" [dados]="dados" [mostrarEmpresas]="quantidadeEmpresas() !== 1" />
+              @if (!online()) {
+                <p class="sem-conexao" role="status">{{ mensagemSemConexao }}</p>
+              } @else {
+                <app-estado-carga [estado]="rankings.estado()" [mensagemErro]="rankings.mensagemErro()"
+                  (tentarNovamente)="recarregar(rankings)" />
+                @if (rankings.dados(); as dados) {
+                  @if (rankings.estado() === 'pronto') {
+                    <app-rankings class="bloco-conteudo" [dados]="dados" [mostrarEmpresas]="quantidadeEmpresas() !== 1" />
+                  }
                 }
               }
             </section>
 
             <section class="card bloco" data-bloco="dfe" aria-labelledby="bloco-dfe">
               <div class="card-cabecalho"><h2 id="bloco-dfe">NF-e × NFC-e</h2></div>
-              <app-estado-carga [estado]="dfe.estado()" [mensagemErro]="dfe.mensagemErro()"
-                (tentarNovamente)="recarregar(dfe)" />
-              @if (dfe.dados(); as dados) {
-                @if (dfe.estado() === 'pronto') {
-                  <app-dfe class="bloco-conteudo" [dados]="dados" />
+              @if (!online()) {
+                <p class="sem-conexao" role="status">{{ mensagemSemConexao }}</p>
+              } @else {
+                <app-estado-carga [estado]="dfe.estado()" [mensagemErro]="dfe.mensagemErro()"
+                  (tentarNovamente)="recarregar(dfe)" />
+                @if (dfe.dados(); as dados) {
+                  @if (dfe.estado() === 'pronto') {
+                    <app-dfe class="bloco-conteudo" [dados]="dados" />
+                  }
                 }
               }
             </section>
@@ -157,10 +181,13 @@ class Bloco<T> {
 export class PainelPage {
   private readonly painel = inject(PainelService);
   private readonly sincronizacao = inject(SincronizacaoApi);
+  private readonly conexao = inject(ConexaoService);
 
   readonly avisoSemTenant = AVISO_SELECIONE_TENANT;
   readonly mensagemSemVendas = MENSAGEM_SEM_VENDAS;
   readonly mensagemSemSincronizacao = MENSAGEM_SEM_SINCRONIZACAO;
+  readonly mensagemSemConexao = MENSAGEM_SEM_CONEXAO;
+  readonly online = this.conexao.online;
   readonly tenant = tenantEfetivo();
   readonly semSincronizacao = signal(false);
   /** `null` até o filtro carregar as empresas; com 1, o ranking de empresas some (RNK-05). */
@@ -180,6 +207,17 @@ export class PainelPage {
     effect(() => {
       if (this.tenant()) untracked(() => this.filtro && this.aplicar(this.filtro));
     });
+    // Sem conexão os blocos param (PWA-03); quando ela volta, o painel refaz tudo com o filtro atual.
+    let estavaOnline = this.online();
+    effect(() => {
+      const online = this.online();
+      untracked(() => {
+        if (online === estavaOnline) return;
+        estavaOnline = online;
+        if (!online) this.blocos.forEach((bloco) => bloco.cancelar());
+        else if (this.filtro) this.aplicar(this.filtro);
+      });
+    });
     inject(DestroyRef).onDestroy(() => {
       this.resumo?.unsubscribe();
       this.blocos.forEach((bloco) => bloco.cancelar());
@@ -189,13 +227,14 @@ export class PainelPage {
   /** Filtro válido do `app-filtro-painel` (inclusive o inicial): consulta os 4 blocos. */
   aplicar(filtro: FiltroPainel): void {
     this.filtro = filtro;
+    if (!this.online()) return;
     this.verificarSincronizacao();
     this.blocos.forEach((bloco) => bloco.carregar(filtro));
   }
 
   /** "Tentar novamente" de um bloco: refaz só ele (UI-08). */
   recarregar(bloco: Pick<Bloco<unknown>, 'carregar'>): void {
-    if (this.filtro) bloco.carregar(this.filtro);
+    if (this.filtro && this.online()) bloco.carregar(this.filtro);
   }
 
   /** Sem nenhuma sincronização bem-sucedida, os KPIs zerados dariam a impressão errada (DASH-06). */

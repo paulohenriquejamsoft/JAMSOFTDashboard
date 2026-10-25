@@ -113,4 +113,17 @@ describe('ShellComponent', () => {
     const alerta = fixture.nativeElement.querySelector('main .alerta') as HTMLElement;
     expect(alerta.textContent!.trim()).toBe('Acesso não permitido');
   });
+  it('sem conexão mostra a faixa "Sem conexão"; com a conexão de volta, a faixa some (PWA-03)', async () => {
+    await criar('Admin');
+    const faixa = () => (fixture.nativeElement as HTMLElement).querySelector('.faixa-conexao');
+    expect(faixa()).toBeNull();
+
+    window.dispatchEvent(new Event('offline'));
+    await fixture.whenStable();
+    expect(faixa()?.textContent?.trim()).toBe('Sem conexão');
+
+    window.dispatchEvent(new Event('online'));
+    await fixture.whenStable();
+    expect(faixa()).toBeNull();
+  });
 });

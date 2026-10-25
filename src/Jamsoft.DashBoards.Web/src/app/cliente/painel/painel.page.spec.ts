@@ -172,4 +172,45 @@ describe('PainelPage', () => {
     http.expectNone('/api/empresas');
     http.expectNone('/api/sincronizacao/resumo');
   });
+  /** Simula a troca de conectividade do navegador (PWA-03). */
+  async function conexao(evento: 'online' | 'offline'): Promise<void> {
+    window.dispatchEvent(new Event(evento));
+    await harness.fixture.whenStable();
+  }
+
+  it('offline: cada bloco mostra "Sem conexão" e nada é consultado (PWA-03)', async () => {
+    await abrir();
+    await responderTodos();
+
+    await conexao('offline');
+
+    for (const nome of BLOCOS) {
+      expect(bloco(nome).querySelector('[role=status]')?.textContent?.trim(), nome).toBe('Sem conexão');
+      expect(bloco(nome).querySelector('.bloco-conteudo'), nome).toBeNull();
+    }
+    tela().querySelector<HTMLButtonElement>('app-filtro-painel button[type=submit]')!.click();
+    await harness.fixture.whenStable();
+    http.expectNone((r) => r.url.startsWith('/api/painel/'));
+    http.expectNone('/api/sincronizacao/resumo');
+  });
+
+  it('a conexão volta: o painel recarrega os 4 blocos com o filtro atual (PWA-03)', async () => {
+    await abrir();
+    await responderTodos();
+    await conexao('offline');
+
+    await conexao('online');
+
+    http.expectOne('/api/sincronizacao/resumo').flush({ ultimoSucessoEm: '2026-10-24T10:00:00Z' });
+    for (const nome of BLOCOS) {
+      const req = pendente(nome);
+      expect(req.request.urlWithParams, nome).toBe(`/api/painel/${nome}?inicio=2026-10-01&fim=2026-10-24`);
+      req.flush(RESPOSTAS[nome]);
+    }
+    await harness.fixture.whenStable();
+    for (const nome of BLOCOS) {
+      expect(bloco(nome).querySelector('.bloco-conteudo'), nome).not.toBeNull();
+      expect(bloco(nome).textContent, nome).not.toContain('Sem conexão');
+    }
+  });
 });

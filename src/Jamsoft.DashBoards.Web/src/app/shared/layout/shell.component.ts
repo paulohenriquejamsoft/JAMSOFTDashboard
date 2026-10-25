@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService, Perfil } from '../../core/auth/auth.service';
 import { EstadoAviso } from '../../core/auth/perfil.guard';
 import { TenantContextoService } from '../../core/auth/tenant-contexto.service';
+import { ConexaoService } from '../../core/pwa/conexao.service';
 import { SeletorTenantComponent } from '../../admin/seletor-tenant/seletor-tenant.component';
 import { StatusDadosComponent } from './status-dados.component';
 
@@ -70,6 +71,10 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
         </div>
       </header>
 
+      @if (!conexao.online()) {
+        <p class="alerta alerta-atencao faixa-conexao" role="status">Sem conexão</p>
+      }
+
       <main class="conteudo">
         @if (aviso(); as texto) {
           <p class="alerta alerta-atencao" role="status">{{ texto }}</p>
@@ -83,6 +88,7 @@ export class ShellComponent {
   private readonly auth = inject(AuthService);
   private readonly contexto = inject(TenantContextoService);
   private readonly router = inject(Router);
+  readonly conexao = inject(ConexaoService);
 
   readonly usuario = this.auth.usuario;
   readonly rotuloPerfil = computed(() => {

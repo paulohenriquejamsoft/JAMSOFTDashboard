@@ -534,9 +534,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: evento `offline` → faixa visível e blocos com "Sem conexão" sem chamadas HTTP; `online` → faixa some e o painel recarrega
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 3 new tests pass
+- [x] Testes: evento `offline` → faixa visível e blocos com "Sem conexão" sem chamadas HTTP; `online` → faixa some e o painel recarrega
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 3 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web
