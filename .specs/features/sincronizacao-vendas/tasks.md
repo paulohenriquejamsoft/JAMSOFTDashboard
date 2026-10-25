@@ -549,9 +549,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: segundo envio do mesmo `batchId` → 200 com corpo idêntico ao primeiro e contagem de vendas no banco inalterada; dois envios simultâneos → mesma resposta e uma única linha em `LOTE_INGESTAO`; mesmo `batchId` em outro tenant é independente
-- [ ] Gate check passes: Full
-- [ ] Test count: 3 new tests pass
+- [x] Testes: segundo envio do mesmo `batchId` → 200 com corpo idêntico ao primeiro e contagem de vendas no banco inalterada; dois envios simultâneos → mesma resposta e uma única linha em `LOTE_INGESTAO`; mesmo `batchId` em outro tenant é independente
+- [x] Gate check passes: Full
+- [x] Test count: 3 new tests pass
 
 **Tests**: integration
 **Gate**: full

@@ -30,7 +30,8 @@ public sealed class TenantDoLote(int id, Guid idPublico, Guid? coletorIdPublico)
 /// ING-08): corpo acima de 2 MB ou mais de 500 vendas → 413 <c>LOTE_GRANDE_DEMAIS</c>; tenant fora da claim
 /// <c>tenants</c> → 403 <c>TENANT_NAO_AUTORIZADO</c>; tenant inativo → 403 <c>TENANT_INATIVO</c>. Depois disso o
 /// lote é gravado num contexto fixo no tenant dele: vendas inválidas são rejeitadas com o motivo e as demais gravadas
-/// pelo <see cref="GravadorVendas"/>.
+/// pelo <see cref="GravadorVendas"/>. O lote é gravado numa transação junto com a linha de <see cref="LoteIngestao"/> e
+/// a resposta; um lote já processado (mesmo <c>batchId</c> no tenant) recebe a resposta gravada (ING-05, AD-014).
 /// </summary>
 public static class LotesEndpoint
 {
@@ -41,6 +42,7 @@ public static class LotesEndpoint
     public const string CodigoTenantInativo = "TENANT_INATIVO";
 
     private const string IndiceOrigem = "IX_ORIGEM_SINCRONIZACAO_TENANT_ID_CONFIGURACAO_ID_ROTINA";
+    private const string IndiceLote = "IX_LOTE_INGESTAO_TENANT_ID_BATCH_ID";
 
     public static IEndpointRouteBuilder MapIngestao(this IEndpointRouteBuilder app)
     {
@@ -73,12 +75,50 @@ public static class LotesEndpoint
             return TenantInativo();
 
         await using var banco = new PlataformaDbContext(opcoes, new TenantDoLote(tenantId, lote.Tenant, atual.UsuarioIdPublico));
-        var resultado = await GravarAsync(banco, tenantId, atual.UsuarioIdPublico, lote, ct);
-        return Results.Ok(resultado);
+        // Lote já processado: a resposta gravada, sem regravar nada (ING-05).
+        if (await RespostaGravadaAsync(banco, lote.BatchId, ct) is { } gravada) return Json(gravada);
+
+        await using var transacao = await banco.Database.BeginTransactionAsync(ct);
+        var (resultado, origemId) = await GravarAsync(banco, tenantId, atual.UsuarioIdPublico, lote, ct);
+        var resposta = JsonSerializer.Serialize(resultado, JsonSerializerOptions.Web);
+        var registro = new LoteIngestao
+        {
+            TenantId = tenantId,
+            BatchId = lote.BatchId,
+            OrigemId = origemId,
+            Inseridos = resultado.Inseridos,
+            Atualizados = resultado.Atualizados,
+            Rejeitados = resultado.Rejeitados.Count,
+            Resposta = resposta,
+        };
+        banco.LotesIngestao.Add(registro);
+        try
+        {
+            await banco.SaveChangesAsync(ct);
+            await transacao.CommitAsync(ct);
+        }
+        catch (DbUpdateException duplicado) when (Duplicado(duplicado, IndiceLote))
+        {
+            // O mesmo lote, enviado ao mesmo tempo, foi gravado primeiro: desfaz este e devolve a resposta daquele.
+            await transacao.RollbackAsync(ct);
+            banco.ChangeTracker.Clear();
+            return Json(await RespostaGravadaAsync(banco, lote.BatchId, ct)
+                ?? throw new InvalidOperationException("Lote duplicado, mas não encontrado.", duplicado));
+        }
+        return Json(resposta);
     }
 
-    private static async Task<ResultadoLote> GravarAsync(PlataformaDbContext banco, int tenantId, Guid? coletorIdPublico,
-        LoteVendas lote, CancellationToken ct)
+    private static Task<string?> RespostaGravadaAsync(PlataformaDbContext banco, Guid batchId, CancellationToken ct) =>
+        banco.LotesIngestao.AsNoTracking().Where(l => l.BatchId == batchId).Select(l => l.Resposta).SingleOrDefaultAsync(ct);
+
+    /// <summary>A resposta como foi gravada, para o reenvio receber exatamente o mesmo corpo.</summary>
+    private static IResult Json(string resposta) => Results.Content(resposta, "application/json");
+
+    private static bool Duplicado(DbUpdateException erro, string indice) =>
+        erro.InnerException is SqlException { Number: 2601 or 2627 } sql && sql.Message.Contains(indice, StringComparison.Ordinal);
+
+    private static async Task<(ResultadoLote Resultado, int OrigemId)> GravarAsync(PlataformaDbContext banco, int tenantId,
+        Guid? coletorIdPublico, LoteVendas lote, CancellationToken ct)
     {
         var validacao = ValidacaoVenda.Validar(lote.Vendas);
         var origem = await OrigemAsync(banco, tenantId, coletorIdPublico, lote, ct);
@@ -89,7 +129,7 @@ public static class LotesEndpoint
             empresas[grupo.Key] = (await servico.ObterOuCriarAsync(tenantId, grupo.Key, grupo.First().NomeEmpresa, ct)).Id;
 
         var (inseridos, atualizados) = await GravadorVendas.GravarAsync(banco, tenantId, origem.Id, validacao.Validas, empresas, ct);
-        return new ResultadoLote(lote.BatchId, inseridos, atualizados, validacao.Rejeitadas);
+        return (new ResultadoLote(lote.BatchId, inseridos, atualizados, validacao.Rejeitadas), origem.Id);
     }
 
     /// <summary>A origem (tenant, configuração, rotina) do lote, criada no primeiro lote.</summary>
@@ -114,8 +154,7 @@ public static class LotesEndpoint
             await banco.SaveChangesAsync(ct);
             return origem;
         }
-        catch (DbUpdateException erro) when (erro.InnerException is SqlException { Number: 2601 or 2627 } sql
-                                              && sql.Message.Contains(IndiceOrigem, StringComparison.Ordinal))
+        catch (DbUpdateException erro) when (Duplicado(erro, IndiceOrigem))
         {
             // Outro lote da mesma configuração criou a origem entre a leitura e a inserção.
             banco.Entry(origem).State = EntityState.Detached;
