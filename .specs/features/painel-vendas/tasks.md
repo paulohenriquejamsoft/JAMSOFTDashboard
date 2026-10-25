@@ -402,9 +402,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes de componente: faturamento e ticket em BRL, vendas inteiro, itens com 2 casas, % canceladas com "%"; variação positiva com seta para cima e texto "+12,30%"; negativa com seta para baixo; nula → "—"; cada bloco com rótulo acessível
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: faturamento e ticket em BRL, vendas inteiro, itens com 2 casas, % canceladas com "%"; variação positiva com seta para cima e texto "+12,30%"; negativa com seta para baixo; nula → "—"; cada bloco com rótulo acessível
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

@@ -8,6 +8,7 @@ import { EstadoCarga } from '../../shared/paginado';
 import { EstadoCargaComponent } from '../../shared/ui/estado-carga.component';
 import { SincronizacaoApi } from '../sincronizacao/sincronizacao.api';
 import { FiltroPainelComponent } from './filtro-painel.component';
+import { KpisComponent } from './kpis.component';
 import { FiltroPainel, PainelService } from './painel.service';
 
 export const MENSAGEM_SEM_VENDAS = 'Nenhuma venda no período';
@@ -50,7 +51,7 @@ class Bloco<T> {
  */
 @Component({
   selector: 'app-painel',
-  imports: [EstadoCargaComponent, FiltroPainelComponent, SeletorTenantComponent],
+  imports: [EstadoCargaComponent, FiltroPainelComponent, KpisComponent, SeletorTenantComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .grade {
@@ -105,8 +106,10 @@ class Bloco<T> {
               <div class="card-cabecalho"><h2 id="bloco-kpis">Indicadores</h2></div>
               <app-estado-carga [estado]="kpis.estado()" [mensagemErro]="kpis.mensagemErro()"
                 (tentarNovamente)="recarregar(kpis)" />
-              @if (kpis.estado() === 'pronto') {
-                <div class="bloco-conteudo"></div>
+              @if (kpis.dados(); as dados) {
+                @if (kpis.estado() === 'pronto') {
+                  <app-kpis class="bloco-conteudo" [kpis]="dados.kpis" />
+                }
               }
             </section>
 
