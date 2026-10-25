@@ -706,9 +706,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: ida e volta preserva o texto; texto cifrado não contém o original; cifrado adulterado lança `CryptographicException`
-- [ ] Gate check passes: Quick-Coletor
-- [ ] Test count: 3 new tests pass
+- [x] Testes: ida e volta preserva o texto; texto cifrado não contém o original; cifrado adulterado lança `CryptographicException`
+- [x] Gate check passes: Quick-Coletor
+- [x] Test count: 3 new tests pass
 
 **Tests**: unit
 **Gate**: quick
