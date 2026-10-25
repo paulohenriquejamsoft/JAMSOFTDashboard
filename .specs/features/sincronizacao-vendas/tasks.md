@@ -681,8 +681,8 @@ T45
 
 **Done when**:
 
-- [ ] `dotnet build Jamsoft.DashBoards.slnx -warnaserror` sem avisos
-- [ ] Gate check passes: Build
+- [x] `dotnet build Jamsoft.DashBoards.slnx -warnaserror` sem avisos
+- [x] Gate check passes: Build
 
 **Tests**: none
 **Gate**: build
