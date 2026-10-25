@@ -43,9 +43,9 @@ public static class Acesso
         Token(await Dados.NovoUsuarioAsync(banco, Perfil.SuperAdmin), null);
 
     /// <summary>Requisição autenticada com corpo JSON.</summary>
-    public static HttpRequestMessage ComCorpo<T>(HttpMethod metodo, string rota, string? token, T corpo)
+    public static HttpRequestMessage ComCorpo<T>(HttpMethod metodo, string rota, string? token, T corpo, Guid? xTenant = null)
     {
-        var requisicao = Requisicao(metodo, rota, token);
+        var requisicao = Requisicao(metodo, rota, token, xTenant);
         requisicao.Content = System.Net.Http.Json.JsonContent.Create(corpo);
         return requisicao;
     }

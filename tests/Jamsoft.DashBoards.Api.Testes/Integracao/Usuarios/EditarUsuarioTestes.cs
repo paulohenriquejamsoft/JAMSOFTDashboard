@@ -93,6 +93,37 @@ public sealed class EditarUsuarioTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task SuperAdmin_com_X_Tenant_edita_usuario_do_tenant_escolhido()
+    {
+        var escolhido = await Dados.NovoTenantAsync(banco, "Cliente Escolhido");
+        var alvo = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, escolhido);
+        var token = await Acesso.TokenSuperAdminAsync(banco);
+
+        var corpo = new
+        {
+            nome = "Editado pelo SuperAdmin",
+            perfil = "Admin",
+            ativo = true,
+            versao = Convert.ToBase64String(alvo.Versao),
+        };
+
+        using var resposta = await _cliente.SendAsync(Acesso.ComCorpo(HttpMethod.Put, $"/api/usuarios/{alvo.IdPublico}",
+            token, corpo, escolhido.IdPublico));
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        Assert.Equal("Editado pelo SuperAdmin", (await Sessao.JsonAsync(resposta)).GetProperty("nome").GetString());
+        var gravado = await GravadoAsync(alvo);
+        Assert.Equal("Editado pelo SuperAdmin", gravado.Nome);
+        Assert.Equal(Perfil.Admin, gravado.Perfil);
+        Assert.Equal(escolhido.Id, gravado.TenantId);
+        await using var contexto = banco.CriarContexto();
+        var auditoria = await contexto.Auditoria.AsNoTracking()
+            .SingleAsync(a => a.RecursoIdPublico == alvo.IdPublico && a.Operacao == "USUARIO_ALTERADO");
+        Assert.Equal(escolhido.IdPublico, auditoria.TenantIdPublico);
+        Assert.Equal("SuperAdmin", auditoria.Perfil);
+    }
+
+    [Fact]
     public async Task Rebaixar_o_unico_Admin_responde_422_ULTIMO_ADMIN_com_a_mensagem_do_spec()
     {
         var (tenant, admin, token) = await TenantComAdminAsync();

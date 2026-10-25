@@ -66,6 +66,29 @@ public sealed class RedefinirSenhaTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task SuperAdmin_com_X_Tenant_redefine_a_senha_de_usuario_do_tenant_escolhido()
+    {
+        var escolhido = await Dados.NovoTenantAsync(banco, "Cliente Escolhido Senhas");
+        var alvo = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, escolhido, comSenha: true);
+        var token = await Acesso.TokenSuperAdminAsync(banco);
+
+        using var resposta = await _cliente.SendAsync(Acesso.ComCorpo(HttpMethod.Post,
+            $"/api/usuarios/{alvo.IdPublico}/redefinir-senha", token, new { senhaTemporaria = SenhaTemporaria },
+            escolhido.IdPublico));
+
+        Assert.Equal(HttpStatusCode.NoContent, resposta.StatusCode);
+        Assert.True((await GravadoAsync(alvo)).TrocarSenha);
+        using var login = await Sessao.LoginAsync(_cliente, alvo.Email, SenhaTemporaria);
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        Assert.True((await Sessao.JsonAsync(login)).GetProperty("trocarSenha").GetBoolean());
+        await using var contexto = banco.CriarContexto();
+        var registro = await contexto.Auditoria.AsNoTracking()
+            .SingleAsync(a => a.RecursoIdPublico == alvo.IdPublico && a.Operacao == "SENHA_REDEFINIDA");
+        Assert.Equal(escolhido.IdPublico, registro.TenantIdPublico);
+        Assert.Equal("SuperAdmin", registro.Perfil);
+    }
+
+    [Fact]
     public async Task Refresh_token_anterior_a_redefinicao_responde_401()
     {
         var (_, token, alvo) = await CenarioAsync();

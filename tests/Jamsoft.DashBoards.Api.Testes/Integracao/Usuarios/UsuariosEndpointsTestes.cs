@@ -158,6 +158,23 @@ public sealed class UsuariosEndpointsTestes(BancoDeTestes banco) : IAsyncLifetim
     }
 
     [Fact]
+    public async Task SuperAdmin_com_X_Tenant_lista_os_usuarios_do_tenant_escolhido()
+    {
+        var escolhido = await Dados.NovoTenantAsync(banco);
+        var admin = await Dados.NovoUsuarioAsync(banco, Perfil.Admin, escolhido);
+        var consulta = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, escolhido);
+        var outro = await Dados.NovoTenantAsync(banco);
+        await Dados.NovoUsuarioAsync(banco, Perfil.Admin, outro);
+        var token = await Acesso.TokenSuperAdminAsync(banco);
+
+        using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, Rota, token, escolhido.IdPublico));
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        Assert.Equal(new[] { admin.IdPublico, consulta.IdPublico }.Order(),
+            (await Sessao.JsonAsync(resposta)).EnumerateArray().Select(u => u.GetProperty("idPublico").GetGuid()).Order());
+    }
+
+    [Fact]
     public async Task Lista_so_usuarios_do_tenant_sem_SENHA_HASH_ID_interno_ou_TENANT_ID()
     {
         var (tenant, admin, token) = await TenantComUsuarioAsync(Perfil.Admin);
