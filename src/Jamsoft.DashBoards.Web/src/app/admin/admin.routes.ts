@@ -25,6 +25,14 @@ export default [
         loadComponent: () => import('./coletores/coletores-lista.page').then((m) => m.ColetoresListaPage),
       },
       {
+        path: 'coletores/novo',
+        loadComponent: () => import('./coletores/coletor-form.page').then((m) => m.ColetorFormPage),
+      },
+      {
+        path: 'coletores/:id',
+        loadComponent: () => import('./coletores/coletor-form.page').then((m) => m.ColetorFormPage),
+      },
+      {
         path: 'auditoria',
         loadComponent: () => import('./auditoria/auditoria.page').then((m) => m.AuditoriaPage),
       },

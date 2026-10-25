@@ -1225,9 +1225,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes de componente: criar envia o corpo esperado e abre o diálogo com o segredo; fechar o diálogo não deixa o segredo em lugar nenhum da tela; sem tenant bloqueia envio; editar tenants trata `CONFLITO_VERSAO`
-- [ ] Gate check passes: Quick-Web
-- [ ] Test count: 5 new tests pass
+- [x] Testes de componente: criar envia o corpo esperado e abre o diálogo com o segredo; fechar o diálogo não deixa o segredo em lugar nenhum da tela; sem tenant bloqueia envio; editar tenants trata `CONFLITO_VERSAO`
+- [x] Gate check passes: Quick-Web
+- [x] Test count: 5 new tests pass
 
 **Tests**: unit
 **Gate**: quick-web

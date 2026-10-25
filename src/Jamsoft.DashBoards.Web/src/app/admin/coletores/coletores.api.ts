@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable, expand, reduce } from 'rxjs';
 import { TenantResumo } from '../../core/auth/auth.service';
 import { Paginado } from '../../shared/paginado';
 
@@ -24,6 +24,19 @@ export interface CredencialColetor {
   clientSecret: string;
 }
 
+export interface CriarColetorRequisicao {
+  nome: string;
+  tenants: string[];
+}
+
+export interface AlterarTenantsRequisicao {
+  tenants: string[];
+  versao: string;
+}
+
+/** Maior página aceita pela API (`TenantsEndpoints.TamanhoMaximo`). */
+export const TAMANHO_MAXIMO = 100;
+
 const BASE = '/api/admin/coletores';
 
 /** Chamadas de `/api/admin/coletores` (COL-01, COL-05..COL-08), somente SuperAdmin. */
@@ -37,6 +50,19 @@ export class ColetoresApi {
     return this.http.get<Paginado<Coletor>>(BASE, { params });
   }
 
+  /** Todos os coletores, página a página: a API não tem leitura por ID. */
+  listarTodos(): Observable<Coletor[]> {
+    return todasAsPaginas((pagina) => this.listar(pagina, TAMANHO_MAXIMO));
+  }
+
+  criar(corpo: CriarColetorRequisicao): Observable<CredencialColetor> {
+    return this.http.post<CredencialColetor>(BASE, corpo);
+  }
+
+  alterarTenants(idPublico: string, corpo: AlterarTenantsRequisicao): Observable<Coletor> {
+    return this.http.put<Coletor>(`${BASE}/${idPublico}/tenants`, corpo);
+  }
+
   revogar(idPublico: string): Observable<Coletor> {
     return this.http.post<Coletor>(`${BASE}/${idPublico}/revogar`, null);
   }
@@ -44,4 +70,12 @@ export class ColetoresApi {
   rotacionar(idPublico: string): Observable<CredencialColetor> {
     return this.http.post<CredencialColetor>(`${BASE}/${idPublico}/rotacionar`, null);
   }
+}
+
+/** Busca a página 1 e as seguintes enquanto houver itens, juntando tudo numa lista. */
+export function todasAsPaginas<T>(buscar: (pagina: number) => Observable<Paginado<T>>): Observable<T[]> {
+  return buscar(1).pipe(
+    expand((p) => (p.pagina * p.tamanho < p.total ? buscar(p.pagina + 1) : EMPTY)),
+    reduce((itens, p) => [...itens, ...p.itens], [] as T[]),
+  );
 }
