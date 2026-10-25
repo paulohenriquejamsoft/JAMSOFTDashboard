@@ -627,9 +627,9 @@ T45
 
 **Done when**:
 
-- [ ] Testes: lista traz as origens do tenant com os campos do STS-01; Consulta na lista → 403; resumo para Consulta → menor `ULTIMO_SUCESSO_EM` das origens; sem sincronização → `ultimoSucessoEm: null`; suíte de isolamento cobre as 2 rotas (Admin/Consulta de A contra B)
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass (+ casos da suíte de isolamento)
+- [x] Testes: lista traz as origens do tenant com os campos do STS-01; Consulta na lista → 403; resumo para Consulta → menor `ULTIMO_SUCESSO_EM` das origens; sem sincronização → `ultimoSucessoEm: null`; suíte de isolamento cobre as 2 rotas (Admin/Consulta de A contra B)
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass (+ casos da suíte de isolamento)
 
 **Tests**: integration
 **Gate**: full

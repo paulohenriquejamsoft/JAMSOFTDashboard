@@ -41,6 +41,7 @@ app.MapColetores();
 app.MapColetor();
 app.MapIngestao();
 app.MapExecucoes();
+app.MapSincronizacao();
 app.MapEmpresas();
 app.MapUsuarios();
 app.MapAuditoria();
