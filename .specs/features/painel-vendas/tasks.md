@@ -188,9 +188,9 @@ T22
 
 **Done when**:
 
-- [ ] Testes: 10 dias com vendas em 3 → 10 pontos e 7 zeros; venda às 23:30 de São Paulo cai no dia local, não no dia UTC; 90 dias → granularidade `mes` com meses vazios zerados; série anterior com o mesmo número de pontos e valores certos
-- [ ] Gate check passes: Full
-- [ ] Test count: 4 new tests pass
+- [x] Testes: 10 dias com vendas em 3 → 10 pontos e 7 zeros; venda às 23:30 de São Paulo cai no dia local, não no dia UTC; 90 dias → granularidade `mes` com meses vazios zerados; série anterior com o mesmo número de pontos e valores certos
+- [x] Gate check passes: Full
+- [x] Test count: 4 new tests pass
 
 **Tests**: integration
 **Gate**: full

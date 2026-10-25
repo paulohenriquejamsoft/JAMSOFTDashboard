@@ -12,3 +12,9 @@ public sealed record Kpis(Indicador Faturamento, Indicador Vendas, Indicador Tic
 // (record de Data Models).
 // Reason: as duas seções do design divergem; a tabela de rotas é o contrato que o frontend consome.
 public sealed record KpisResposta(Periodo Periodo, Periodo Anterior, bool SemVendas, Kpis Kpis);
+
+/// <summary><c>Data</c>: o dia, ou o dia 1 do mês; <c>Rotulo</c>: dd/MM ou MM/yyyy.</summary>
+public sealed record PontoEvolucao(string Rotulo, DateOnly Data, decimal Atual, decimal Anterior);
+
+/// <summary><c>Granularidade</c>: "dia" ou "mes".</summary>
+public sealed record EvolucaoResposta(string Granularidade, IReadOnlyList<PontoEvolucao> Pontos);
