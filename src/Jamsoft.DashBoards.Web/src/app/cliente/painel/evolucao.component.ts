@@ -1,4 +1,4 @@
-import { formatCurrency, getCurrencySymbol } from '@angular/common';
+import { formatCurrency, formatNumber, getCurrencySymbol } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DEFAULT_CURRENCY_CODE, LOCALE_ID, computed, inject, input } from '@angular/core';
 import type { EChartsCoreOption } from 'echarts/core';
 import { NgxEchartsDirective } from 'ngx-echarts';
@@ -67,7 +67,11 @@ export class EvolucaoComponent {
       yAxis: {
         type: 'value',
         splitLine: { lineStyle: { color: tema.grade } },
-        axisLabel: { color: tema.textoSuave, fontFamily: tema.fonteMono },
+        axisLabel: {
+          color: tema.textoSuave,
+          fontFamily: tema.fonteMono,
+          formatter: (valor: number) => formatNumber(valor, this.locale, '1.0-2'),
+        },
       },
       series: [
         { name: 'Atual', type: 'line', symbolSize: 8, data: pontos.map((p) => p.atual), ...estiloSerieAtual(tema) },

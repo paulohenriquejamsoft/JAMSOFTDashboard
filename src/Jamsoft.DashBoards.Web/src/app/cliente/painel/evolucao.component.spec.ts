@@ -6,6 +6,7 @@ import { EvolucaoResposta } from './painel.service';
 
 interface Opcoes {
   xAxis: { data: string[] };
+  yAxis: { axisLabel: { formatter: (valor: number) => string } };
   tooltip: { trigger: string; triggerOn: string; formatter: (p: { dataIndex: number }[]) => string };
   series: { name: string; type: string; data: number[]; lineStyle: { color: string; type: string } }[];
 }
@@ -72,6 +73,12 @@ describe('EvolucaoComponent', () => {
     expect(opcoes.tooltip.trigger).toBe('axis');
     const texto = opcoes.tooltip.formatter([{ dataIndex: 1 }]).replaceAll(String.fromCharCode(0xa0), ' ');
     expect(texto).toBe('02/10/2026<br/>Atual R$ 0,00<br/>Anterior R$ 1.234,56');
+  });
+
+  it('eixo de valores usa o separador de milhar pt-BR (2.500)', async () => {
+    const { formatter } = (await criar(DIARIO)).yAxis.axisLabel;
+
+    expect([0, 2500, 1234567, 1500.5].map(formatter)).toEqual(['0', '2.500', '1.234.567', '1.500,5']);
   });
 
   it('tooltip abre com cursor e com toque', async () => {
