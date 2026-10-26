@@ -146,6 +146,14 @@
 - **Date**: 2026-10-25
 - **Status**: active
 
+### AD-019
+- **Decision**: A feature `painel-vendas` fecha como está. A meta de 2 s (p95) vale para o mês corrente, que a atende. Os períodos longos (12 e 24 meses: p95 de 3 a 8 s e um 500 por timeout de 30 s) ficam para uma feature separada, que vai escolher entre a coluna de data local (Opção A do `medicao.md`, revisa o AD-018) e os agregados pré-calculados (Opção B).
+- **Reason**: Decisão do usuário. O uso principal é o mês corrente, e as duas otimizações mudam o modelo de dados e a ingestão, o que pede uma spec própria.
+- **Trade-off**: Até a nova feature, períodos de 12 e 24 meses ficam lentos e podem falhar com 500. O bloco afetado mostra "Tentar novamente" (UI-08).
+- **Scope**: API (painel).
+- **Date**: 2026-10-26
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/plataforma-tenancy-acesso` — **concluída e verificada** (Verifier iteração 3: PASS; 54/54 ACs, 13/13 mutações mortas)

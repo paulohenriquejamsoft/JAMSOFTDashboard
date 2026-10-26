@@ -75,6 +75,8 @@ O p95 do mês corrente atende à meta. O custo cresce de forma linear com o núm
 
 A decisão fica com o Design. Nada foi alterado no código por esta tarefa.
 
+**Decisão:** a feature fecha como está e a otimização dos períodos longos vai para uma feature separada (coluna de data local ou agregados pré-calculados). Ver AD-019 em `.specs/STATE.md`.
+
 ## Lighthouse e PWA
 
 | Página | Ferramenta | Acessibilidade | Falhas | PWA instalável |
