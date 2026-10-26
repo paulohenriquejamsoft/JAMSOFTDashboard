@@ -1,9 +1,12 @@
 using System.Net;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Jamsoft.DashBoards.Api.Testes.Infraestrutura;
+using System.Net.Http.Json;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -96,6 +99,30 @@ public sealed class LoginTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Com_cookie_entre_sites_e_PathBase_o_cookie_vai_SameSite_None_Partitioned_no_caminho_da_aplicacao()
+    {
+        // Como na publicação: frontend em outro site e API como aplicação do IIS em /JamsoftDashboardApi.
+        await using var api = new ApiFactory(banco).WithWebHostBuilder(b =>
+        {
+            b.UseSetting("Acesso:CookieEntreSites", "true");
+            b.ConfigureServices(s => s.AddTransient<IStartupFilter, PathBaseDaAplicacao>());
+        });
+        using var cliente = api.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.SuperAdmin, null, comSenha: true);
+
+        using var resposta = await cliente.PostAsJsonAsync("/JamsoftDashboardApi/api/auth/login",
+            new { email = usuario.Email, senha = Dados.Senha });
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        var atributos = Sessao.SetCookieRefresh(resposta)!.Split(';').Select(a => a.Trim().ToLowerInvariant()).ToList();
+        Assert.Contains("samesite=none", atributos);
+        Assert.Contains("partitioned", atributos);
+        Assert.Contains("secure", atributos);
+        Assert.Contains("httponly", atributos);
+        Assert.Contains("path=/jamsoftdashboardapi/api/auth", atributos);
+    }
+
+    [Fact]
     public async Task Email_inexistente_e_senha_errada_respondem_401_com_o_mesmo_corpo()
     {
         var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.SuperAdmin, comSenha: true);
@@ -166,4 +193,14 @@ public sealed class LoginTestes(BancoDeTestes banco) : IAsyncLifetime
             Assert.DoesNotContain(refresh, linha);
         });
     }
+}
+
+/// <summary>Publicação como aplicação do IIS: tudo sob <c>/JamsoftDashboardApi</c>, antes do pipeline da API.</summary>
+internal sealed class PathBaseDaAplicacao : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        app.UsePathBase("/JamsoftDashboardApi");
+        next(app);
+    };
 }

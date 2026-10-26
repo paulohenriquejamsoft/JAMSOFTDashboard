@@ -47,6 +47,11 @@ form {
   display: flex;
   flex-direction: column;
   gap: var(--espaco-4);
+
+  // O `.campo` global usa `flex: 1 1 200px` (pensado para linhas); em coluna viraria 200px de altura.
+  .campo {
+    flex: 0 0 auto;
+  }
 }
 
 ul {

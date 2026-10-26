@@ -9,7 +9,7 @@ namespace Jamsoft.DashBoards.Api.Modulos.Painel;
 
 /// <summary>
 /// Base de consulta dos blocos do painel: vendas do tenant efetivo (filtro global, DASH-07) na faixa do filtro e,
-/// quando informado, só das empresas escolhidas (DASH-04).
+/// quando informados, só das empresas (DASH-04), tipos de documento e vendedores (DASH-10) escolhidos.
 /// </summary>
 public sealed class ConsultaVendas(PlataformaDbContext banco)
 {
@@ -19,7 +19,11 @@ public sealed class ConsultaVendas(PlataformaDbContext banco)
         var desde = filtro.DesdeUtc;
         var ate = filtro.AteUtcExclusivo;
         var vendas = banco.Vendas.AsNoTracking().Where(v => v.DataHora >= desde && v.DataHora < ate);
-        return empresaIds is { Length: > 0 } ? vendas.Where(v => empresaIds.Contains(v.EmpresaId)) : vendas;
+        if (empresaIds is { Length: > 0 }) vendas = vendas.Where(v => empresaIds.Contains(v.EmpresaId));
+        if (filtro.Tipos is { Length: > 0 } tipos) vendas = vendas.Where(v => tipos.Contains(v.TipoDfe));
+        if (filtro.Vendedores is { Length: > 0 } vendedores)
+            vendas = vendas.Where(v => v.VendedorCodigo != null && vendedores.Contains(v.VendedorCodigo.Value));
+        return vendas;
     }
 
     /// <summary>

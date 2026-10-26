@@ -10,7 +10,7 @@ namespace Jamsoft.DashBoards.Api.Modulos.Painel;
 
 /// <summary>
 /// Painel de vendas em <c>/api/painel</c>, um endpoint por bloco, todos com o mesmo filtro
-/// (<c>inicio</c>, <c>fim</c>, <c>empresas</c>) e restritos ao tenant efetivo (DASH-07).
+/// (<c>inicio</c>, <c>fim</c>, <c>empresas</c>, <c>tipos</c>, <c>vendedores</c>) e restritos ao tenant efetivo (DASH-07).
 /// Vendas efetivadas = Finalizada + Contingência; Inutilizada fica fora de todos os indicadores.
 /// </summary>
 public static class PainelEndpoints
@@ -38,6 +38,7 @@ public static class PainelEndpoints
         grupo.MapGet("/evolucao", EvolucaoAsync);
         grupo.MapGet("/rankings", RankingsAsync);
         grupo.MapGet("/dfe", DfeAsync);
+        grupo.MapGet("/vendedores", VendedoresAsync);
         return app;
     }
 
@@ -46,17 +47,18 @@ public static class PainelEndpoints
 
     /// <summary>Empresa fora do tenant lança <see cref="ProblemaApiException"/> 404 (DASH-08).</summary>
     private static async Task<Preparado> PrepararAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
-        ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
+        string[]? tipos, int[]? vendedores, ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
     {
-        if (!FiltroPainel.TentarCriar(inicio, fim, empresas, FiltroPainel.HojeEmSaoPaulo(tempo), out var filtro, out var erros))
+        if (!FiltroPainel.TentarCriar(inicio, fim, empresas, tipos, vendedores, FiltroPainel.HojeEmSaoPaulo(tempo),
+                out var filtro, out var erros))
             return new Preparado(filtro, null, ProblemasApi.Validacao(erros));
         return new Preparado(filtro, await consulta.ResolverEmpresasAsync(filtro.Empresas, ct), null);
     }
 
     public static async Task<IResult> KpisAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
-        ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
+        string[]? tipos, int[]? vendedores, ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
     {
-        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, tipos, vendedores, consulta, tempo, ct);
         if (erro is not null) return erro;
 
         var atual = await TotaisAsync(consulta, filtro, empresaIds, ct);
@@ -102,9 +104,9 @@ public static class PainelEndpoints
     /// por posição (1º bucket do período ↔ 1º bucket do anterior) (TRD-01..03).
     /// </summary>
     public static async Task<IResult> EvolucaoAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
-        ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
+        string[]? tipos, int[]? vendedores, ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
     {
-        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, tipos, vendedores, consulta, tempo, ct);
         if (erro is not null) return erro;
 
         var atual = await SerieAsync(consulta, filtro, empresaIds, ct);
@@ -151,16 +153,16 @@ public static class PainelEndpoints
     /// pt-BR (RNK-04). Participação = faturamento ÷ total do período × 100 (RNK-02).
     /// </summary>
     public static async Task<IResult> RankingsAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
-        ConsultaVendas consulta, PlataformaDbContext banco, TimeProvider tempo, CancellationToken ct)
+        string[]? tipos, int[]? vendedores, ConsultaVendas consulta, PlataformaDbContext banco, TimeProvider tempo, CancellationToken ct)
     {
-        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, tipos, vendedores, consulta, tempo, ct);
         if (erro is not null) return erro;
 
         var efetivadas = consulta.Do(filtro, empresaIds).Where(v => v.Situacao == Finalizada || v.Situacao == Contingencia);
         var total = await efetivadas.SumAsync(v => v.Valor, ct);
 
-        var vendedores = await TopAsync(efetivadas, v => v.VendedorCodigo, ct);
-        var codigosVendedores = Codigos(vendedores);
+        var porVendedor = await TopAsync(efetivadas, v => v.VendedorCodigo, ct);
+        var codigosVendedores = Codigos(porVendedor);
         var nomesVendedores = await efetivadas
             .Where(v => v.VendedorCodigo != null && codigosVendedores.Contains(v.VendedorCodigo.Value))
             .GroupBy(v => v.VendedorCodigo!.Value)
@@ -182,7 +184,7 @@ public static class PainelEndpoints
             .ToDictionaryAsync(e => e.Id, e => (string?)e.Nome, ct);
 
         return Results.Ok(new RankingsResposta(Arredondar(total),
-            Itens(vendedores, nomesVendedores, total),
+            Itens(porVendedor, nomesVendedores, total),
             Itens(clientes, nomesClientes, total),
             Itens(porEmpresa, nomesEmpresas, total)));
     }
@@ -218,9 +220,9 @@ public static class PainelEndpoints
     /// tipo sem vendas vem com zeros (DFE-01, DFE-02).
     /// </summary>
     public static async Task<IResult> DfeAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,
-        ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
+        string[]? tipos, int[]? vendedores, ConsultaVendas consulta, TimeProvider tempo, CancellationToken ct)
     {
-        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, consulta, tempo, ct);
+        var (filtro, empresaIds, erro) = await PrepararAsync(inicio, fim, empresas, tipos, vendedores, consulta, tempo, ct);
         if (erro is not null) return erro;
 
         var porTipo = await consulta.Do(filtro, empresaIds)
@@ -230,12 +232,29 @@ public static class PainelEndpoints
             .ToDictionaryAsync(x => x.Tipo, ct);
         var total = porTipo.Values.Sum(x => x.Faturamento);
 
-        var tipos = Venda.TiposDfe.Select(tipo =>
+        var itens = Venda.TiposDfe.Select(tipo =>
         {
             var (faturamento, vendas) = porTipo.TryGetValue(tipo, out var x) ? (x.Faturamento, x.Vendas) : (0m, 0);
             return new ItemDfe(tipo, Arredondar(faturamento), vendas, total == 0 ? 0 : Arredondar(faturamento / total * 100));
         }).ToList();
-        return Results.Ok(new DfeResposta(tipos));
+        return Results.Ok(new DfeResposta(itens));
+    }
+
+    /// <summary>
+    /// Vendedores que já venderam no tenant efetivo, para o filtro do painel (DASH-10): código e último nome recebido,
+    /// em ordem alfabética pt-BR. Venda sem vendedor fica de fora.
+    /// </summary>
+    public static async Task<IResult> VendedoresAsync(PlataformaDbContext banco, CancellationToken ct)
+    {
+        var vendedores = await banco.Vendas.AsNoTracking()
+            .Where(v => v.VendedorCodigo != null)
+            .GroupBy(v => v.VendedorCodigo!.Value)
+            .Select(g => new { Codigo = g.Key, Nome = g.OrderByDescending(v => v.DataHora).Select(v => v.VendedorNome).First() })
+            .ToListAsync(ct);
+        return Results.Ok(vendedores
+            .Select(v => new VendedorFiltro(v.Codigo, string.IsNullOrWhiteSpace(v.Nome) ? $"Código {v.Codigo}" : v.Nome))
+            .OrderBy(v => v.Nome, NomesPtBr).ThenBy(v => v.Codigo)
+            .ToList());
     }
 
     private static Indicador Indicador(decimal atual, decimal anterior) =>

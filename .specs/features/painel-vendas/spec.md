@@ -71,6 +71,7 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 7. The API SHALL calcular os indicadores apenas com vendas do tenant efetivo do token (ou do tenant selecionado pelo SuperAdmin). (DASH-07)
 8. IF a seleção de empresas contém empresa de outro tenant THEN a API SHALL responder 404. (DASH-08)
 9. WHEN a API responde os KPIs THEN cada KPI SHALL trazer também o valor do período anterior equivalente e a variação percentual (nula quando o anterior é zero). (DASH-09)
+10. WHEN o usuário marca tipos de documento (NF-e, NFC-e, Pedido) ou escolhe um vendedor THEN o sistema SHALL restringir todos os indicadores da tela a esses tipos e a esse vendedor; tipo fora do domínio SHALL responder 400 e vendas sem vendedor ficam fora quando há vendedor escolhido. (DASH-10)
 
 **Independent Test**: Com um conjunto fixo de vendas semeadas (finalizadas, canceladas, inutilizadas em 2 empresas), conferir cada KPI contra valores calculados à mão.
 
@@ -207,6 +208,7 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 | DASH-07 | P1: KPIs do período | Tasks | In Tasks |
 | DASH-08 | P1: KPIs do período | Tasks | In Tasks |
 | DASH-09 | P1: KPIs do período | Tasks | In Tasks |
+| DASH-10 | P1: KPIs do período | Execute | Implemented |
 | TRD-01 | P1: Evolução temporal | Tasks | In Tasks |
 | TRD-02 | P1: Evolução temporal | Tasks | In Tasks |
 | TRD-03 | P1: Evolução temporal | Tasks | In Tasks |

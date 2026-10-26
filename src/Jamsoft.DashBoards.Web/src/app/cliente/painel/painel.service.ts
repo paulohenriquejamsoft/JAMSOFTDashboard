@@ -2,11 +2,26 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-/** Filtro comum aos 4 blocos: datas locais inclusivas `yyyy-MM-dd` e IDs públicos de empresa (vazio = todas). */
+/**
+ * Filtro comum aos 4 blocos: datas locais inclusivas `yyyy-MM-dd`, IDs públicos de empresa, tipos de documento e
+ * códigos de vendedor (lista vazia = todos).
+ */
 export interface FiltroPainel {
   inicio: string;
   fim: string;
   empresas: string[];
+  tipos: TipoDocumento[];
+  vendedores: number[];
+}
+
+/** Domínio de `TIPO_DFE` na API. */
+export const TIPOS_DOCUMENTO = ['NF-e', 'NFC-e', 'Pedido'] as const;
+export type TipoDocumento = (typeof TIPOS_DOCUMENTO)[number];
+
+/** Opção do filtro de vendedor: código e último nome recebido. */
+export interface Vendedor {
+  codigo: number;
+  nome: string;
 }
 
 export interface Periodo {
@@ -64,7 +79,7 @@ export interface RankingsResposta {
 }
 
 export interface ItemDfe {
-  tipo: 'NF-e' | 'NFC-e' | 'Pedido';
+  tipo: TipoDocumento;
   faturamento: number;
   vendas: number;
   participacao: number;
@@ -99,11 +114,18 @@ export class PainelService {
   dfe(filtro: FiltroPainel): Observable<DfeResposta> {
     return this.http.get<DfeResposta>(`${BASE}/dfe`, { params: parametros(filtro) });
   }
+
+  /** Vendedores do tenant para o filtro, em ordem alfabética. */
+  vendedores(): Observable<Vendedor[]> {
+    return this.http.get<Vendedor[]>(`${BASE}/vendedores`);
+  }
 }
 
-/** `inicio`, `fim` e `empresas` repetido uma vez por empresa; sem `empresas` quando a lista é vazia. */
+/** `inicio`, `fim` e `empresas`, `tipos` e `vendedores` repetidos uma vez por item; lista vazia não vai. */
 function parametros(filtro: FiltroPainel): HttpParams {
   let params = new HttpParams().set('inicio', filtro.inicio).set('fim', filtro.fim);
   for (const empresa of filtro.empresas) params = params.append('empresas', empresa);
+  for (const tipo of filtro.tipos) params = params.append('tipos', tipo);
+  for (const vendedor of filtro.vendedores) params = params.append('vendedores', vendedor);
   return params;
 }

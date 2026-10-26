@@ -64,6 +64,7 @@ describe('PainelPage', () => {
     await harness.navigateByUrl('/cliente');
     if (perfil === 'SuperAdmin') return;
     http.expectOne('/api/empresas').flush(empresas);
+    http.expectOne('/api/painel/vendedores').flush([]);
     http.expectOne('/api/sincronizacao/resumo').flush({ ultimoSucessoEm });
     await harness.fixture.whenStable();
   }

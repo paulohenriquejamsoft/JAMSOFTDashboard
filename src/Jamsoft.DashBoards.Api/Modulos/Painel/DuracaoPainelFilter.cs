@@ -26,9 +26,13 @@ public sealed class DuracaoPainelFilter(ILogger<DuracaoPainelFilter> log, ITenan
         }
     }
 
-    /// <summary>Dias do período pedido (inicio e fim são os 2 primeiros parâmetros das rotas); nulo se inválido.</summary>
+    /// <summary>
+    /// Dias do período pedido (inicio e fim são os 2 primeiros parâmetros das rotas de bloco); nulo se inválido ou se a
+    /// rota não tem período (<c>/vendedores</c>).
+    /// </summary>
     private int? Dias(EndpointFilterInvocationContext contexto) =>
-        FiltroPainel.TentarCriar(contexto.GetArgument<DateOnly?>(0), contexto.GetArgument<DateOnly?>(1), null,
+        contexto.Arguments is [DateOnly or null, DateOnly or null, ..] &&
+        FiltroPainel.TentarCriar(contexto.GetArgument<DateOnly?>(0), contexto.GetArgument<DateOnly?>(1), null, null, null,
             FiltroPainel.HojeEmSaoPaulo(tempo), out var filtro, out _)
             ? filtro.Dias
             : null;

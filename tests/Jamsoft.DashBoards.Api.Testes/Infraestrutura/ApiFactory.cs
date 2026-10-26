@@ -16,5 +16,7 @@ public sealed class ApiFactory(BancoDeTestes banco) : WebApplicationFactory<Prog
         // Os workers de exclusão e de limpeza de lotes ficam desligados; os testes chamam a lógica diretamente.
         builder.UseSetting("Exclusao:WorkerAtivo", "false");
         builder.UseSetting("LimpezaLotes:Ativa", "false");
+        // O appsettings.json de produção liga o cookie entre sites; os testes partem do padrão (Strict).
+        builder.UseSetting("Acesso:CookieEntreSites", "false");
     }
 }

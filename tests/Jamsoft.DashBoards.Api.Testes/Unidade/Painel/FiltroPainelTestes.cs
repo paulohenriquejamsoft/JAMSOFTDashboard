@@ -9,7 +9,7 @@ public sealed class FiltroPainelTestes
 {
     private static FiltroPainel Criar(DateOnly? inicio, DateOnly? fim, DateOnly? hoje = null)
     {
-        Assert.True(FiltroPainel.TentarCriar(inicio, fim, null, hoje ?? new DateOnly(2026, 10, 24), out var filtro, out var erros),
+        Assert.True(FiltroPainel.TentarCriar(inicio, fim, null, null, null, hoje ?? new DateOnly(2026, 10, 24), out var filtro, out var erros),
             string.Join("; ", erros.SelectMany(e => e.Value)));
         Assert.Empty(erros);
         return filtro;
@@ -17,7 +17,7 @@ public sealed class FiltroPainelTestes
 
     private static Dictionary<string, string[]> Erros(DateOnly inicio, DateOnly fim)
     {
-        Assert.False(FiltroPainel.TentarCriar(inicio, fim, null, new DateOnly(2026, 10, 24), out _, out var erros));
+        Assert.False(FiltroPainel.TentarCriar(inicio, fim, null, null, null, new DateOnly(2026, 10, 24), out _, out var erros));
         return erros;
     }
 
@@ -130,5 +130,24 @@ public sealed class FiltroPainelTestes
                 new DateOnly(2026, 2, 1), new DateOnly(2026, 3, 1),
             ],
             filtro.Buckets());
+    }
+
+    [Fact]
+    public void Tipo_de_documento_fora_do_dominio_da_erro_em_tipos()
+    {
+        Assert.False(FiltroPainel.TentarCriar(new DateOnly(2026, 10, 1), new DateOnly(2026, 10, 10), null, ["NF-e", "CT-e"],
+            null, new DateOnly(2026, 10, 24), out _, out var erros));
+
+        Assert.Equal(["tipos"], erros.Keys);
+    }
+
+    [Fact]
+    public void Periodo_anterior_mantem_tipos_e_vendedores()
+    {
+        Assert.True(FiltroPainel.TentarCriar(new DateOnly(2026, 10, 11), new DateOnly(2026, 10, 20), null,
+            ["Pedido", "Pedido"], [7, 3], new DateOnly(2026, 10, 24), out var filtro, out _));
+
+        Assert.Equal(["Pedido"], filtro.Anterior.Tipos!);
+        Assert.Equal([7, 3], filtro.Anterior.Vendedores!);
     }
 }

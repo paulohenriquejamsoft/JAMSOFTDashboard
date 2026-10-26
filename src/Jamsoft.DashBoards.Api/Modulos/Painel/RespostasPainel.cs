@@ -25,7 +25,10 @@ public sealed record ItemRanking(string Nome, decimal Faturamento, int Vendas, d
 public sealed record RankingsResposta(decimal TotalFaturamento, IReadOnlyList<ItemRanking> Vendedores,
     IReadOnlyList<ItemRanking> Clientes, IReadOnlyList<ItemRanking> Empresas);
 
-/// <summary><c>Tipo</c>: "NF-e" ou "NFC-e"; <c>Participacao</c>: % do faturamento do período.</summary>
+/// <summary><c>Tipo</c>: "NF-e", "NFC-e" ou "Pedido"; <c>Participacao</c>: % do faturamento do período.</summary>
 public sealed record ItemDfe(string Tipo, decimal Faturamento, int Vendas, decimal Participacao);
 
 public sealed record DfeResposta(IReadOnlyList<ItemDfe> Tipos);
+
+/// <summary>Opção do filtro de vendedor (DASH-10).</summary>
+public sealed record VendedorFiltro(int Codigo, string Nome);

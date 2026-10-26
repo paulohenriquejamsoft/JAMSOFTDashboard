@@ -9,7 +9,7 @@ import { FiltroPainel, PainelService } from './painel.service';
 
 const EMPRESA_1 = '3f2504e0-4f89-11d3-9a0c-0305e82c3301';
 const EMPRESA_2 = '9a7b1c2d-0000-4000-8000-000000000002';
-const outubro: FiltroPainel = { inicio: '2026-10-01', fim: '2026-10-24', empresas: [] };
+const outubro: FiltroPainel = { inicio: '2026-10-01', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [] };
 
 function sessao(perfil: string, accessToken: string) {
   return {
@@ -91,6 +91,24 @@ describe('PainelService', () => {
     const req = api.expectOne((r) => r.url === '/api/painel/dfe');
     expect(req.request.urlWithParams).toBe('/api/painel/dfe?inicio=2026-10-01&fim=2026-10-24');
     req.flush({ tipos: [] });
+  });
+
+  it('dfe repete tipos e vendedores uma vez por item (DASH-10)', () => {
+    servico.dfe({ ...outubro, tipos: ['NF-e', 'Pedido'], vendedores: [7] }).subscribe();
+
+    const req = api.expectOne((r) => r.url === '/api/painel/dfe');
+    expect(req.request.urlWithParams).toBe(
+      '/api/painel/dfe?inicio=2026-10-01&fim=2026-10-24&tipos=NF-e&tipos=Pedido&vendedores=7',
+    );
+    req.flush({ tipos: [] });
+  });
+
+  it('vendedores chama /api/painel/vendedores', () => {
+    let resposta: unknown;
+    servico.vendedores().subscribe((r) => (resposta = r));
+
+    api.expectOne('/api/painel/vendedores').flush([{ codigo: 1, nome: 'Ana' }]);
+    expect(resposta).toEqual([{ codigo: 1, nome: 'Ana' }]);
   });
 
   it('401 em /api/painel/kpis renova a sessão e repete com o token novo', () => {

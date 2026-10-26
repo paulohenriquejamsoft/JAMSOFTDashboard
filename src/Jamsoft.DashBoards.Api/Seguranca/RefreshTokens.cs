@@ -1,11 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
+using Jamsoft.DashBoards.Api.Configuracao;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
 using Jamsoft.DashBoards.Api.Infraestrutura.Erros;
 using Jamsoft.DashBoards.Api.Modulos.Autenticacao;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Jamsoft.DashBoards.Api.Seguranca;
 
@@ -109,18 +111,34 @@ public sealed class RefreshTokens(PlataformaDbContext banco, TimeProvider tempo)
     }
 
     /// <summary>Apaga o cookie no navegador (mesmo caminho e atributos de quando foi gravado).</summary>
-    public static void ApagarCookie(HttpResponse resposta) => resposta.Cookies.Delete(Cookie, OpcoesCookie(null));
+    public static void ApagarCookie(HttpResponse resposta) =>
+        resposta.Cookies.Delete(Cookie, OpcoesCookie(resposta.HttpContext.Request, null));
 
-    /// <summary>Cookie <c>HttpOnly; Secure; SameSite=Strict; Path=/api/auth</c>, fora do alcance de scripts.</summary>
+    /// <summary>
+    /// Cookie <c>HttpOnly; Secure; SameSite=Strict; Path=/api/auth</c>, fora do alcance de scripts; com
+    /// <see cref="AcessoOptions.CookieEntreSites"/>, <c>SameSite=None; Partitioned</c>.
+    /// </summary>
     public static void GravarCookie(HttpResponse resposta, RefreshEmitido refresh) =>
-        resposta.Cookies.Append(Cookie, refresh.Token, OpcoesCookie(refresh.ExpiraEm));
+        resposta.Cookies.Append(Cookie, refresh.Token, OpcoesCookie(resposta.HttpContext.Request, refresh.ExpiraEm));
 
-    private static CookieOptions OpcoesCookie(DateTimeOffset? expiraEm) => new()
+    /// <remarks>
+    /// O caminho leva o <c>PathBase</c>: publicada como aplicação do IIS (ex.: <c>/JamsoftDashboardApi</c>), a rota real
+    /// é <c>/JamsoftDashboardApi/api/auth/...</c> e um cookie com <c>Path=/api/auth</c> nunca voltaria no refresh.
+    /// </remarks>
+    private static CookieOptions OpcoesCookie(HttpRequest requisicao, DateTimeOffset? expiraEm)
     {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.Strict,
-        Path = CaminhoCookie,
-        Expires = expiraEm,
-    };
+        var entreSites = requisicao.HttpContext.RequestServices.GetRequiredService<IOptions<AcessoOptions>>().Value
+            .CookieEntreSites;
+        var opcoes = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = entreSites ? SameSiteMode.None : SameSiteMode.Strict,
+            Path = requisicao.PathBase.Add(CaminhoCookie).Value,
+            Expires = expiraEm,
+        };
+        // CHIPS: cookie de terceiro particionado pelo site do frontend, aceito mesmo com cookies de terceiros bloqueados.
+        if (entreSites) opcoes.Extensions.Add("partitioned");
+        return opcoes;
+    }
 }

@@ -13,5 +13,12 @@ public sealed class AcessoOptions
     /// <summary>Requisições a <c>/api/auth/login</c> por IP a cada minuto.</summary>
     public int LimiteLoginPorMinuto { get; set; } = 20;
 
+    /// <summary>
+    /// Frontend em outro site (outro domínio registrável) que a API: o cookie do refresh token vai com
+    /// <c>SameSite=None; Partitioned</c>, porque com <c>Strict</c> o navegador não o envia nas chamadas do frontend.
+    /// O CSRF do refresh continua barrado pelo cabeçalho <c>X-Requested-With</c> e pela lista de origens do CORS.
+    /// </summary>
+    public bool CookieEntreSites { get; set; }
+
     public bool Valida() => TentativasAteBloqueio > 0 && MinutosBloqueio > 0 && LimiteLoginPorMinuto > 0;
 }

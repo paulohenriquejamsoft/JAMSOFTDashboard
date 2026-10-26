@@ -97,4 +97,48 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Equal([new Tipo("NF-e", 200.00m, 1, 88.69m), new Tipo("NFC-e", 25.50m, 1, 11.31m), new Tipo("Pedido", 0m, 0, 0m)],
             tipos);
     }
+
+    [Fact]
+    public async Task Filtro_por_vendedor_restringe_o_DFe_as_vendas_dele()
+    {
+        var c = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e Vendedor"));
+
+        var tipos = await DfeAsync(c, "&vendedores=2");
+
+        // Bruno (2) no período: só a 2 (NFC-e, 50, Contingência).
+        Assert.Equal([new Tipo("NF-e", 0m, 0, 0m), new Tipo("NFC-e", 50.00m, 1, 100.00m), new Tipo("Pedido", 0m, 0, 0m)], tipos);
+    }
+
+    [Fact]
+    public async Task Tipo_de_documento_invalido_responde_400()
+    {
+        var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e Tipo Inválido"));
+        var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, c.Tenant);
+
+        using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get,
+            "/api/painel/dfe?inicio=2026-10-11&fim=2026-10-20&tipos=CT-e", Acesso.Token(usuario, c.Tenant)));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Vendedores_lista_codigo_e_ultimo_nome_em_ordem_alfabetica_sem_os_de_outro_tenant()
+    {
+        var c = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Vendedores"));
+        var outro = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Vendedores Outro"));
+        await VendasSemeadas.InserirAsync(banco, outro,
+            VendasSemeadas.Venda(outro.Matriz, 1, VendasSemeadas.Sp(10, 12, 10, 0), 10m, vendedorCodigo: 9, vendedorNome: "Zeca"));
+        // Ana mudou de nome depois: vale o último recebido.
+        await VendasSemeadas.InserirAsync(banco, c,
+            VendasSemeadas.Venda(c.Matriz, 50, VendasSemeadas.Sp(10, 25, 10, 0), 10m, vendedorCodigo: 1, vendedorNome: "Ana Paula"));
+        var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, c.Tenant);
+
+        using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get, "/api/painel/vendedores",
+            Acesso.Token(usuario, c.Tenant)));
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        var vendedores = (await Sessao.JsonAsync(resposta)).EnumerateArray()
+            .Select(v => (v.GetProperty("codigo").GetInt32(), v.GetProperty("nome").GetString())).ToList();
+        Assert.Equal([(1, "Ana Paula"), (2, "Bruno")], vendedores);
+    }
 }

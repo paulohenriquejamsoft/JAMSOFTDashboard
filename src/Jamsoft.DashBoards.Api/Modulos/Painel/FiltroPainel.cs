@@ -8,7 +8,7 @@ public enum Granularidade
 }
 
 /// <summary>
-/// Período e empresas validados de uma consulta do painel. As datas são inclusivas no fuso de São Paulo e viram
+/// Período, empresas, tipos de documento e vendedores validados de uma consulta do painel. As datas são inclusivas no fuso de São Paulo e viram
 /// a faixa <c>[inicio 00:00, fim+1 00:00)</c> em UTC (AD-018).
 /// </summary>
 public sealed class FiltroPainel
@@ -19,24 +19,30 @@ public sealed class FiltroPainel
     /// <summary>America/Sao_Paulo ("E. South America Standard Time" no Windows).</summary>
     public static readonly TimeZoneInfo FusoSaoPaulo = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
 
-    private FiltroPainel(DateOnly inicio, DateOnly fim, Guid[]? empresas)
+    private FiltroPainel(DateOnly inicio, DateOnly fim, Guid[]? empresas, string[]? tipos, int[]? vendedores)
     {
         Inicio = inicio;
         Fim = fim;
         Empresas = empresas;
+        Tipos = tipos;
+        Vendedores = vendedores;
     }
 
     public DateOnly Inicio { get; }
     public DateOnly Fim { get; }
     /// <summary>ID_PUBLICO das empresas selecionadas; nulo ou vazio = todas.</summary>
     public Guid[]? Empresas { get; }
+    /// <summary>Tipos de documento (<see cref="Ingestao.Venda.TiposDfe"/>); nulo ou vazio = todos.</summary>
+    public string[]? Tipos { get; }
+    /// <summary>Códigos de vendedor; nulo ou vazio = todos.</summary>
+    public int[]? Vendedores { get; }
 
     public DateTimeOffset DesdeUtc => MeiaNoiteUtc(Inicio);
     public DateTimeOffset AteUtcExclusivo => MeiaNoiteUtc(Fim.AddDays(1));
     public int Dias => Fim.DayNumber - Inicio.DayNumber + 1;
 
     /// <summary>Mesmo número de dias, terminando na véspera de <see cref="Inicio"/> (DASH-09).</summary>
-    public FiltroPainel Anterior => new(Inicio.AddDays(-Dias), Inicio.AddDays(-1), Empresas);
+    public FiltroPainel Anterior => new(Inicio.AddDays(-Dias), Inicio.AddDays(-1), Empresas, Tipos, Vendedores);
 
     public Granularidade Granularidade => Dias <= DiasMaximosGranularidadeDiaria ? Granularidade.Dia : Granularidade.Mes;
 
@@ -59,10 +65,10 @@ public sealed class FiltroPainel
 
     /// <summary>
     /// Sem datas, usa o mês corrente (dia 1 até <paramref name="hoje"/>) (DASH-01). Fim antes do início ou período
-    /// acima de 24 meses → erro em <c>fim</c> (DASH-05).
+    /// acima de 24 meses → erro em <c>fim</c> (DASH-05). Tipo fora do domínio → erro em <c>tipos</c> (DASH-10).
     /// </summary>
-    public static bool TentarCriar(DateOnly? inicio, DateOnly? fim, Guid[]? empresas, DateOnly hoje,
-        out FiltroPainel filtro, out Dictionary<string, string[]> erros)
+    public static bool TentarCriar(DateOnly? inicio, DateOnly? fim, Guid[]? empresas, string[]? tipos,
+        int[]? vendedores, DateOnly hoje, out FiltroPainel filtro, out Dictionary<string, string[]> erros)
     {
         var i = inicio ?? new DateOnly(hoje.Year, hoje.Month, 1);
         var f = fim ?? hoje;
@@ -71,8 +77,10 @@ public sealed class FiltroPainel
             erros["fim"] = ["A data final não pode ser anterior à inicial."];
         else if (f > i.AddMonths(MesesMaximos).AddDays(-1))
             erros["fim"] = [$"O período não pode passar de {MesesMaximos} meses."];
+        if (tipos is not null && tipos.Any(t => !Ingestao.Venda.TiposDfe.Contains(t, StringComparer.Ordinal)))
+            erros["tipos"] = [$"Tipo de documento deve ser {string.Join(", ", Ingestao.Venda.TiposDfe)}."];
 
-        filtro = new FiltroPainel(i, f, empresas);
+        filtro = new FiltroPainel(i, f, empresas, tipos?.Distinct().ToArray(), vendedores?.Distinct().ToArray());
         return erros.Count == 0;
     }
 

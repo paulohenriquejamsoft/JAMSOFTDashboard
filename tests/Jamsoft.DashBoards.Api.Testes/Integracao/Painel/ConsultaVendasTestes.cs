@@ -26,9 +26,9 @@ public sealed class ConsultaVendasTestes(BancoDeTestes banco) : IAsyncLifetime
         return new PlataformaDbContext(options.Options, new TenantFixo(tenant.Id, idPublico: tenant.IdPublico));
     }
 
-    private static FiltroPainel Filtro(Guid[]? empresas = null)
+    private static FiltroPainel Filtro(Guid[]? empresas = null, string[]? tipos = null, int[]? vendedores = null)
     {
-        Assert.True(FiltroPainel.TentarCriar(VendasSemeadas.Inicio, VendasSemeadas.Fim, empresas,
+        Assert.True(FiltroPainel.TentarCriar(VendasSemeadas.Inicio, VendasSemeadas.Fim, empresas, tipos, vendedores,
             VendasSemeadas.Fim, out var filtro, out _));
         return filtro;
     }
@@ -64,6 +64,31 @@ public sealed class ConsultaVendasTestes(BancoDeTestes banco) : IAsyncLifetime
 
         Assert.Equal([c.Filial.Id], empresaIds!);
         Assert.Equal(VendasSemeadas.IdsFilialNoPeriodo, vendas.Order());
+    }
+
+    [Fact]
+    public async Task Filtro_por_tipo_de_documento_restringe_as_vendas_aos_tipos_escolhidos()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco, "Cliente Painel Tipos");
+        await VendasSemeadas.SemearAsync(banco, tenant);
+        await using var contexto = Contexto(tenant);
+
+        var vendas = await new ConsultaVendas(contexto).Do(Filtro(tipos: ["NF-e"]), null).Select(v => v.VendaId).ToListAsync();
+
+        Assert.Equal([1, 5], vendas.Order());
+    }
+
+    [Fact]
+    public async Task Filtro_por_vendedor_restringe_as_vendas_e_deixa_de_fora_as_sem_vendedor()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco, "Cliente Painel Vendedores");
+        await VendasSemeadas.SemearAsync(banco, tenant);
+        await using var contexto = Contexto(tenant);
+
+        var vendas = await new ConsultaVendas(contexto).Do(Filtro(vendedores: [1]), null).Select(v => v.VendaId).ToListAsync();
+
+        // Ana (1): 1, 3 e 5; as vendas 4 e 6 não têm vendedor.
+        Assert.Equal([1, 3, 5], vendas.Order());
     }
 
     [Fact]

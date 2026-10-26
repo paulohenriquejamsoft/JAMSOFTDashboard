@@ -7,7 +7,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { RELOGIO } from '../../shared/layout/status-dados.component';
 import { Empresa } from '../empresas/empresas.api';
 import { FiltroPainelComponent } from './filtro-painel.component';
-import { FiltroPainel } from './painel.service';
+import { FiltroPainel, Vendedor } from './painel.service';
 
 const EMPRESA_A = '3f2504e0-4f89-11d3-9a0c-0305e82c3301';
 const EMPRESA_B = '9a7b1c2d-0000-4000-8000-000000000002';
@@ -29,8 +29,13 @@ describe('FiltroPainelComponent', () => {
   let host: HostComponent;
   let http: HttpTestingController;
 
-  /** Abre `/painel` com o relógio em `agora` e responde `/api/empresas`. */
-  async function abrir(url: string, agora: string, empresas: Empresa[] = [empresa(EMPRESA_A, 'Matriz')]) {
+  /** Abre `/painel` com o relógio em `agora` e responde `/api/empresas` e `/api/painel/vendedores`. */
+  async function abrir(
+    url: string,
+    agora: string,
+    empresas: Empresa[] = [empresa(EMPRESA_A, 'Matriz')],
+    vendedores: Vendedor[] = [],
+  ) {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([{ path: 'painel', component: HostComponent }]),
@@ -43,6 +48,7 @@ describe('FiltroPainelComponent', () => {
     harness = await RouterTestingHarness.create();
     host = await harness.navigateByUrl(url, HostComponent);
     http.expectOne('/api/empresas').flush(empresas);
+    http.expectOne('/api/painel/vendedores').flush(vendedores);
     await harness.fixture.whenStable();
   }
 
@@ -66,10 +72,10 @@ describe('FiltroPainelComponent', () => {
     await abrir('/painel', '2026-10-24T15:00:00Z');
 
     const casos: [string, FiltroPainel][] = [
-      ['Últimos 7 dias', { inicio: '2026-10-18', fim: '2026-10-24', empresas: [] }],
-      ['Últimos 30 dias', { inicio: '2026-09-25', fim: '2026-10-24', empresas: [] }],
-      ['Mês anterior', { inicio: '2026-09-01', fim: '2026-09-30', empresas: [] }],
-      ['Este mês', { inicio: '2026-10-01', fim: '2026-10-24', empresas: [] }],
+      ['Últimos 7 dias', { inicio: '2026-10-18', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [] }],
+      ['Últimos 30 dias', { inicio: '2026-09-25', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [] }],
+      ['Mês anterior', { inicio: '2026-09-01', fim: '2026-09-30', empresas: [], tipos: [], vendedores: [] }],
+      ['Este mês', { inicio: '2026-10-01', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [] }],
     ];
     for (const [atalho, esperado] of casos) {
       botao(atalho).click();
@@ -84,7 +90,7 @@ describe('FiltroPainelComponent', () => {
     // 01/10/2026 02:00 UTC = 30/09/2026 23:00 em São Paulo.
     await abrir('/painel', '2026-10-01T02:00:00Z');
 
-    expect(host.emitidos).toEqual([{ inicio: '2026-09-01', fim: '2026-09-30', empresas: [] }]);
+    expect(host.emitidos).toEqual([{ inicio: '2026-09-01', fim: '2026-09-30', empresas: [], tipos: [], vendedores: [] }]);
   });
 
   it('mudar o período emite o novo filtro e grava na URL', async () => {
@@ -92,7 +98,7 @@ describe('FiltroPainelComponent', () => {
 
     await mudarData('filtro-inicio', '2026-10-10');
 
-    expect(ultimo()).toEqual({ inicio: '2026-10-10', fim: '2026-10-24', empresas: [] });
+    expect(ultimo()).toEqual({ inicio: '2026-10-10', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [] });
     expect(url()).toBe('/painel?inicio=2026-10-10&fim=2026-10-24');
   });
 
@@ -103,10 +109,10 @@ describe('FiltroPainelComponent', () => {
       [empresa(EMPRESA_A, 'Matriz'), empresa(EMPRESA_B, 'Filial')],
     );
 
-    expect(host.emitidos).toEqual([{ inicio: '2026-08-01', fim: '2026-08-31', empresas: [EMPRESA_A, EMPRESA_B] }]);
+    expect(host.emitidos).toEqual([{ inicio: '2026-08-01', fim: '2026-08-31', empresas: [EMPRESA_A, EMPRESA_B], tipos: [], vendedores: [] }]);
     expect(campo('filtro-inicio').value).toBe('2026-08-01');
     expect(campo('filtro-fim').value).toBe('2026-08-31');
-    const marcadas = [...tela().querySelectorAll<HTMLInputElement>('fieldset input[type=checkbox]')].map((c) => c.checked);
+    const marcadas = [...tela().querySelectorAll<HTMLInputElement>('.empresas input[type=checkbox]')].map((c) => c.checked);
     expect(marcadas).toEqual([true, true]);
   });
 
@@ -133,7 +139,7 @@ describe('FiltroPainelComponent', () => {
 
     await mudarData('filtro-fim', '2026-09-30');
     expect(tela().querySelector('[role=alert]')).toBeNull();
-    expect(ultimo()).toEqual({ inicio: '2024-10-01', fim: '2026-09-30', empresas: [] });
+    expect(ultimo()).toEqual({ inicio: '2024-10-01', fim: '2026-09-30', empresas: [], tipos: [], vendedores: [] });
   });
 
   it('informa quantas empresas o tenant tem', async () => {
@@ -144,17 +150,65 @@ describe('FiltroPainelComponent', () => {
 
   it('seletor de empresas fica oculto com 1 empresa e, com 2, marcar uma restringe o filtro e a URL', async () => {
     await abrir('/painel', '2026-10-24T15:00:00Z');
-    expect(tela().querySelector('fieldset')).toBeNull();
+    expect(tela().querySelector('.empresas')).toBeNull();
 
     TestBed.resetTestingModule();
     await abrir('/painel', '2026-10-24T15:00:00Z', [empresa(EMPRESA_A, 'Matriz'), empresa(EMPRESA_B, 'Filial')]);
-    const caixas = [...tela().querySelectorAll<HTMLInputElement>('fieldset input[type=checkbox]')];
+    const caixas = [...tela().querySelectorAll<HTMLInputElement>('.empresas input[type=checkbox]')];
     expect(caixas.map((c) => c.parentElement!.textContent!.trim())).toEqual(['Matriz', 'Filial']);
 
     caixas[1].click();
     await harness.fixture.whenStable();
 
-    expect(ultimo()).toEqual({ inicio: '2026-10-01', fim: '2026-10-24', empresas: [EMPRESA_B] });
+    expect(ultimo()).toEqual({ inicio: '2026-10-01', fim: '2026-10-24', empresas: [EMPRESA_B], tipos: [], vendedores: [] });
     expect(url()).toBe(`/painel?inicio=2026-10-01&fim=2026-10-24&empresas=${EMPRESA_B}`);
+  });
+
+  it('marcar tipos de documento restringe o filtro e a URL, na ordem do domínio (DASH-10)', async () => {
+    await abrir('/painel', '2026-10-24T15:00:00Z');
+    const caixas = [...tela().querySelectorAll<HTMLInputElement>('fieldset.tipos input[type=checkbox]')];
+    expect(caixas.map((c) => c.parentElement!.textContent!.trim())).toEqual(['NF-e', 'NFC-e', 'Pedido']);
+
+    caixas[2].click();
+    caixas[0].click();
+    await harness.fixture.whenStable();
+
+    expect(ultimo()).toEqual({ inicio: '2026-10-01', fim: '2026-10-24', empresas: [], tipos: ['NF-e', 'Pedido'], vendedores: [] });
+    expect(url()).toBe('/painel?inicio=2026-10-01&fim=2026-10-24&tipos=NF-e&tipos=Pedido');
+  });
+
+  it('seletor de vendedor fica oculto sem vendedores; escolher um restringe o filtro e a URL (DASH-10)', async () => {
+    await abrir('/painel', '2026-10-24T15:00:00Z');
+    expect(tela().querySelector('#filtro-vendedor')).toBeNull();
+
+    TestBed.resetTestingModule();
+    await abrir('/painel', '2026-10-24T15:00:00Z', undefined, [{ codigo: 1, nome: 'Ana' }, { codigo: 2, nome: 'Bruno' }]);
+    const seletor = tela().querySelector<HTMLSelectElement>('#filtro-vendedor')!;
+    expect([...seletor.options].map((o) => o.textContent!.trim())).toEqual(['Todos', 'Ana', 'Bruno']);
+
+    seletor.value = '2';
+    seletor.dispatchEvent(new Event('change'));
+    await harness.fixture.whenStable();
+
+    expect(ultimo()).toEqual({ inicio: '2026-10-01', fim: '2026-10-24', empresas: [], tipos: [], vendedores: [2] });
+    expect(url()).toBe('/painel?inicio=2026-10-01&fim=2026-10-24&vendedor=2');
+
+    seletor.value = '';
+    seletor.dispatchEvent(new Event('change'));
+    await harness.fixture.whenStable();
+    expect(ultimo()?.vendedores).toEqual([]);
+  });
+
+  it('abrir com ?tipos&vendedor restaura o filtro e ignora tipo desconhecido', async () => {
+    await abrir('/painel?inicio=2026-08-01&fim=2026-08-31&tipos=Pedido&tipos=CT-e&vendedor=1', '2026-10-24T15:00:00Z', undefined, [
+      { codigo: 1, nome: 'Ana' },
+    ]);
+
+    expect(host.emitidos).toEqual([
+      { inicio: '2026-08-01', fim: '2026-08-31', empresas: [], tipos: ['Pedido'], vendedores: [1] },
+    ]);
+    const marcadas = [...tela().querySelectorAll<HTMLInputElement>('fieldset.tipos input[type=checkbox]')].map((c) => c.checked);
+    expect(marcadas).toEqual([false, false, true]);
+    expect(tela().querySelector<HTMLSelectElement>('#filtro-vendedor')!.value).toBe('1');
   });
 });
