@@ -21,6 +21,8 @@ public sealed class RegrasArquiteturaTestes
         "Jamsoft.DashBoards.Api.Modulos.Autenticacao",
         // Admin de coletores: COLETOR_TENANT é do tenant, mas a listagem atravessa tenants (design, Risks).
         "Jamsoft.DashBoards.Api.Modulos.Coletores",
+        // Chaves MCP: emitidas pelo CLI, sem usuário no contexto, para o tenant escolhido pelo operador.
+        "Jamsoft.DashBoards.Api.Modulos.Mcp",
     ];
 
     /// <summary>Infraestrutura que define <c>OperacaoGlobal</c> e aplica o filtro global.</summary>

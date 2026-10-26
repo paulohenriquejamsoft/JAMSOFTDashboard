@@ -1,5 +1,6 @@
 using System.Net;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
+using Jamsoft.DashBoards.Api.Modulos.Mcp;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -39,7 +40,7 @@ public sealed class IsolamentoTenantsTestes(BancoDeTestes banco) : IAsyncLifetim
     }
 
     /// <summary>Recursos do tenant B que as tentativas miram.</summary>
-    private sealed record TenantB(Tenant Tenant, Empresa Empresa, Usuario Usuario);
+    private sealed record TenantB(Tenant Tenant, Empresa Empresa, Usuario Usuario, ChaveMcp ChaveMcp);
 
     /// <summary>Uma tentativa de acesso a B; <c>ViaCabecalho</c> quando usa <c>X-Tenant</c> de B.</summary>
     private sealed record Tentativa(HttpRequestMessage Requisicao, bool ViaCabecalho);
@@ -63,6 +64,15 @@ public sealed class IsolamentoTenantsTestes(BancoDeTestes banco) : IAsyncLifetim
     /// <summary>Chave: "MÉTODO /rota" como no <see cref="EndpointDataSource"/>.</summary>
     private static readonly Dictionary<string, Caso> Casos = new()
     {
+        ["GET /api/chaves-mcp"] = new(true, (b, t) =>
+            [PeloCabecalho(HttpMethod.Get, "/api/chaves-mcp", t, b)]),
+        ["POST /api/chaves-mcp"] = new(true, (b, t) =>
+            [PeloCabecalho(HttpMethod.Post, "/api/chaves-mcp", t, b, new { descricao = "Invasora" })]),
+        ["POST /api/chaves-mcp/{idPublico}/revogar"] = new(true, (b, t) =>
+        [
+            PeloId(HttpMethod.Post, $"/api/chaves-mcp/{b.ChaveMcp.IdPublico}/revogar", t),
+            PeloCabecalho(HttpMethod.Post, $"/api/chaves-mcp/{b.ChaveMcp.IdPublico}/revogar", t, b),
+        ]),
         ["GET /api/empresas"] = new(false, (b, t) =>
             [PeloCabecalho(HttpMethod.Get, "/api/empresas", t, b)]),
         ["POST /api/empresas"] = new(true, (b, t) =>
@@ -240,7 +250,10 @@ public sealed class IsolamentoTenantsTestes(BancoDeTestes banco) : IAsyncLifetim
         await using var contexto = banco.CriarContexto();
         var empresa = new Empresa { TenantId = tenant.Id, CodEmpresa = 1, Nome = "Matriz B" };
         contexto.Empresas.Add(empresa);
+        var (chave, _) = EmissaoChavesMcp.Nova("Claude B", null);
+        chave.TenantId = tenant.Id;
+        contexto.ChavesMcp.Add(chave);
         await contexto.SaveChangesAsync();
-        return new TenantB(tenant, empresa, usuario);
+        return new TenantB(tenant, empresa, usuario, chave);
     }
 }

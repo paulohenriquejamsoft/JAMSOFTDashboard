@@ -43,6 +43,10 @@ public readonly record struct OperacaoAuditada(string Codigo)
     public static readonly OperacaoAuditada ColetorRevogado = new("COLETOR_REVOGADO");
     public static readonly OperacaoAuditada ColetorSecretRotacionado = new("COLETOR_SECRET_ROTACIONADO");
 
+    /// <summary>Api-keys do servidor MCP (conector do Claude).</summary>
+    public static readonly OperacaoAuditada ChaveMcpCriada = new("CHAVE_MCP_CRIADA");
+    public static readonly OperacaoAuditada ChaveMcpRevogada = new("CHAVE_MCP_REVOGADA");
+
     public override string ToString() => Codigo;
 }
 

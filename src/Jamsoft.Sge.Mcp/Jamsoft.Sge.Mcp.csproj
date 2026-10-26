@@ -7,10 +7,15 @@
     <RootNamespace>Jamsoft.Sge.Mcp</RootNamespace>
     <UserSecretsId>jamsoft-sge-mcp</UserSecretsId>
   </PropertyGroup>
-  <ItemGroup> 
+
+  <ItemGroup>
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jamsoft.DashBoards.Contratos\Jamsoft.DashBoards.Contratos.csproj" />
   </ItemGroup>
 
 </Project>

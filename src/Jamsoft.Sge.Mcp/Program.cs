@@ -1,5 +1,3 @@
-using Dapper;
-using Jamsoft.Sge.Mcp.Cli;
 using Jamsoft.Sge.Mcp.Configuracao;
 using Jamsoft.Sge.Mcp.Dados;
 using Jamsoft.Sge.Mcp.Seguranca;
@@ -7,20 +5,15 @@ using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Comandos administrativos (gerar-chave, gerar-chave-mestra) rodam e saem sem subir o servidor.
-if (ComandosCli.TentarExecutar(args, builder.Configuration)) return;
-
-// venda_id → VendaId, Nome_Empresa → NomeEmpresa etc.
-DefaultTypeMap.MatchNamesWithUnderscores = true;
-
 builder.Services.AddOptions<McpOptions>()
     .Bind(builder.Configuration.GetSection(McpOptions.Secao))
-    .Validate(o => !string.IsNullOrWhiteSpace(o.ChaveCriptografia), "Mcp:ChaveCriptografia não configurada.")
+    .Validate(o => o.Valida(), "Mcp:CacheSegundos, Mcp:MaxDiasConsulta e Mcp:TimeoutConsultaSegundos precisam ser positivos.")
+    .Validate(_ => !string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Plataforma")),
+        "ConnectionStrings:Plataforma não configurada.")
     .ValidateOnStart();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<ProtetorConexao>();
 builder.Services.AddSingleton<IRepositorioChaves, RepositorioChaves>();
 builder.Services.AddSingleton<VendasRepositorio>();
 
@@ -44,7 +37,7 @@ app.UseAuthorization();
 // Sem autenticação: só para monitoramento (IIS, load balancer).
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 
-// Endpoint MCP (Streamable HTTP). Exige api-key válida.
+// Endpoint MCP (Streamable HTTP). Exige api-key válida de um tenant ativo.
 app.MapMcp("/mcp").RequireAuthorization();
 
 app.Run();

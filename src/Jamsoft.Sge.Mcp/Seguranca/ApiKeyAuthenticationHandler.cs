@@ -11,11 +11,12 @@ public static class ApiKeyDefaults
     public const string Esquema = "ApiKey";
     public const string Cabecalho = "X-Api-Key";
     public const string ParametroQuery = "api_key";
-    public const string ClaimCliente = "sge:cliente";
+    /// <summary>ID_PUBLICO do tenant, com o mesmo nome da claim do access token da API.</summary>
+    public const string ClaimTenant = "tenant";
 }
 
 /// <summary>
-/// Lê a api-key da requisição, valida no banco central e coloca o cliente (Tenant) no HttpContext.
+/// Lê a api-key da requisição, valida no banco da plataforma e coloca o tenant no HttpContext.
 /// Aceita, nesta ordem:
 ///   1. X-Api-Key: sge_xxx
 ///   2. Authorization: Bearer sge_xxx
@@ -38,16 +39,16 @@ public sealed class ApiKeyAuthenticationHandler(
         if (tenant is null)
         {
             Logger.LogWarning("api-key recusada vinda de {Ip}.", Context.Connection.RemoteIpAddress);
-            return AuthenticateResult.Fail("api-key inválida, inativa ou vencida.");
+            return AuthenticateResult.Fail("api-key inválida, revogada, vencida ou de tenant inativo.");
         }
 
         Context.DefinirTenant(tenant);
 
         var identidade = new ClaimsIdentity(
         [
-            new Claim(ClaimTypes.NameIdentifier, tenant.ChaveId.ToString()),
-            new Claim(ClaimTypes.Name, tenant.Cliente),
-            new Claim(ApiKeyDefaults.ClaimCliente, tenant.Cliente),
+            new Claim(ClaimTypes.NameIdentifier, tenant.PrefixoChave),
+            new Claim(ClaimTypes.Name, tenant.Nome),
+            new Claim(ApiKeyDefaults.ClaimTenant, tenant.IdPublico.ToString()),
         ], ApiKeyDefaults.Esquema);
 
         return AuthenticateResult.Success(

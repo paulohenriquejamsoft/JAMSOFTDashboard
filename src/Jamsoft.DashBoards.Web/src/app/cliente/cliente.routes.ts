@@ -34,6 +34,11 @@ export default [
         canMatch: [perfilGuard(ADMIN_TENANT)],
         loadComponent: () => import('./sincronizacao/sincronizacao.page').then((m) => m.SincronizacaoPage),
       },
+      {
+        path: 'chaves-mcp',
+        canMatch: [perfilGuard(ADMIN_TENANT)],
+        loadComponent: () => import('./chaves-mcp/chaves-mcp.page').then((m) => m.ChavesMcpPage),
+      },
     ],
   },
 ] satisfies Routes;

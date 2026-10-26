@@ -65,7 +65,7 @@ describe('ShellComponent', () => {
     ]);
   });
 
-  it('Admin vê Painel, Usuários, Empresas, Sincronização e Meu perfil (UI-02)', async () => {
+  it('Admin vê Painel, Usuários, Empresas, Sincronização, Conector Claude e Meu perfil (UI-02)', async () => {
     await criar('Admin');
 
     expect(itensMenu()).toEqual([
@@ -73,6 +73,7 @@ describe('ShellComponent', () => {
       { rotulo: 'Usuários', link: '/cliente/usuarios' },
       { rotulo: 'Empresas', link: '/cliente/empresas' },
       { rotulo: 'Sincronização', link: '/cliente/sincronizacao' },
+      { rotulo: 'Conector Claude', link: '/cliente/chaves-mcp' },
       { rotulo: 'Meu perfil', link: '/conta/perfil' },
     ]);
   });
@@ -100,6 +101,7 @@ describe('ShellComponent', () => {
       { rotulo: 'Usuários', link: '/cliente/usuarios' },
       { rotulo: 'Empresas', link: '/cliente/empresas' },
       { rotulo: 'Sincronização', link: '/cliente/sincronizacao' },
+      { rotulo: 'Conector Claude', link: '/cliente/chaves-mcp' },
     ]);
   });
 

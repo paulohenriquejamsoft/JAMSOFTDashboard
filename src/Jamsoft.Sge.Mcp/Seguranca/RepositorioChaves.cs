@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using Dapper;
+using Jamsoft.DashBoards.Contratos.Mcp;
 using Jamsoft.Sge.Mcp.Configuracao;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Caching.Memory;
@@ -9,37 +10,47 @@ namespace Jamsoft.Sge.Mcp.Seguranca;
 
 public interface IRepositorioChaves
 {
-    /// <summary>Devolve o cliente dono da chave, ou null se a chave for inválida, inativa ou vencida.</summary>
+    /// <summary>Tenant dono da chave, ou null se a chave for inválida, inativa, vencida ou o tenant estiver inativo.</summary>
     Task<Tenant?> ValidarAsync(string chave, CancellationToken ct);
 }
 
-/// <summary>Lê as api-keys da tabela dbo.McpApiKey do banco central (ConnectionStrings:Master).</summary>
+/// <summary>
+/// Valida a api-key na tabela CHAVE_MCP do banco da plataforma (ConnectionStrings:Plataforma), emitida pela API
+/// com <c>dotnet run -- gerar-chave-mcp</c>. Tenant inativo (inclusive em exclusão) recusa a chave.
+/// </summary>
 public sealed class RepositorioChaves(
     IConfiguration configuracao,
     IOptions<McpOptions> opcoes,
-    ProtetorConexao protetor,
     IMemoryCache cache,
     ILogger<RepositorioChaves> log) : IRepositorioChaves
 {
-    private readonly string _conexaoMaster = configuracao.GetConnectionString("Master")
-        ?? throw new InvalidOperationException("ConnectionStrings:Master não configurada.");
+    private readonly string _conexao = configuracao.GetConnectionString("Plataforma")
+        ?? throw new InvalidOperationException("ConnectionStrings:Plataforma não configurada.");
 
-    // Cache curto para chaves inválidas: evita que tentativas repetidas martelem o banco central.
+    // Cache curto para chaves inválidas: evita que tentativas repetidas martelem o banco.
     private static readonly TimeSpan CacheInvalida = TimeSpan.FromSeconds(30);
     private static readonly object Invalida = new();
 
     private const string Sql = """
-        SELECT Id, Cliente, ConnectionStringCifrada, HashChave, Ativo, ExpiraEm
-        FROM dbo.McpApiKey
-        WHERE Prefixo = @Prefixo
+        SELECT c.ID          AS ChaveId,
+               c.HASH        AS Hash,
+               c.ATIVO       AS Ativo,
+               c.EXPIRA_EM   AS ExpiraEm,
+               t.ID          AS TenantId,
+               t.ID_PUBLICO  AS TenantIdPublico,
+               t.NOME        AS TenantNome,
+               t.ATIVO       AS TenantAtivo
+        FROM dbo.CHAVE_MCP AS c
+        JOIN dbo.TENANT    AS t ON t.ID = c.TENANT_ID
+        WHERE c.PREFIXO = @Prefixo
         """;
 
     public async Task<Tenant?> ValidarAsync(string chave, CancellationToken ct)
     {
-        if (!ApiKey.TentarLerPrefixo(chave, out var prefixo)) return null;
+        if (!FormatoChaveMcp.TentarLerPrefixo(chave, out var prefixo)) return null;
 
-        var hash = ApiKey.Hash(chave);
-        var chaveCache = "apikey:" + Convert.ToHexString(hash);
+        var hash = FormatoChaveMcp.Hash(chave);
+        var chaveCache = "chave-mcp:" + Convert.ToHexString(hash);
 
         if (cache.TryGetValue(chaveCache, out var emCache))
             return emCache as Tenant;
@@ -47,56 +58,53 @@ public sealed class RepositorioChaves(
         var tenant = await BuscarAsync(prefixo, hash, ct);
 
         cache.Set(chaveCache, (object?)tenant ?? Invalida,
-            tenant is null ? CacheInvalida : TimeSpan.FromMinutes(Math.Max(1, opcoes.Value.CacheMinutos)));
+            tenant is null ? CacheInvalida : TimeSpan.FromSeconds(opcoes.Value.CacheSegundos));
         return tenant;
     }
 
     private async Task<Tenant?> BuscarAsync(string prefixo, byte[] hash, CancellationToken ct)
     {
-        await using var conexao = new SqlConnection(_conexaoMaster);
+        await using var conexao = new SqlConnection(_conexao);
+        // PREFIXO é char(8): parâmetro do mesmo tipo, sem conversão implícita que impeça o índice.
+        var parametro = new DbString { Value = prefixo, IsAnsi = true, IsFixedLength = true, Length = FormatoChaveMcp.TamanhoPrefixo };
         var registro = await conexao.QueryFirstOrDefaultAsync<RegistroChave>(
-            new CommandDefinition(Sql, new { Prefixo = prefixo }, cancellationToken: ct));
+            new CommandDefinition(Sql, new { Prefixo = parametro }, cancellationToken: ct));
 
         if (registro is null) return null;
 
         // Comparação em tempo constante: não revela quantos bytes do hash bateram.
-        if (registro.HashChave is null || !CryptographicOperations.FixedTimeEquals(registro.HashChave, hash))
-            return null;
+        if (!CryptographicOperations.FixedTimeEquals(registro.Hash, hash)) return null;
 
         if (!registro.Ativo)
         {
-            log.LogWarning("Uso de api-key inativa (Id {Id}, cliente {Cliente}).", registro.Id, registro.Cliente);
+            log.LogWarning("Uso de chave MCP revogada ({Prefixo}, tenant {Tenant}).", prefixo, registro.TenantIdPublico);
             return null;
         }
 
         if (registro.ExpiraEm is { } expira && expira <= DateTime.UtcNow)
         {
-            log.LogWarning("Uso de api-key vencida (Id {Id}, cliente {Cliente}).", registro.Id, registro.Cliente);
+            log.LogWarning("Uso de chave MCP vencida ({Prefixo}, tenant {Tenant}).", prefixo, registro.TenantIdPublico);
             return null;
         }
 
-        string conexaoCliente;
-        try
+        if (!registro.TenantAtivo)
         {
-            conexaoCliente = protetor.Decifrar(registro.ConnectionStringCifrada);
-        }
-        catch (CryptographicException ex)
-        {
-            log.LogError(ex, "Não foi possível decifrar a connection string da api-key Id {Id}. " +
-                             "A Mcp:ChaveCriptografia mudou?", registro.Id);
+            log.LogWarning("Uso de chave MCP de tenant inativo ({Prefixo}, tenant {Tenant}).", prefixo, registro.TenantIdPublico);
             return null;
         }
 
-        return new Tenant(registro.Id, registro.Cliente, conexaoCliente);
+        return new Tenant(registro.TenantId, registro.TenantIdPublico, registro.TenantNome, prefixo);
     }
 
     private sealed class RegistroChave
     {
-        public int Id { get; set; }
-        public string Cliente { get; set; } = "";
-        public string ConnectionStringCifrada { get; set; } = "";
-        public byte[]? HashChave { get; set; }
+        public int ChaveId { get; set; }
+        public byte[] Hash { get; set; } = [];
         public bool Ativo { get; set; }
         public DateTime? ExpiraEm { get; set; }
+        public int TenantId { get; set; }
+        public Guid TenantIdPublico { get; set; }
+        public string TenantNome { get; set; } = "";
+        public bool TenantAtivo { get; set; }
     }
 }

@@ -1,5 +1,8 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using Jamsoft.DashBoards.Api.Infraestrutura.Dados;
+using Jamsoft.DashBoards.Api.Modulos.Mcp;
+using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +14,8 @@ namespace Jamsoft.DashBoards.Api.Cli;
 /// Comandos de implantação que rodam e saem sem subir o servidor:
 ///   dotnet run -- migrar
 ///   dotnet run -- criar-superadmin --email admin@jamsoft.com.br --nome "Nome"
+///   dotnet run -- gerar-chave-mcp --cnpj 00.000.000/0001-00 --descricao "Claude - Painéis" [--expira 2027-12-31]
+///   dotnet run -- revogar-chave-mcp --prefixo XXXXXXXX
 /// Usam a connection string "Plataforma" da configuração.
 /// </summary>
 public static class ComandosCli
@@ -37,6 +42,8 @@ public static class ComandosCli
         {
             "migrar" => MigrarAsync(configuracao, saida).GetAwaiter().GetResult(),
             "criar-superadmin" => CriarSuperAdminAsync(args, configuracao, saida, erro).GetAwaiter().GetResult(),
+            "gerar-chave-mcp" => GerarChaveMcpAsync(args, configuracao, saida, erro).GetAwaiter().GetResult(),
+            "revogar-chave-mcp" => RevogarChaveMcpAsync(args, configuracao, saida, erro).GetAwaiter().GetResult(),
             _ => null,
         };
     }
@@ -85,6 +92,77 @@ public static class ComandosCli
         saida.WriteLine($"SuperAdmin {email} criado. Troca de senha obrigatória no primeiro login.");
         saida.WriteLine("Senha temporária (mostrada só agora; entregue por canal seguro):");
         saida.WriteLine($"  {senha}");
+        return 0;
+    }
+
+    /// <summary>
+    /// Api-key do servidor MCP para o tenant do CNPJ (<see cref="ChaveMcp"/>), a mesma que o Admin gera na tela. A chave
+    /// aparece só aqui; no banco fica o SHA-256. Validade em <c>--expira</c> (inclusiva, até o fim do dia em São Paulo).
+    /// </summary>
+    private static async Task<int> GerarChaveMcpAsync(string[] args, IConfiguration configuracao, TextWriter saida,
+        TextWriter erro)
+    {
+        const string uso = "Uso: dotnet run -- gerar-chave-mcp --cnpj 00.000.000/0001-00 --descricao \"Descrição\" [--expira yyyy-MM-dd]";
+        var descricao = Argumento(args, "--descricao")?.Trim();
+        var expira = Argumento(args, "--expira");
+        if (!Cnpj.TentarNormalizar(Argumento(args, "--cnpj"), out var cnpj)
+            || string.IsNullOrEmpty(descricao) || descricao.Length > ChaveMcp.DescricaoMaxima)
+        {
+            erro.WriteLine(uso);
+            return 1;
+        }
+
+        DateOnly? ultimoDia = null;
+        if (expira is not null)
+        {
+            if (!DateOnly.TryParseExact(expira, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dia))
+            {
+                erro.WriteLine(uso);
+                return 1;
+            }
+            ultimoDia = dia;
+        }
+
+        await using var banco = Contexto(configuracao);
+        var tenant = await banco.Tenants.AsNoTracking().SingleOrDefaultAsync(t => t.Cnpj == cnpj);
+        if (tenant is null)
+        {
+            erro.WriteLine($"Nenhum tenant com o CNPJ {cnpj}. Nada foi criado.");
+            return 1;
+        }
+        if (!tenant.Ativo)
+        {
+            erro.WriteLine($"O tenant {tenant.Nome} está inativo. Nada foi criado.");
+            return 1;
+        }
+
+        var (chave, prefixo) = await EmissaoChavesMcp.GerarAsync(banco, tenant, descricao, ultimoDia);
+
+        saida.WriteLine($"Chave MCP {prefixo} criada para o tenant {tenant.Nome}.");
+        saida.WriteLine("api-key (mostrada só agora; entregue por canal seguro):");
+        saida.WriteLine($"  {chave}");
+        return 0;
+    }
+
+    /// <summary>Inativa a chave MCP do prefixo; o servidor MCP para de aceitá-la quando o cache dele expira.</summary>
+    private static async Task<int> RevogarChaveMcpAsync(string[] args, IConfiguration configuracao, TextWriter saida,
+        TextWriter erro)
+    {
+        var prefixo = Argumento(args, "--prefixo")?.Trim();
+        if (string.IsNullOrEmpty(prefixo))
+        {
+            erro.WriteLine("Uso: dotnet run -- revogar-chave-mcp --prefixo XXXXXXXX");
+            return 1;
+        }
+
+        await using var banco = Contexto(configuracao);
+        if (!await EmissaoChavesMcp.RevogarAsync(banco, prefixo, DateTime.UtcNow))
+        {
+            erro.WriteLine($"Nenhuma chave MCP ativa com o prefixo {prefixo}.");
+            return 1;
+        }
+
+        saida.WriteLine($"Chave MCP {prefixo} revogada.");
         return 0;
     }
 

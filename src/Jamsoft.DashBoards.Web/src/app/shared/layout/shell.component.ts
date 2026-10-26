@@ -112,6 +112,7 @@ export class ShellComponent {
       { rotulo: 'Usuários', link: '/cliente/usuarios' },
       { rotulo: 'Empresas', link: '/cliente/empresas' },
       { rotulo: 'Sincronização', link: '/cliente/sincronizacao' },
+      { rotulo: 'Conector Claude', link: '/cliente/chaves-mcp' },
     ];
     const conta: SecaoMenu = { titulo: 'Conta', itens: [{ rotulo: 'Meu perfil', link: '/conta/perfil' }] };
     if (perfil === 'SuperAdmin') {

@@ -629,6 +629,78 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Mcp.ChaveMcp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("ATIVO");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("CRIADO_EM")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .HasColumnName("DESCRICAO");
+
+                    b.Property<DateTime?>("ExpiraEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("EXPIRA_EM");
+
+                    b.Property<byte[]>("Hash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(32)")
+                        .HasColumnName("HASH");
+
+                    b.Property<Guid>("IdPublico")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("ID_PUBLICO")
+                        .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+                    b.Property<string>("Prefixo")
+                        .IsRequired()
+                        .HasColumnType("char(8)")
+                        .HasColumnName("PREFIXO");
+
+                    b.Property<DateTime?>("RevogadoEm")
+                        .HasColumnType("datetime2(0)")
+                        .HasColumnName("REVOGADO_EM");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int")
+                        .HasColumnName("TENANT_ID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPublico")
+                        .IsUnique();
+
+                    b.HasIndex("Prefixo")
+                        .IsUnique();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Prefixo"), new[] { "Hash", "TenantId", "Ativo", "ExpiraEm" });
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("CHAVE_MCP", t =>
+                        {
+                            t.HasCheckConstraint("CK_CHAVE_MCP_HASH", "DATALENGTH(HASH) = 32");
+                        });
+                });
+
             modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -875,6 +947,15 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Jamsoft.DashBoards.Api.Modulos.Mcp.ChaveMcp", b =>
+                {
                     b.HasOne("Jamsoft.DashBoards.Api.Modulos.Tenants.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")

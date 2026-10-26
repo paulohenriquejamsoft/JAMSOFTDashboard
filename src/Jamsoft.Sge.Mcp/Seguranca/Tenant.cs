@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Http;
-
 namespace Jamsoft.Sge.Mcp.Seguranca;
 
-/// <summary>Cliente identificado pela api-key, com a connection string já decifrada.</summary>
-public sealed record Tenant(int ChaveId, string Cliente, string ConnectionString);
+/// <summary>
+/// Tenant da plataforma identificado pela api-key. <see cref="Id"/> é o TENANT_ID interno, usado só nas consultas;
+/// para fora (respostas e logs) vai o <see cref="IdPublico"/>.
+/// </summary>
+public sealed record Tenant(int Id, Guid IdPublico, string Nome, string PrefixoChave);
 
 public static class TenantHttpContextExtensions
 {
@@ -11,8 +12,8 @@ public static class TenantHttpContextExtensions
 
     public static void DefinirTenant(this HttpContext contexto, Tenant tenant) => contexto.Items[ItemKey] = tenant;
 
-    /// <summary>Devolve o cliente autenticado na requisição atual ou lança se não houver.</summary>
+    /// <summary>Devolve o tenant autenticado na requisição atual ou lança se não houver.</summary>
     public static Tenant ObterTenant(this HttpContext? contexto) =>
         contexto?.Items[ItemKey] as Tenant
-        ?? throw new InvalidOperationException("Requisição sem cliente autenticado.");
+        ?? throw new InvalidOperationException("Requisição sem tenant autenticado.");
 }

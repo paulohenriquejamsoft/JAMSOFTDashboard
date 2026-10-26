@@ -6,6 +6,7 @@ using Jamsoft.DashBoards.Api.Modulos.Coletores;
 using Jamsoft.DashBoards.Api.Modulos.Empresas;
 using Jamsoft.DashBoards.Api.Modulos.Exclusao;
 using Jamsoft.DashBoards.Api.Modulos.Ingestao;
+using Jamsoft.DashBoards.Api.Modulos.Mcp;
 using Jamsoft.DashBoards.Api.Modulos.Tenants;
 using Jamsoft.DashBoards.Api.Modulos.Usuarios;
 using Jamsoft.DashBoards.Api.Seguranca;
@@ -47,6 +48,7 @@ public sealed class PlataformaDbContext(DbContextOptions<PlataformaDbContext> op
     public DbSet<OrigemSincronizacao> OrigensSincronizacao => Set<OrigemSincronizacao>();
     public DbSet<Venda> Vendas => Set<Venda>();
     public DbSet<LoteIngestao> LotesIngestao => Set<LoteIngestao>();
+    public DbSet<ChaveMcp> ChavesMcp => Set<ChaveMcp>();
 
     /// <summary>Lido a cada consulta: o EF troca a referência ao contexto pela instância em uso.</summary>
     private int TenantIdFiltro => TenantAtual.IdOuSemAcesso;

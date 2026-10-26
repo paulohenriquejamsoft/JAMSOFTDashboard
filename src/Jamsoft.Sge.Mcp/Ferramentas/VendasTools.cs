@@ -12,8 +12,8 @@ using ModelContextProtocol.Server;
 namespace Jamsoft.Sge.Mcp.Ferramentas;
 
 /// <summary>
-/// Ferramentas MCP de vendas do SGE. O banco usado é sempre o do cliente dono da api-key
-/// da requisição: a ferramenta não recebe nome de banco nem connection string.
+/// Ferramentas MCP de vendas. O tenant é sempre o dono da api-key da requisição:
+/// a ferramenta não recebe tenant, empresa de outro tenant nem connection string.
 /// </summary>
 [McpServerToolType]
 public sealed class VendasTools(
@@ -25,9 +25,10 @@ public sealed class VendasTools(
     private static readonly JsonSerializerOptions Json = new() { WriteIndented = false };
 
     [McpServerTool(Name = "listar_vendas", Title = "Listar vendas", ReadOnly = true, Idempotent = true)]
-    [Description("Lista as notas de saída (NF-e e NFC-e) do SGE no período, uma linha por venda, " +
-                 "com tipo de DF-e, data, valor, cliente, vendedor, situação (Finalizada, Cancelada, Inutilizada), " +
-                 "empresa/loja e quantidade de itens. O período filtra a data de faturamento. " +
+    [Description("Lista as vendas (NF-e, NFC-e e Pedido) do cliente no período, uma linha por venda, " +
+                 "com tipo de documento, data/hora (fuso de São Paulo), valor, cliente, vendedor, " +
+                 "situação (Finalizada, Contingência, Cancelada, Inutilizada), empresa/loja e quantidade de itens. " +
+                 "Vendas efetivadas = Finalizada + Contingência. O período filtra a data/hora da venda. " +
                  "Devolve um array JSON de objetos.")]
     public async Task<string> ListarVendas(
         [Description("Data inicial, inclusive, no formato yyyy-MM-dd. Se vazio: primeiro dia do mês, dois meses atrás.")]
@@ -37,7 +38,7 @@ public sealed class VendasTools(
         CancellationToken ct = default)
     {
         var tenant = http.HttpContext.ObterTenant();
-        var hoje = DateOnly.FromDateTime(DateTime.Now);
+        var hoje = VendasRepositorio.HojeEmSaoPaulo();
 
         var dataFim = LerData(fim, nameof(fim)) ?? hoje;
         var dataInicio = LerData(inicio, nameof(inicio)) ?? new DateOnly(hoje.Year, hoje.Month, 1).AddMonths(-2);
@@ -52,29 +53,29 @@ public sealed class VendasTools(
         try
         {
             var linhas = await vendas.ListarAsync(tenant, dataInicio, dataFim, ct);
-            log.LogInformation("listar_vendas: cliente {Cliente}, {Inicio:yyyy-MM-dd} a {Fim:yyyy-MM-dd}, {Qtd} linhas.",
-                tenant.Cliente, dataInicio, dataFim, linhas.Count);
+            // Nunca registra dados de venda: só o tenant, o período e a quantidade.
+            log.LogInformation("listar_vendas: tenant {Tenant}, {Inicio:yyyy-MM-dd} a {Fim:yyyy-MM-dd}, {Qtd} linhas.",
+                tenant.IdPublico, dataInicio, dataFim, linhas.Count);
             return JsonSerializer.Serialize(linhas, Json);
         }
         catch (SqlException ex)
         {
             // O detalhe vai para o log do servidor; para o cliente MCP, só uma mensagem segura.
-            log.LogError(ex, "Erro SQL em listar_vendas para o cliente {Cliente}.", tenant.Cliente);
-            throw new McpException("Não foi possível consultar o banco de dados do cliente. Veja o log do servidor MCP.");
+            log.LogError(ex, "Erro SQL em listar_vendas para o tenant {Tenant}.", tenant.IdPublico);
+            throw new McpException("Não foi possível consultar as vendas. Veja o log do servidor MCP.");
         }
     }
 
-    [McpServerTool(Name = "identificar_conexao", Title = "Identificar conexão", ReadOnly = true, Idempotent = true)]
-    [Description("Mostra para qual cliente, servidor e banco a api-key atual aponta (sem senha). Útil para testar a conexão.")]
-    public string IdentificarConexao()
+    [McpServerTool(Name = "identificar_tenant", Title = "Identificar tenant", ReadOnly = true, Idempotent = true)]
+    [Description("Mostra de qual cliente (tenant) são os dados que a api-key atual enxerga. Útil para testar a conexão.")]
+    public string IdentificarTenant()
     {
         var tenant = http.HttpContext.ObterTenant();
-        var cs = new SqlConnectionStringBuilder(tenant.ConnectionString);
         return JsonSerializer.Serialize(new
         {
-            cliente = tenant.Cliente,
-            servidor = cs.DataSource,
-            banco = cs.InitialCatalog,
+            tenant = tenant.Nome,
+            tenantId = tenant.IdPublico,
+            chave = tenant.PrefixoChave,
         }, Json);
     }
 
