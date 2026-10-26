@@ -67,7 +67,7 @@ public sealed class ExtratorVendas
         SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
         SELECT TOP (@Tamanho)
             ns.NumNotaSaida                                    AS VendaId,
-            CASE WHEN ns.modelo = 65 THEN 'NFC-e' ELSE 'NF-e' END AS TipoDfe,
+            CASE WHEN NS.TipoFatura = 2 THEN 'Pedido' ELSE CASE WHEN ns.modelo = 65 THEN 'NFC-e' ELSE 'NF-e' END END AS TipoDfe,
             ns.DataHoraFechamento                              AS DataHoraFechamento,
             ns.datafatura                                      AS DataFatura,
             ns.totnota                                         AS Valor,
@@ -87,7 +87,7 @@ public sealed class ExtratorVendas
             (SELECT COUNT(*) FROM NotaSaidaProd
               WHERE NotaSaidaProd.numnotasaida = ns.numnotasaida) AS QtdItens
         FROM c_NotaSaida AS ns
-        WHERE ns.situacaonota IN (5, 6, 9, 11, 12)
+        WHERE NS.TipoFatura<9 and ns.situacaonota IN (5, 6, 9, 11, 12)
           AND ns.TotalCondNeutra = 0
           AND ns.datafatura >= @Inicio AND ns.datafatura < @Fim
           AND (ns.datafatura > @CursorData
