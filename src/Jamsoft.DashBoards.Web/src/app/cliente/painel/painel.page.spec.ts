@@ -8,6 +8,7 @@ import { trocarEcharts } from '../../../testes/echarts-falso';
 import { responderProblema } from '../../../testes/problemas';
 import { AuthService, Perfil, UsuarioSessao } from '../../core/auth/auth.service';
 import { RELOGIO } from '../../shared/layout/status-dados.component';
+import { Empresa } from '../empresas/empresas.api';
 import { DfeComponent } from './dfe.component';
 import { EvolucaoComponent } from './evolucao.component';
 import { DfeResposta, EvolucaoResposta, Indicador, KpisResposta, RankingsResposta } from './painel.service';
@@ -38,7 +39,11 @@ describe('PainelPage', () => {
   let http: HttpTestingController;
 
   /** Abre `/cliente` em 24/10/2026 (São Paulo) e responde empresas e resumo de sincronização. */
-  async function abrir(perfil: Perfil = 'Admin', ultimoSucessoEm: string | null = '2026-10-24T10:00:00Z') {
+  async function abrir(
+    perfil: Perfil = 'Admin',
+    ultimoSucessoEm: string | null = '2026-10-24T10:00:00Z',
+    empresas: Empresa[] = [],
+  ) {
     const sessao: UsuarioSessao = {
       perfil,
       tenant: perfil === 'SuperAdmin' ? null : { idPublico: 'a1', nome: 'Loja A' },
@@ -58,7 +63,7 @@ describe('PainelPage', () => {
     harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/cliente');
     if (perfil === 'SuperAdmin') return;
-    http.expectOne('/api/empresas').flush([]);
+    http.expectOne('/api/empresas').flush(empresas);
     http.expectOne('/api/sincronizacao/resumo').flush({ ultimoSucessoEm });
     await harness.fixture.whenStable();
   }
@@ -159,6 +164,30 @@ describe('PainelPage', () => {
     expect(tela().textContent).toContain('Nenhuma venda sincronizada ainda');
     expect(tela().textContent).not.toContain('Nenhuma venda no período');
     expect(tela().querySelector('[data-bloco]')).toBeNull();
+  });
+
+  const empresa = (idPublico: string, nome: string): Empresa => ({ idPublico, codEmpresa: 1, nome, nomeManual: false });
+  const RANKINGS_COM_EMPRESA: RankingsResposta = {
+    totalFaturamento: 100,
+    vendedores: [],
+    clientes: [],
+    empresas: [{ nome: 'Matriz', faturamento: 100, vendas: 1, participacao: 100 }],
+  };
+  const rankingEmpresas = () => bloco('rankings').querySelector('[data-ranking=empresas]');
+
+  it('tenant com uma única empresa não mostra o ranking de empresas (RNK-05)', async () => {
+    await abrir('Admin', '2026-10-24T10:00:00Z', [empresa('e1', 'Matriz')]);
+    await responderTodos({ rankings: RANKINGS_COM_EMPRESA });
+
+    expect(bloco('rankings').querySelector('.bloco-conteudo')).not.toBeNull();
+    expect(rankingEmpresas()).toBeNull();
+  });
+
+  it('tenant com mais de uma empresa mostra o ranking de empresas (RNK-05)', async () => {
+    await abrir('Admin', '2026-10-24T10:00:00Z', [empresa('e1', 'Matriz'), empresa('e2', 'Filial')]);
+    await responderTodos({ rankings: RANKINGS_COM_EMPRESA });
+
+    expect(rankingEmpresas()).not.toBeNull();
   });
 
   it('SuperAdmin sem tenant vê o seletor e nada é consultado', async () => {
