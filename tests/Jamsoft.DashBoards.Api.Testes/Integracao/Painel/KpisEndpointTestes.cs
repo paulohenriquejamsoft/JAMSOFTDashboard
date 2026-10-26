@@ -82,6 +82,26 @@ public sealed class KpisEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Filtro_com_uma_empresa_restringe_os_KPIs_as_vendas_dela()
+    {
+        var tenant = await Dados.NovoTenantAsync(banco, "Cliente KPIs Filial");
+        var c = await VendasSemeadas.SemearAsync(banco, tenant);
+        var token = Acesso.Token(await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, tenant), tenant);
+
+        using var resposta = await GetAsync(
+            $"{Periodo(VendasSemeadas.Inicio, VendasSemeadas.Fim)}&empresas={c.Filial.IdPublico}", token);
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        var kpis = (await Sessao.JsonAsync(resposta)).GetProperty("kpis");
+        // Filial: período 5 (200, 4 itens) e 6 (25,50, 1 item); anterior 9 (60, 1 item). Sem canceladas.
+        AssertIndicador(kpis, "faturamento", 225.50m, 60.00m, 275.83m);
+        AssertIndicador(kpis, "vendas", 2, 1, 100.00m);
+        AssertIndicador(kpis, "ticketMedio", 112.75m, 60.00m, 87.92m);
+        AssertIndicador(kpis, "itensPorVenda", 2.50m, 1.00m, 150.00m);
+        AssertIndicador(kpis, "percentualCanceladas", 0m, 0m, null);
+    }
+
+    [Fact]
     public async Task Sem_datas_usa_o_mes_corrente_ate_hoje()
     {
         var (_, token) = await TenantComVendasAsync();

@@ -139,4 +139,19 @@ public sealed class RankingsEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.All(vendedores, v => Assert.Equal(Math.Round(v.Faturamento / 780m * 100, 2, MidpointRounding.AwayFromZero), v.Participacao));
         Assert.True(vendedores.Sum(v => v.Participacao) <= 100m);
     }
+
+    [Fact]
+    public async Task Filtro_com_uma_empresa_restringe_os_rankings_as_vendas_dela()
+    {
+        var c = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Rankings Filial"));
+
+        var corpo = await RankingsAsync(c, $"inicio=2026-10-11&fim=2026-10-20&empresas={c.Filial.IdPublico}");
+
+        // Filial no período: 5 (Ana, Cliente Y, 200) e 6 (sem vendedor, Cliente Y, 25,50); total 225,50.
+        Assert.Equal(225.50m, corpo.GetProperty("totalFaturamento").GetDecimal());
+        Assert.Equal([new Item("Ana", 200.00m, 1, 88.69m), new Item("Não informado", 25.50m, 1, 11.31m)],
+            Lista(corpo, "vendedores"));
+        Assert.Equal([new Item("Cliente Y", 225.50m, 2, 100.00m)], Lista(corpo, "clientes"));
+        Assert.Equal([new Item("Filial", 225.50m, 2, 100.00m)], Lista(corpo, "empresas"));
+    }
 }

@@ -29,11 +29,12 @@ public sealed class EvolucaoEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
 
     private sealed record Ponto(DateOnly Data, decimal Atual, decimal Anterior);
 
-    private async Task<(string Granularidade, List<Ponto> Pontos)> EvolucaoAsync(ConjuntoVendas c, string inicio, string fim)
+    private async Task<(string Granularidade, List<Ponto> Pontos)> EvolucaoAsync(ConjuntoVendas c, string inicio, string fim,
+        string extra = "")
     {
         var usuario = await Dados.NovoUsuarioAsync(banco, Perfil.Consulta, c.Tenant);
         using var resposta = await _cliente.SendAsync(Acesso.Requisicao(HttpMethod.Get,
-            $"/api/painel/evolucao?inicio={inicio}&fim={fim}", Acesso.Token(usuario, c.Tenant)));
+            $"/api/painel/evolucao?inicio={inicio}&fim={fim}{extra}", Acesso.Token(usuario, c.Tenant)));
         Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
         var corpo = await Sessao.JsonAsync(resposta);
         var pontos = corpo.GetProperty("pontos").EnumerateArray().Select(p => new Ponto(
@@ -106,5 +107,17 @@ public sealed class EvolucaoEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
         Assert.Equal(10, pontos.Count);
         Assert.Equal([0, 0, 0, 0, 60.00m, 0, 0, 0, 0, 40.00m], pontos.Select(p => p.Anterior));
         Assert.Equal([100.00m, 50.00m, 0, 0, 200.00m, 0, 0, 0, 0, 25.50m], pontos.Select(p => p.Atual));
+    }
+
+    [Fact]
+    public async Task Filtro_com_uma_empresa_restringe_as_duas_series_as_vendas_dela()
+    {
+        var c = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Evolução Filial"));
+
+        var (_, pontos) = await EvolucaoAsync(c, "2026-10-11", "2026-10-20", $"&empresas={c.Filial.IdPublico}");
+
+        // Filial: 5 (15/10, 200) e 6 (20/10, 25,50); anterior 9 (05/10, 60) ↔ 15/10.
+        Assert.Equal([0, 0, 0, 0, 200.00m, 0, 0, 0, 0, 25.50m], pontos.Select(p => p.Atual));
+        Assert.Equal([0, 0, 0, 0, 60.00m, 0, 0, 0, 0, 0], pontos.Select(p => p.Anterior));
     }
 }
