@@ -20,6 +20,7 @@ if (ComandosCli.TentarExecutar(args, builder.Configuration)) return;
 builder.Services.AddErrosApi();
 builder.Services.AddDadosPlataforma(builder.Configuration.GetConnectionString("Plataforma"));
 builder.Services.AddAuditoria();
+builder.Services.AddCorsApi();
 builder.Services.AddSegurancaApi();
 builder.Services.AddAutenticacao();
 builder.Services.AddColetores();
@@ -32,6 +33,8 @@ builder.Services.AddPainel();
 var app = builder.Build();
 
 app.UseErrosApi();
+// Antes da autenticação: o preflight (OPTIONS) não leva token e é respondido aqui.
+app.UseCors();
 app.UseSegurancaApi();
 app.UseAutenticacao();
 
