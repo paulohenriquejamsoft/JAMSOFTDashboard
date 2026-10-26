@@ -38,6 +38,9 @@ const DEFINICOES: { id: keyof KpisResposta['kpis']; rotulo: string; formato: For
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
+      /* Verde de texto da variação positiva: 5,13:1 sobre o branco do bloco (12 px pede 4,5:1). O --sucesso do DS
+         (#388e3c) dá 4,11:1 e continua como está nos demais usos. */
+      --kpi-sucesso-texto: #2e7d32;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--espaco-3);
@@ -76,7 +79,7 @@ const DEFINICOES: { id: keyof KpisResposta['kpis']; rotulo: string; formato: For
       color: var(--text-muted);
     }
     .sucesso {
-      color: var(--sucesso);
+      color: var(--kpi-sucesso-texto);
     }
     .perigo {
       color: var(--perigo);

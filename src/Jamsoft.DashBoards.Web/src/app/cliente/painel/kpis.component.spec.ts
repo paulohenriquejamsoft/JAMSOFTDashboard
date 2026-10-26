@@ -48,6 +48,17 @@ describe('KpisComponent', () => {
     expect(texto(variacao.querySelector('.visualmente-oculto'))).toBe('de alta em relação ao período anterior');
   });
 
+  it('variação positiva usa o verde de texto do painel, com contraste ≥ 4,5:1 sobre o branco do bloco (UI-06)', async () => {
+    await criar();
+
+    const verde = getComputedStyle(fixture.nativeElement as HTMLElement).getPropertyValue('--kpi-sucesso-texto').trim();
+    const variacao = kpi('faturamento').querySelector('.variacao')!;
+
+    expect(verde).toBe('#2e7d32');
+    expect(getComputedStyle(variacao).color).toBe('var(--kpi-sucesso-texto)');
+    expect(contraste(verde, '#ffffff')).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('variação negativa tem seta para baixo, texto "-5,00%" e cor de perigo', async () => {
     await criar();
     const variacao = kpi('vendas').querySelector('.variacao')!;
@@ -80,3 +91,16 @@ describe('KpisComponent', () => {
     expect(texto(raiz.querySelector(`#${descricao}`))).toContain('+12,30% de alta em relação ao período anterior');
   });
 });
+
+/** Razão de contraste WCAG 2.x entre duas cores `#rrggbb`. */
+function contraste(a: string, b: string): number {
+  const luminancia = (cor: string) => {
+    const [r, g, bl] = [1, 3, 5].map((i) => {
+      const s = parseInt(cor.slice(i, i + 2), 16) / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [claro, escuro] = [luminancia(a), luminancia(b)].sort((x, y) => y - x);
+  return (claro + 0.05) / (escuro + 0.05);
+}
