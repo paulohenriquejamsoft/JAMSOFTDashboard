@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 5,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::testar cada filtro de consulta no nivel do endpoint com valores esperados que mudam quando o filtro e removido nao so na camada de consulta",
+      "text": "Testar cada filtro de consulta no nivel do endpoint com valores esperados que mudam quando o filtro e removido, nao so na camada de consulta",
+      "signal": "surviving_mutant",
+      "scope": "api-endpoints",
+      "status": "candidate",
+      "features": [
+        "painel-vendas"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md rodada 1 mutante A9 (DASH-04, PainelEndpoints.cs:53) (api-endpoints)"
+      ],
+      "created": "2026-10-26T09:05:54Z",
+      "last_seen": "2026-10-26T09:05:54Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::testar na pagina a ligacao de cada input condicional dos componentes filhos nao so o componente isolado",
+      "text": "Testar na pagina a ligacao de cada input condicional dos componentes filhos, nao so o componente isolado",
+      "signal": "surviving_mutant",
+      "scope": "web-pages",
+      "status": "candidate",
+      "features": [
+        "painel-vendas"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md rodada 1 mutante W5 (RNK-05, painel.page.ts:155) (web-pages)"
+      ],
+      "created": "2026-10-26T09:05:55Z",
+      "last_seen": "2026-10-26T09:05:55Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_precision_gap::fixar na spec a base de cada percentual e o criterio de desempate de cada ordenacao com corte",
+      "text": "Fixar na spec a base de cada percentual e o criterio de desempate de cada ordenacao com corte",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "painel-vendas"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DFE-01 e RNK-04 (validation.md rodada 1 gaps 4 e 5) (spec)"
+      ],
+      "created": "2026-10-26T09:05:55Z",
+      "last_seen": "2026-10-26T09:05:55Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_precision_gap::escrever requisitos de compatibilidade de navegador como os motores e versoes que o e2e executa",
+      "text": "Escrever requisitos de compatibilidade de navegador como os motores e versoes que o e2e executa",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "painel-vendas"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "PWA-06 (validation.md rodada 2 gap 1) (spec)"
+      ],
+      "created": "2026-10-26T09:05:55Z",
+      "last_seen": "2026-10-26T09:05:55Z"
+    }
+  ]
+}

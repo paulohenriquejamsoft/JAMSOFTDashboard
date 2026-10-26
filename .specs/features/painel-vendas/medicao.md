@@ -86,7 +86,7 @@ A decisão fica com o Design. Nada foi alterado no código por esta tarefa.
 | `/conta/login` (build de produção) | CDP `Page.getInstallabilityErrors` + `Page.getAppManifest` (Chromium 156) | — | — | **Sim**: 0 erros de instalação, 0 erros de manifest, service worker controlando a página |
 
 - **Não medido: a nota da categoria "PWA" do Lighthouse.** Ela não existe a partir do Lighthouse 12. O Lighthouse 11.7.1, último com essa categoria, falhou com `PROTOCOL_TIMEOUT` (`Debugger.disable`) no Chrome 155/156, tanto no Chrome instalado quanto no do Playwright. Em lugar dela, a instalabilidade foi medida pelo próprio critério do Chromium, o mesmo que o Lighthouse 11 consultava.
-- **Falha de contraste no painel:** a variação positiva dos KPIs (`.variacao.sucesso`, `--sucesso` = `#388e3c` sobre branco, 12 px) tem contraste de **4,11:1**, abaixo de 4,5:1. É preciso escurecer o token de sucesso usado em texto pequeno, ou criar um `--sucesso-texto`, como já existe `--primary-texto`. Isso fica como correção a decidir, fora desta tarefa.
+- **Falha de contraste no painel:** a variação positiva dos KPIs (`.variacao.sucesso`, `--sucesso` = `#388e3c` sobre branco, 12 px) tem contraste de **4,11:1**, abaixo de 4,5:1. É preciso escurecer o token de sucesso usado em texto pequeno, ou criar um `--sucesso-texto`, como já existe `--primary-texto`. **Corrigido depois** (`bcf8457`): por decisão do usuário, só o texto da variação do KPI passou a usar `#2e7d32` (5,13:1); `--sucesso` do DS não mudou.
 - O Chrome headless desta máquina às vezes não pinta a página (`NO_FCP`). O script tenta até 3 vezes.
 
 ## Revisão visual contra o Design System
@@ -102,9 +102,9 @@ Fonte: screenshots do painel com o conjunto semeado do e2e, em 1440 × 900 e 360
 | Cores dos gráficos: atual em `--primary` e anterior tracejado em `--text-muted` | ✅ |
 | Tabelas de ranking com barra de participação em vermelho do DS | ✅ |
 | Variação "—" quando o anterior é 0 | ✅ |
-| Eixo Y da evolução com separador en-US (`2,500` em vez de `2.500`) | ❌ Divergência: o formatter do eixo não usa pt-BR (a tooltip usa) |
+| Eixo Y da evolução com separador en-US (`2,500` em vez de `2.500`) | ✅ Corrigido em `d430d2a` (formatter pt-BR: `2.500`) |
 | Rosca NF-e × NFC-e em 1440 px | ⚠️ Na captura de 1440 px, o card mostrou só a legenda, sem a rosca. Em 360 px a rosca aparece, mas a captura saiu no meio da animação. Precisa de verificação manual: pode ser só o momento da captura, ou o gráfico com altura 0 quando o card estica na grade |
-| Contraste da variação positiva (`--sucesso`) | ❌ 4,11:1 (ver Lighthouse) |
+| Contraste da variação positiva (`--sucesso`) | ✅ Corrigido em `bcf8457` (`#2e7d32`, 5,13:1, só no painel) |
 | 360 px: sem rolagem horizontal da página | ✅ (e2e T21). Tabelas de ranking rolam dentro do card |
 | 360 px: menu lateral vira bloco no topo, com todos os itens, e empurra o painel para baixo; "Dados atualizados em…" quebra em 4 linhas no header; o valor "R$ 2.500,00" quebra em 2 linhas no KPI | ⚠️ Funcional, mas pede ajuste de layout móvel (menu recolhível, header compacto). Melhoria para decidir |
 
