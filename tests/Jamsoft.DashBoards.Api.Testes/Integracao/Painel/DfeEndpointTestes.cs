@@ -59,6 +59,20 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Participacao_e_por_faturamento_e_nao_por_quantidade_de_vendas()
+    {
+        var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e Base"));
+        await VendasSemeadas.InserirAsync(banco, c,
+            VendasSemeadas.Venda(c.Matriz, 1, VendasSemeadas.Sp(10, 12, 10, 0), 300.00m, tipoDfe: "NF-e"),
+            VendasSemeadas.Venda(c.Matriz, 2, VendasSemeadas.Sp(10, 12, 11, 0), 100.00m, tipoDfe: "NFC-e"));
+
+        var tipos = await DfeAsync(c);
+
+        // Uma venda de cada tipo: por quantidade seria 50/50; por faturamento, 300/400 e 100/400.
+        Assert.Equal([new Tipo("NF-e", 300.00m, 1, 75.00m), new Tipo("NFC-e", 100.00m, 1, 25.00m)], tipos);
+    }
+
+    [Fact]
     public async Task Periodo_so_com_NFCe_traz_NFe_com_zeros()
     {
         var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e só NFC-e"));

@@ -140,10 +140,10 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 
 **Acceptance Criteria**:
 
-1. WHEN o usuário abre o painel THEN a API SHALL retornar, por tipo de DF-e, faturamento, nº de vendas e participação % no período e filtros selecionados. (DFE-01)
+1. WHEN o usuário abre o painel THEN a API SHALL retornar, por tipo de DF-e, faturamento, nº de vendas e participação % por faturamento (faturamento do tipo ÷ faturamento total) no período e filtros selecionados. (DFE-01)
 2. IF um dos tipos não tem vendas no período THEN a API SHALL retorná-lo com valores zero. (DFE-02)
 
-**Independent Test**: 3 NF-e e 7 NFC-e semeadas: participação por quantidade 30%/70%.
+**Independent Test**: 3 NF-e e 7 NFC-e de mesmo valor semeadas: participação por faturamento 30%/70%. 1 NF-e de R$ 300 e 1 NFC-e de R$ 100: participação por faturamento 75%/25% (por quantidade seria 50%/50%).
 
 ---
 
