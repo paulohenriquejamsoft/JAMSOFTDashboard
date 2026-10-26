@@ -623,7 +623,7 @@ namespace Jamsoft.DashBoards.Api.Infraestrutura.Dados.Migrations
 
                             t.HasCheckConstraint("CK_VENDA_SITUACAO", "SITUACAO IN (N'Finalizada',N'Cancelada',N'Inutilizada',N'Contingência')");
 
-                            t.HasCheckConstraint("CK_VENDA_TIPO_DFE", "TIPO_DFE IN ('NF-e','NFC-e')");
+                            t.HasCheckConstraint("CK_VENDA_TIPO_DFE", "TIPO_DFE IN ('NF-e','NFC-e','Pedido')");
 
                             t.HasCheckConstraint("CK_VENDA_VALOR", "VALOR >= 0");
                         });

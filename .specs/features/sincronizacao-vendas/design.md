@@ -235,7 +235,7 @@ OUTPUT $action;
 ```sql
 SELECT TOP (@Tamanho)
     ns.NumNotaSaida                                    AS venda_id,
-    CASE WHEN ns.modelo = 65 THEN 'NFC-e' ELSE 'NF-e' END AS tipo_dfe,
+    CASE WHEN ns.TipoFatura = 2 THEN 'Pedido' WHEN ns.modelo = 65 THEN 'NFC-e' ELSE 'NF-e' END AS tipo_dfe,
     ns.DataHoraFechamento                              AS data_hora,      -- data e hora (painel)
     ns.datafatura                                      AS data_fatura,    -- só data (filtro/checkpoint)
     ns.totnota                                         AS valor,
@@ -255,7 +255,8 @@ SELECT TOP (@Tamanho)
     (SELECT COUNT(*) FROM NotaSaidaProd
       WHERE NotaSaidaProd.numnotasaida = ns.numnotasaida) AS qtd_itens
 FROM c_NotaSaida AS ns
-WHERE ns.situacaonota IN (5, 6, 9, 11, 12)             -- somente estes status
+WHERE ns.TipoFatura < 9                                 -- 2 = Pedido; 9 em diante fica fora
+  AND ns.situacaonota IN (5, 6, 9, 11, 12)             -- somente estes status
   AND ns.TotalCondNeutra = 0                          -- somente vendas sem valor neutro
   AND ns.datafatura >= @Inicio AND ns.datafatura < @Fim
   AND (ns.datafatura > @CursorData
@@ -358,7 +359,7 @@ VENDA (                                          -- IPertenceAoTenant
   UQ (TENANT_ID, COD_EMPRESA, VENDA_ID),
   IX (TENANT_ID, DATA_HORA) INCLUDE (EMPRESA_ID, VALOR, SITUACAO, TIPO_DFE, QTD_ITENS,
                                      VENDEDOR_CODIGO, COD_CLIENTE),            -- painel-vendas
-  CK SITUACAO IN (N'Finalizada',N'Cancelada',N'Inutilizada',N'Contingência'), CK TIPO_DFE IN ('NF-e','NFC-e'),
+  CK SITUACAO IN (N'Finalizada',N'Cancelada',N'Inutilizada',N'Contingência'), CK TIPO_DFE IN ('NF-e','NFC-e','Pedido'),
   CK VALOR >= 0, CK QTD_ITENS >= 0 )
 
 LOTE_INGESTAO (                                  -- IPertenceAoTenant

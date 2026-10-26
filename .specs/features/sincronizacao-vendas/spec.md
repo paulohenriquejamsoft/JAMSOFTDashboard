@@ -67,7 +67,7 @@ Os dados de vendas estão nos bancos dos ERPs, dentro dos servidores dos cliente
 | Campo | Tipo | Regra |
 | ----- | ---- | ----- |
 | `venda_id` | INT | Obrigatório, > 0 |
-| `tipo_dfe` | VARCHAR(20) | `NF-e` ou `NFC-e` |
+| `tipo_dfe` | VARCHAR(20) | `NF-e`, `NFC-e` ou `Pedido` (`TipoFatura = 2` no ERP) |
 | `data_hora` | DATETIMEOFFSET | Obrigatório; vem de `DataHoraFechamento` |
 | `valor` | DECIMAL(19,4) (MONEY no ERP) | ≥ 0 |
 | `cod_cliente` | INT | Opcional |

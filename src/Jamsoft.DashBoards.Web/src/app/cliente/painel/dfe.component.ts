@@ -7,7 +7,7 @@ import { estiloTexto, lerTemaGraficos } from './graficos/tema-graficos';
 import { DfeResposta } from './painel.service';
 
 /**
- * Rosca NF-e × NFC-e (DFE-01) com legenda em HTML: faturamento, nº de vendas e participação de cada tipo. A
+ * Rosca por tipo de documento — NF-e, NFC-e e Pedido (DFE-01) — com legenda em HTML: faturamento, nº de vendas e participação de cada tipo. A
  * legenda traz o nome e os números, então a identidade nunca depende só da cor.
  */
 @Component({
@@ -56,8 +56,8 @@ import { DfeResposta } from './painel.service';
   `,
   template: `
     <div echarts class="grafico" [options]="opcoes()" role="img"
-      aria-label="Gráfico de rosca da divisão do faturamento entre NF-e e NFC-e"></div>
-    <ul aria-label="Legenda NF-e × NFC-e">
+      aria-label="Gráfico de rosca da divisão do faturamento entre NF-e, NFC-e e Pedido"></div>
+    <ul aria-label="Legenda por tipo de documento">
       @for (item of itens(); track item.tipo) {
         <li [attr.data-tipo]="item.tipo">
           <span class="cor" aria-hidden="true" [style.background]="item.cor"></span>
@@ -75,10 +75,10 @@ import { DfeResposta } from './painel.service';
 export class DfeComponent {
   readonly dados = input.required<DfeResposta>();
 
-  /** Tipos na ordem da API, com a cor da fatia (NF-e `--primary`, NFC-e `--secundario`). */
+  /** Tipos na ordem da API, com a cor da fatia (NF-e `--primary`, NFC-e `--secundario`, Pedido `--atencao`). */
   readonly itens = computed(() => {
     const tema = lerTemaGraficos();
-    const cores = [tema.primaria, tema.secundaria];
+    const cores = [tema.primaria, tema.secundaria, tema.terciaria];
     return this.dados().tipos.map((tipo, i) => ({ ...tipo, cor: cores[i % cores.length] }));
   });
 
@@ -89,7 +89,7 @@ export class DfeComponent {
       tooltip: { trigger: 'item', triggerOn: 'mousemove|click' },
       series: [
         {
-          name: 'Faturamento por DF-e',
+          name: 'Faturamento por tipo de documento',
           type: 'pie',
           radius: ['55%', '80%'],
           label: { show: false },

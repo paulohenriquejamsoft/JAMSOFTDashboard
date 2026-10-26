@@ -106,7 +106,8 @@ public sealed class ValidacaoVendaTestes
     [Theory]
     [InlineData("NF-e")]
     [InlineData("NFC-e")]
-    public void Os_dois_tipos_de_DFe_sao_aceitos(string tipo)
+    [InlineData("Pedido")]
+    public void Os_tres_tipos_de_DFe_sao_aceitos(string tipo)
     {
         Assert.Equal(tipo, Assert.Single(ValidacaoVenda.Validar([Valida() with { TipoDfe = tipo }]).Validas).TipoDfe);
     }
@@ -114,10 +115,11 @@ public sealed class ValidacaoVendaTestes
     [Theory]
     [InlineData("NFS-e")]
     [InlineData("nfc-e")]
+    [InlineData("pedido")]
     [InlineData(null)]
     public void TipoDfe_fora_do_dominio_e_rejeitado(string? tipo)
     {
-        Assert.Equal("tipoDfe deve ser NF-e ou NFC-e", UnicaRejeitada(Valida() with { TipoDfe = tipo! }).Motivo);
+        Assert.Equal("tipoDfe deve ser NF-e ou NFC-e ou Pedido", UnicaRejeitada(Valida() with { TipoDfe = tipo! }).Motivo);
     }
 
     [Fact]

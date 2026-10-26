@@ -214,7 +214,7 @@ public static class PainelEndpoints
             .ToList();
 
     /// <summary>
-    /// Faturamento, nº de vendas e participação % (sobre o faturamento) por tipo de DF-e, sempre com NF-e e NFC-e:
+    /// Faturamento, nº de vendas e participação % (sobre o faturamento) por tipo de documento, sempre com NF-e, NFC-e e Pedido:
     /// tipo sem vendas vem com zeros (DFE-01, DFE-02).
     /// </summary>
     public static async Task<IResult> DfeAsync(DateOnly? inicio, DateOnly? fim, Guid[]? empresas,

@@ -14,6 +14,7 @@ public sealed record NotaFalsa(
     TimeSpan? HoraFechamento = null,
     bool SemFechamento = false,
     int Modelo = 65,
+    int TipoFatura = 1,
     decimal TotNota = 10m,
     int? CodCliente = 10,
     string? Fantasia = "Cliente",
@@ -43,6 +44,7 @@ public sealed class ErpFalso
         CREATE TABLE dbo.NotaSaida (
             NumNotaSaida       int IDENTITY(1, 1) NOT NULL PRIMARY KEY,
             modelo             int           NOT NULL,
+            TipoFatura         int           NOT NULL DEFAULT 1,
             datafatura         datetime      NOT NULL,
             DataHoraFechamento datetime      NULL,
             dataentrega        datetime      NULL,
@@ -64,7 +66,7 @@ public sealed class ErpFalso
 
     private const string View = """
         CREATE VIEW dbo.c_NotaSaida AS
-        SELECT NumNotaSaida, modelo, datafatura, DataHoraFechamento, dataentrega, totnota, codcliente, FANTASIA,
+        SELECT NumNotaSaida, modelo, TipoFatura, datafatura, DataHoraFechamento, dataentrega, totnota, codcliente, FANTASIA,
                codvendedor, nomevend, situacaonota, TotalCondNeutra, Empresa, codEmpresa
           FROM dbo.NotaSaida;
         """;
@@ -106,9 +108,9 @@ public sealed class ErpFalso
         await using var conexao = new SqlConnection(ConnectionString);
         var fechamento = nota.SemFechamento ? (DateTime?)null : nota.DataFatura.Date + (nota.HoraFechamento ?? TimeSpan.FromHours(10));
         var numero = await conexao.ExecuteScalarAsync<int>("""
-            INSERT dbo.NotaSaida (modelo, datafatura, DataHoraFechamento, totnota, codcliente, FANTASIA, codvendedor, nomevend,
-                                  situacaonota, TotalCondNeutra, Empresa, codEmpresa)
-            VALUES (@Modelo, @DataFatura, @Fechamento, @TotNota, @CodCliente, @Fantasia, @CodVendedor, @NomeVendedor,
+            INSERT dbo.NotaSaida (modelo, TipoFatura, datafatura, DataHoraFechamento, totnota, codcliente, FANTASIA, codvendedor,
+                                  nomevend, situacaonota, TotalCondNeutra, Empresa, codEmpresa)
+            VALUES (@Modelo, @TipoFatura, @DataFatura, @Fechamento, @TotNota, @CodCliente, @Fantasia, @CodVendedor, @NomeVendedor,
                     @SituacaoNota, @TotalCondNeutra, @Empresa, @CodEmpresa);
             DECLARE @Num int = SCOPE_IDENTITY();
             INSERT dbo.NotaSaidaProd (numnotasaida, codproduto, quantidade)
@@ -117,6 +119,7 @@ public sealed class ErpFalso
             """, new
         {
             nota.Modelo,
+            nota.TipoFatura,
             DataFatura = nota.DataFatura.Date,
             Fechamento = fechamento,
             nota.TotNota,

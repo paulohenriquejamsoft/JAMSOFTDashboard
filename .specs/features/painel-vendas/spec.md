@@ -31,7 +31,7 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Indicadores do MVP | KPIs gerais, evolução temporal, rankings, NF-e × NFC-e | Escolha do usuário | y |
+| Indicadores do MVP | KPIs gerais, evolução temporal, rankings, tipo de documento (NF-e × NFC-e × Pedido) | Escolha do usuário | y |
 | Base do faturamento | Soma de `valor` das vendas **efetivadas**: "Finalizada" + "Contingência" | Confirmado pelo usuário em 2026-10-25: contingência é venda efetivada aguardando autorização; canceladas e inutilizadas não são receita | y |
 | Ticket médio | Faturamento ÷ nº de vendas efetivadas (Finalizada + Contingência); 0 quando não há vendas | Definição usual, coerente com a base do faturamento | n |
 | Itens por venda | Soma de `qtd_itens` ÷ nº de vendas efetivadas (Finalizada + Contingência) | Coerente com ticket médio | n |
@@ -132,18 +132,18 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 
 ---
 
-### P2: NF-e × NFC-e
+### P2: Tipo de documento (NF-e, NFC-e e Pedido)
 
-**User Story**: Como gestor, quero ver a divisão do faturamento entre NF-e e NFC-e, para entender o peso do varejo e do atacado.
+**User Story**: Como gestor, quero ver a divisão do faturamento entre NF-e, NFC-e e Pedido, para entender o peso do varejo, do atacado e dos pedidos.
 
 **Why P2**: Escolhido para o MVP; bloco independente.
 
 **Acceptance Criteria**:
 
-1. WHEN o usuário abre o painel THEN a API SHALL retornar, por tipo de DF-e, faturamento, nº de vendas e participação % por faturamento (faturamento do tipo ÷ faturamento total) no período e filtros selecionados. (DFE-01)
+1. WHEN o usuário abre o painel THEN a API SHALL retornar, por tipo de documento (NF-e, NFC-e e Pedido), faturamento, nº de vendas e participação % por faturamento (faturamento do tipo ÷ faturamento total) no período e filtros selecionados. (DFE-01)
 2. IF um dos tipos não tem vendas no período THEN a API SHALL retorná-lo com valores zero. (DFE-02)
 
-**Independent Test**: 3 NF-e e 7 NFC-e de mesmo valor semeadas: participação por faturamento 30%/70%. 1 NF-e de R$ 300 e 1 NFC-e de R$ 100: participação por faturamento 75%/25% (por quantidade seria 50%/50%).
+**Independent Test**: 3 NF-e, 5 NFC-e e 2 Pedidos de mesmo valor semeados: participação por faturamento 30%/50%/20%. 1 NF-e de R$ 300 e 1 NFC-e de R$ 100: participação por faturamento 75%/25% (por quantidade seria 50%/50%).
 
 ---
 
@@ -224,8 +224,8 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 | RNK-03 | P2: Rankings | Tasks | In Tasks |
 | RNK-04 | P2: Rankings | Tasks | In Tasks |
 | RNK-05 | P2: Rankings | Tasks | In Tasks |
-| DFE-01 | P2: NF-e × NFC-e | Tasks | In Tasks |
-| DFE-02 | P2: NF-e × NFC-e | Tasks | In Tasks |
+| DFE-01 | P2: Tipo de documento (NF-e, NFC-e e Pedido) | Tasks | In Tasks |
+| DFE-02 | P2: Tipo de documento (NF-e, NFC-e e Pedido) | Tasks | In Tasks |
 | PWA-01 | P2: PWA e responsividade | Tasks | In Tasks |
 | PWA-02 | P2: PWA e responsividade | Tasks | In Tasks |
 | PWA-03 | P2: PWA e responsividade | Tasks | In Tasks |

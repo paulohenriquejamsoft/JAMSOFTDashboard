@@ -50,7 +50,7 @@ class Bloco<T> {
 
 /**
  * `/cliente`: painel de vendas do tenant efetivo. Filtro no topo e 4 blocos independentes (KPIs, evolução,
- * rankings, NF-e × NFC-e), cada um com o próprio carregando/erro/"Tentar novamente". Sem vendas no período mostra
+ * rankings, tipo de documento), cada um com o próprio carregando/erro/"Tentar novamente". Sem vendas no período mostra
  * "Nenhuma venda no período"; tenant que nunca sincronizou mostra "Nenhuma venda sincronizada ainda" no lugar dos
  * blocos (DASH-06). SuperAdmin sem tenant vê o seletor e nada é consultado (UI-03).
  */
@@ -159,7 +159,7 @@ class Bloco<T> {
             </section>
 
             <section class="card bloco" data-bloco="dfe" aria-labelledby="bloco-dfe">
-              <div class="card-cabecalho"><h2 id="bloco-dfe">NF-e × NFC-e</h2></div>
+              <div class="card-cabecalho"><h2 id="bloco-dfe">Tipo de documento</h2></div>
               @if (!online()) {
                 <p class="sem-conexao" role="status">{{ mensagemSemConexao }}</p>
               } @else {

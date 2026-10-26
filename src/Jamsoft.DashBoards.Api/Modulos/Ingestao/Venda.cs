@@ -19,7 +19,7 @@ public sealed class Venda : IPertenceAoTenant
     public static readonly IReadOnlyList<string> Situacoes = ["Finalizada", "Cancelada", "Inutilizada", "Contingência"];
 
     /// <summary>Domínio de <see cref="TipoDfe"/> (contrato da venda).</summary>
-    public static readonly IReadOnlyList<string> TiposDfe = ["NF-e", "NFC-e"];
+    public static readonly IReadOnlyList<string> TiposDfe = ["NF-e", "NFC-e", "Pedido"];
 
     public long Id { get; set; }
     public int TenantId { get; set; }

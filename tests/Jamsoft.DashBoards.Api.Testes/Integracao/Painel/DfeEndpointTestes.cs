@@ -41,12 +41,12 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Tres_NFe_e_sete_NFCe_dividem_faturamento_vendas_e_participacao()
+    public async Task Tres_NFe_cinco_NFCe_e_dois_Pedidos_dividem_faturamento_vendas_e_participacao()
     {
         var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e"));
         var vendas = Enumerable.Range(1, 10)
             .Select(i => VendasSemeadas.Venda(i % 2 == 0 ? c.Matriz : c.Filial, i, VendasSemeadas.Sp(10, 12, 10, i), 100.00m,
-                i == 10 ? "Contingência" : "Finalizada", i <= 3 ? "NF-e" : "NFC-e"))
+                i == 10 ? "Contingência" : "Finalizada", i <= 3 ? "NF-e" : i <= 8 ? "NFC-e" : "Pedido"))
             // Cancelada e Inutilizada não entram.
             .Append(VendasSemeadas.Venda(c.Matriz, 11, VendasSemeadas.Sp(10, 13, 10, 0), 500.00m, "Cancelada", "NF-e"))
             .Append(VendasSemeadas.Venda(c.Matriz, 12, VendasSemeadas.Sp(10, 13, 11, 0), 500.00m, "Inutilizada", "NFC-e"))
@@ -55,7 +55,8 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
 
         var tipos = await DfeAsync(c);
 
-        Assert.Equal([new Tipo("NF-e", 300.00m, 3, 30.00m), new Tipo("NFC-e", 700.00m, 7, 70.00m)], tipos);
+        Assert.Equal([new Tipo("NF-e", 300.00m, 3, 30.00m), new Tipo("NFC-e", 500.00m, 5, 50.00m), new Tipo("Pedido", 200.00m, 2, 20.00m)],
+            tipos);
     }
 
     [Fact]
@@ -69,11 +70,11 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
         var tipos = await DfeAsync(c);
 
         // Uma venda de cada tipo: por quantidade seria 50/50; por faturamento, 300/400 e 100/400.
-        Assert.Equal([new Tipo("NF-e", 300.00m, 1, 75.00m), new Tipo("NFC-e", 100.00m, 1, 25.00m)], tipos);
+        Assert.Equal([new Tipo("NF-e", 300.00m, 1, 75.00m), new Tipo("NFC-e", 100.00m, 1, 25.00m), new Tipo("Pedido", 0m, 0, 0m)], tipos);
     }
 
     [Fact]
-    public async Task Periodo_so_com_NFCe_traz_NFe_com_zeros()
+    public async Task Periodo_so_com_NFCe_traz_NFe_e_Pedido_com_zeros()
     {
         var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente DF-e só NFC-e"));
         await VendasSemeadas.InserirAsync(banco, c,
@@ -82,7 +83,7 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
 
         var tipos = await DfeAsync(c);
 
-        Assert.Equal([new Tipo("NF-e", 0m, 0, 0m), new Tipo("NFC-e", 50.00m, 2, 100.00m)], tipos);
+        Assert.Equal([new Tipo("NF-e", 0m, 0, 0m), new Tipo("NFC-e", 50.00m, 2, 100.00m), new Tipo("Pedido", 0m, 0, 0m)], tipos);
     }
 
     [Fact]
@@ -93,6 +94,7 @@ public sealed class DfeEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
         var tipos = await DfeAsync(c, $"&empresas={c.Filial.IdPublico}");
 
         // Filial no período: 5 (NF-e, 200) e 6 (NFC-e, 25,50); total 225,50.
-        Assert.Equal([new Tipo("NF-e", 200.00m, 1, 88.69m), new Tipo("NFC-e", 25.50m, 1, 11.31m)], tipos);
+        Assert.Equal([new Tipo("NF-e", 200.00m, 1, 88.69m), new Tipo("NFC-e", 25.50m, 1, 11.31m), new Tipo("Pedido", 0m, 0, 0m)],
+            tipos);
     }
 }

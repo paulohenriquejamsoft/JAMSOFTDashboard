@@ -71,6 +71,19 @@ public sealed class ExtratorVendasTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Tipo_vem_de_TipoFatura_e_modelo_e_TipoFatura_9_ou_mais_fica_fora()
+    {
+        var nfce = await _erp.InserirAsync(new NotaFalsa(Dia, Modelo: 65));
+        var nfe = await _erp.InserirAsync(new NotaFalsa(Dia, Modelo: 55));
+        var pedido = await _erp.InserirAsync(new NotaFalsa(Dia, Modelo: 65, TipoFatura: 2));
+        await _erp.InserirAsync(new NotaFalsa(Dia, TipoFatura: 9));
+
+        var vendas = await LerTudoDoDiaAsync();
+
+        Assert.Equal([(nfce, "NFC-e"), (nfe, "NF-e"), (pedido, "Pedido")], vendas.Select(v => (v.VendaId, v.TipoDfe)));
+    }
+
+    [Fact]
     public async Task DataHoraFechamento_nula_usa_a_datafatura_as_00h00_e_sinaliza_o_aviso()
     {
         await _erp.InserirAsync(new NotaFalsa(Dia, SemFechamento: true));

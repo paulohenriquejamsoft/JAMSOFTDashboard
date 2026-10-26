@@ -9,8 +9,10 @@ export interface TemaGraficos {
   textoSuave: string;
   /** `--text-secondary`: textos dos eixos e da legenda. */
   textoSecundario: string;
-  /** `--secundario`: 2ª categoria (rosca NF-e × NFC-e). */
+  /** `--secundario`: 2ª categoria (rosca por tipo de documento). */
   secundaria: string;
+  /** `--atencao`: 3ª categoria (rosca por tipo de documento). */
+  terciaria: string;
   /** `--borda-suave`: linhas de grade. */
   grade: string;
   /** `--surface-bg`: fundo do card, usado no espaço entre fatias. */
@@ -30,6 +32,7 @@ export function lerTemaGraficos(raiz: Element = document.documentElement): TemaG
     textoSuave: token('--text-muted'),
     textoSecundario: token('--text-secondary'),
     secundaria: token('--secundario'),
+    terciaria: token('--atencao'),
     grade: token('--borda-suave'),
     superficie: token('--surface-bg'),
     fonte: token('--font'),

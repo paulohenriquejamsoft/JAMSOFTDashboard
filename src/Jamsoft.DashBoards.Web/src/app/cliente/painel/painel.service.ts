@@ -64,7 +64,7 @@ export interface RankingsResposta {
 }
 
 export interface ItemDfe {
-  tipo: 'NF-e' | 'NFC-e';
+  tipo: 'NF-e' | 'NFC-e' | 'Pedido';
   faturamento: number;
   vendas: number;
   participacao: number;

@@ -10,8 +10,9 @@ interface Opcoes {
 
 const DADOS: DfeResposta = {
   tipos: [
-    { tipo: 'NF-e', faturamento: 1234.56, vendas: 3, participacao: 30.25 },
-    { tipo: 'NFC-e', faturamento: 2846.7, vendas: 7, participacao: 69.75 },
+    { tipo: 'NF-e', faturamento: 1234.56, vendas: 3, participacao: 24.3 },
+    { tipo: 'NFC-e', faturamento: 2846.7, vendas: 7, participacao: 56.02 },
+    { tipo: 'Pedido', faturamento: 1000, vendas: 1, participacao: 19.68 },
   ],
 };
 
@@ -32,7 +33,7 @@ describe('DfeComponent', () => {
   const legenda = (tipo: string) =>
     (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(`li[data-tipo="${tipo}"]`)!;
 
-  it('gera uma série de pizza com NF-e e NFC-e e os valores da resposta', async () => {
+  it('gera uma série de pizza com NF-e, NFC-e e Pedido e os valores da resposta', async () => {
     const opcoes = await criar(DADOS);
 
     expect(opcoes.series).toHaveLength(1);
@@ -40,14 +41,16 @@ describe('DfeComponent', () => {
     expect(opcoes.series[0].data.map(({ name, value }) => ({ name, value }))).toEqual([
       { name: 'NF-e', value: 1234.56 },
       { name: 'NFC-e', value: 2846.7 },
+      { name: 'Pedido', value: 1000 },
     ]);
   });
 
   it('legenda mostra faturamento, vendas e participação formatados', async () => {
     await criar(DADOS);
 
-    expect(texto(legenda('NF-e'))).toBe('NF-e R$ 1.234,56 · 3 vendas · 30,25%');
-    expect(texto(legenda('NFC-e'))).toBe('NFC-e R$ 2.846,70 · 7 vendas · 69,75%');
+    expect(texto(legenda('NF-e'))).toBe('NF-e R$ 1.234,56 · 3 vendas · 24,30%');
+    expect(texto(legenda('NFC-e'))).toBe('NFC-e R$ 2.846,70 · 7 vendas · 56,02%');
+    expect(texto(legenda('Pedido'))).toBe('Pedido R$ 1.000,00 · 1 venda · 19,68%');
   });
 
   it('tipo sem vendas aparece na legenda com "R$ 0,00"', async () => {
@@ -55,9 +58,11 @@ describe('DfeComponent', () => {
       tipos: [
         { tipo: 'NF-e', faturamento: 0, vendas: 0, participacao: 0 },
         { tipo: 'NFC-e', faturamento: 500, vendas: 2, participacao: 100 },
+        { tipo: 'Pedido', faturamento: 0, vendas: 0, participacao: 0 },
       ],
     });
 
     expect(texto(legenda('NF-e'))).toBe('NF-e R$ 0,00 · 0 vendas · 0,00%');
+    expect(texto(legenda('Pedido'))).toBe('Pedido R$ 0,00 · 0 vendas · 0,00%');
   });
 });
