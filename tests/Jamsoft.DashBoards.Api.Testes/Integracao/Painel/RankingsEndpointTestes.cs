@@ -115,6 +115,30 @@ public sealed class RankingsEndpointTestes(BancoDeTestes banco) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Empate_no_corte_do_top_10_entra_o_de_menor_codigo()
+    {
+        var c = await VendasSemeadas.PrepararAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Rankings Corte"));
+        // Vendedores 1..9 com 200, 190, ..., 120; 10º e 11º empatados em 50: código 20 "Zeca" e código 21 "Aaron".
+        var vendas = Enumerable.Range(1, 9)
+            .Select(k => VendasSemeadas.Venda(c.Matriz, k, VendasSemeadas.Sp(10, 12, 10, 0), 210m - 10m * k,
+                vendedorCodigo: k, vendedorNome: $"Vendedor {k}"))
+            .Append(VendasSemeadas.Venda(c.Matriz, 20, VendasSemeadas.Sp(10, 12, 11, 0), 50.00m, vendedorCodigo: 21,
+                vendedorNome: "Aaron"))
+            .Append(VendasSemeadas.Venda(c.Matriz, 21, VendasSemeadas.Sp(10, 12, 12, 0), 50.00m, vendedorCodigo: 20,
+                vendedorNome: "Zeca"))
+            .ToArray();
+        await VendasSemeadas.InserirAsync(banco, c, vendas);
+
+        var vendedores = Lista(await RankingsAsync(c), "vendedores");
+
+        // Pelo nome, "Aaron" entraria; pelo código (crescente), entra o 20, "Zeca".
+        Assert.Equal(10, vendedores.Count);
+        // Total 1540 (200 + ... + 120 = 1440, mais 50 + 50): 50 / 1540 × 100 = 3,2467 → 3,25.
+        Assert.Equal(new Item("Zeca", 50.00m, 1, 3.25m), vendedores[^1]);
+        Assert.DoesNotContain(vendedores, v => v.Nome == "Aaron");
+    }
+
+    [Fact]
     public async Task Empresa_renomeada_a_mao_aparece_com_o_nome_manual()
     {
         var c = await VendasSemeadas.SemearAsync(banco, await Dados.NovoTenantAsync(banco, "Cliente Rankings Renomeada"));

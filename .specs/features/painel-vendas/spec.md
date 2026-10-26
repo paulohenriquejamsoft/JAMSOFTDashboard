@@ -125,7 +125,7 @@ Os clientes da JAMSOFT não têm uma visão consolidada e acessível das própri
 1. WHEN o usuário abre os rankings THEN a API SHALL retornar o top 10 de vendedores, de clientes e de empresas por faturamento no período e filtros selecionados. (RNK-01)
 2. The cada item do ranking SHALL conter nome, faturamento, nº de vendas e participação % no faturamento total do período. (RNK-02)
 3. WHEN vendas não têm vendedor ou cliente informado THEN a API SHALL agrupá-las num item "Não informado". (RNK-03)
-4. WHEN dois itens têm o mesmo faturamento THEN a API SHALL ordená-los por nome em ordem alfabética. (RNK-04)
+4. WHEN dois itens têm o mesmo faturamento THEN a API SHALL ordená-los por nome em ordem alfabética. No corte do top 10, empate no valor é desempatado pelo código, crescente: o de menor código entra. (RNK-04)
 5. WHERE o tenant tem uma única empresa o frontend SHALL ocultar o ranking de empresas. (RNK-05)
 
 **Independent Test**: Dados semeados com 12 vendedores: ranking retorna 10, ordenados, com participação somando ≤ 100%.
