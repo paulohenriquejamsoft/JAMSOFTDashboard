@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService, Perfil } from '../../core/auth/auth.service';
 import { EstadoAviso } from '../../core/auth/perfil.guard';
@@ -34,8 +34,9 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
   imports: [RouterOutlet, RouterLink, RouterLinkActive, SeletorTenantComponent, StatusDadosComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './shell.component.scss',
+  host: { '[class.menu-fechado]': '!menuAberto()' },
   template: `
-    <nav class="menu" aria-label="Menu principal">
+    <nav id="menu-principal" class="menu" aria-label="Menu principal">
       <div class="menu-topo">
         <img src="marca/logo-branca.png" alt="JAMSOFT Sistemas" />
       </div>
@@ -56,6 +57,16 @@ export const ROTULO_PERFIL: Record<Perfil, string> = {
 
     <div class="area">
       <header class="cabecalho">
+        <button
+          type="button"
+          class="alternar-menu"
+          aria-controls="menu-principal"
+          [attr.aria-expanded]="menuAberto()"
+          [attr.aria-label]="menuAberto() ? 'Fechar menu' : 'Abrir menu'"
+          (click)="alternarMenu()"
+        >
+          <span aria-hidden="true"></span>
+        </button>
         <!-- Só aparece para o SuperAdmin (CTX-01). -->
         <app-seletor-tenant />
         <app-status-dados />
@@ -91,6 +102,7 @@ export class ShellComponent {
   readonly conexao = inject(ConexaoService);
 
   readonly usuario = this.auth.usuario;
+  readonly menuAberto = signal(true);
   readonly rotuloPerfil = computed(() => {
     const perfil = this.usuario()?.perfil;
     return perfil ? ROTULO_PERFIL[perfil] : '';
@@ -133,6 +145,10 @@ export class ShellComponent {
     if (perfil === 'Admin') return [{ titulo: 'Principal', itens: [painel, ...gestao] }, conta];
     return [{ titulo: 'Principal', itens: [painel] }, conta];
   });
+
+  alternarMenu(): void {
+    this.menuAberto.update((aberto) => !aberto);
+  }
 
   sair(): void {
     this.auth.logout().subscribe({ complete: () => void this.router.navigateByUrl('/conta/login') });

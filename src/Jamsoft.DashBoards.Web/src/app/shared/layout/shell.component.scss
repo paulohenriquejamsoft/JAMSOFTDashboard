@@ -72,6 +72,10 @@
   }
 }
 
+:host(.menu-fechado) .menu {
+  display: none;
+}
+
 .area {
   flex: 1;
   min-width: 0;
@@ -90,6 +94,60 @@
   align-items: center;
   gap: var(--espaco-3);
   padding: 0 var(--espaco-5);
+}
+
+// Botão "hambúrguer": três barras desenhadas com o span e seus pseudo-elementos.
+.alternar-menu {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--raio-nav);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--borda-header);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-texto);
+    outline-offset: 1px;
+  }
+
+  span,
+  span::before,
+  span::after {
+    display: block;
+    width: 16px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+  }
+
+  span {
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+
+    &::before {
+      top: -5px;
+    }
+
+    &::after {
+      top: 5px;
+    }
+  }
 }
 
 .usuario {

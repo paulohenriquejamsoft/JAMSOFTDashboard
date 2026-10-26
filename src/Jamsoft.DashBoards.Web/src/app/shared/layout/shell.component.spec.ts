@@ -115,6 +115,27 @@ describe('ShellComponent', () => {
     const alerta = fixture.nativeElement.querySelector('main .alerta') as HTMLElement;
     expect(alerta.textContent!.trim()).toBe('Acesso não permitido');
   });
+  it('o botão do cabeçalho fecha e reabre o menu lateral', async () => {
+    await criar('Admin');
+    const el = fixture.nativeElement as HTMLElement;
+    const botao = el.querySelector('button.alternar-menu') as HTMLButtonElement;
+    const menu = el.querySelector('nav[aria-label="Menu principal"]') as HTMLElement;
+    expect(botao.getAttribute('aria-expanded')).toBe('true');
+
+    botao.click();
+    await fixture.whenStable();
+    expect(el.classList).toContain('menu-fechado');
+    expect(getComputedStyle(menu).display).toBe('none');
+    expect(botao.getAttribute('aria-expanded')).toBe('false');
+    expect(botao.getAttribute('aria-label')).toBe('Abrir menu');
+
+    botao.click();
+    await fixture.whenStable();
+    expect(el.classList).not.toContain('menu-fechado');
+    expect(getComputedStyle(menu).display).not.toBe('none');
+    expect(botao.getAttribute('aria-expanded')).toBe('true');
+  });
+
   it('sem conexão mostra a faixa "Sem conexão"; com a conexão de volta, a faixa some (PWA-03)', async () => {
     await criar('Admin');
     const faixa = () => (fixture.nativeElement as HTMLElement).querySelector('.faixa-conexao');

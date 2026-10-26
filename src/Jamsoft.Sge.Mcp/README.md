@@ -17,7 +17,8 @@ Claude / painel ──HTTPS──▶ /mcp  (X-Api-Key: sge_xxx)
 ```
 src/Jamsoft.Sge.Mcp/
   Program.cs                                configuração do host, autenticação e endpoint /mcp
-  appsettings.json                          opções (a connection string fica fora do código)
+  appsettings.json                          opções e connection string de produção
+  appsettings.Development.json              connection string de desenvolvimento
   Configuracao/McpOptions.cs                opções da seção "Mcp"
   Seguranca/RepositorioChaves.cs            valida a chave em CHAVE_MCP (com cache)
   Seguranca/ApiKeyAuthenticationHandler.cs  autenticação ASP.NET Core por api-key
