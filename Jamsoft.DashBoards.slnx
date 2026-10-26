@@ -4,6 +4,7 @@
     <Project Path="src/Jamsoft.DashBoards.Coletor.Nucleo/Jamsoft.DashBoards.Coletor.Nucleo.csproj" />
     <Project Path="src/Jamsoft.DashBoards.Coletor/Jamsoft.DashBoards.Coletor.csproj" />
     <Project Path="src/Jamsoft.DashBoards.Contratos/Jamsoft.DashBoards.Contratos.csproj" />
+    <Project Path="src/Jamsoft.Sge.Mcp/Jamsoft.Sge.Mcp.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Jamsoft.DashBoards.Api.Testes/Jamsoft.DashBoards.Api.Testes.csproj" />
